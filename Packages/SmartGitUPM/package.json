@@ -1,0 +1,28 @@
+{
+  "name": "com.ishix.smartgitupm",
+  "version": "1.0.0",
+  "displayName": "Smart Git UPM",
+  "description": "Plugin for smart management of packages in a Git repository.",
+  "unity": "2021.3",
+  "author": {
+    "name": "IShix",
+    "url": "https://github.com/IShix-g"
+  },
+  "keywords": [
+    "Unity",
+    "Git",
+    "UPM",
+    "Management",
+    "Packages",
+    "Tool"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IShix-g/SmartGitUPM.git"
+  },
+  "url": "https://github.com/IShix-g/SmartGitUPM",
+  "documentationUrl": "https://github.com/IShix-g/SmartGitUPM",
+  "licensesUrl": "https://github.com/IShix-g/SmartGitUPM/blob/master/LICENSE",
+  "samples": []
+}
