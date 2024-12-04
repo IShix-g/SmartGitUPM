@@ -4,7 +4,7 @@
 Unity Editorで、Gitリポジトリ内のパッケージを効率的に管理するためのプラグイン。
 
 > [!IMPORTANT]
-> DISCLAIMER: SmartGitUPM is an open-source service, not an official service provided by Unity Technologies Inc.
+> 免責事項：SmartGitUPMはオープンソースのサービスであり、Unity Technologies Inc.が提供する公式のサービスではありません。
 
 ![Header](Docs/header.png)
 
