@@ -1,6 +1,5 @@
 
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,14 +67,7 @@ namespace SmartGitUPM.Editor
                     message += "Install url: " + packageInstallUrl + "\npackage.json url: " + gitPackageJsonUrl;
                 }
 
-                if (ex.GetType() == typeof(HttpRequestException))
-                {
-                    throw new HttpRequestException(message, ex);
-                }
-                else
-                {
-                    throw new Exception(message, ex);
-                }
+                throw new PackageInstallException(message, ex);
             }
             finally
             {
@@ -110,7 +102,7 @@ namespace SmartGitUPM.Editor
         public static string ToRawPackageJsonURL(string packageInstallUrl, string branch)
         {
             var rootUrl = ToRawPackageRootURL(packageInstallUrl, branch);
-            return Path.Combine(rootUrl, PackageJsonFileName);
+            return rootUrl + "/" + PackageJsonFileName;
         }
         
         public static string ToRawPackageRootURL(string packageInstallUrl, string branch)
@@ -132,7 +124,7 @@ namespace SmartGitUPM.Editor
             var path = ExtractPathFromQuery(query);
             var resultUrl = packageInstallUrl.Contains("github.com") ? GitHubRawUrl + pathWithoutFileName : uri.GetLeftPart(UriPartial.Authority) + pathWithoutFileName;
             var raw = packageInstallUrl.Contains("github.com") ? $"refs/heads/{branch}" : $"raw/{branch}";
-            return $"{resultUrl}/{raw}/{path}/";
+            return $"{resultUrl}/{raw}/{path}";
         }
 
         static string ExtractPathFromQuery(string query)

@@ -8,6 +8,12 @@ namespace Editor
 {
     public class TestWindow
     {
+        [MenuItem("Tests/Create Path")]
+        public static void CreatePath()
+        {
+            AssetDatabaseSupport.CreateDirectories("Assets/Test/Test2");
+        }
+        
         [MenuItem("Tests/Install Package")]
         public static void InstallPackage()
         {
@@ -71,6 +77,16 @@ namespace Editor
                     isClickedYes => Debug.Log("Closed. Clicked Yes: " + isClickedYes)
                 );
             CustomDialog.Open(contents, "Notice");
+        }
+
+        [MenuItem("Tests/Print Package Cache")]
+        static void PrintPackageCache()
+        {
+            PackageCacheManager.Initialize();
+            if (PackageCacheManager.HasCache())
+            {
+                Debug.Log(PackageCacheManager.Infos.Packages.Select(x => "- " + x.DisplayName + " (" + x.Name + ")").Aggregate((a,b) => a + "\n" + b));
+            }
         }
     }
 }

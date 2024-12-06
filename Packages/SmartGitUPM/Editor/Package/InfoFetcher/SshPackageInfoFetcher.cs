@@ -2,10 +2,10 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
@@ -31,16 +31,19 @@ namespace SmartGitUPM.Editor
                 throw new ArgumentException("Specify the URL of " + SupportProtocol + ". packageInstallUrl: " + packageInstallUrl, nameof(packageInstallUrl));
             }
             
+            PackageCacheManager.Initialize();
+            
             var (absolutePath, query) = ParsePath(packageInstallUrl);
-            var rootPath = Path.Combine(Application.dataPath + "/../", PackageCachePath);
-            var tempPath = Path.Combine(rootPath, ".tmp_" + CreateUniqID());
+            var rootPath = Application.dataPath + "/../" + PackageCachePath;
+            var tempPath = rootPath + "/.tmp_" + CreateUniqID();
             var command = "git";
             var arguments = default(string);
             var packagePath = ExtractPathFromQuery(query);
             var packageJsonPath = !string.IsNullOrEmpty(packagePath)
-                ? Path.Combine(ExtractPathFromQuery(query), HttpPackageInfoFetcher.PackageJsonFileName)
+                ? ExtractPathFromQuery(query) + "/" + HttpPackageInfoFetcher.PackageJsonFileName
                 : HttpPackageInfoFetcher.PackageJsonFileName;
             var localInfo = default(PackageLocalInfo);
+            var isCachePackage = false;
             var localPackagePath = default(string);
             var absoluteLocalPackageJsonPath = default(string);
             
@@ -50,14 +53,14 @@ namespace SmartGitUPM.Editor
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
                 var info = await _installer.GetInfoByPackageId(packageInstallUrl, _tokenSource.Token);
-                localInfo = info != default
-                    ? new PackageLocalInfo
-                    {
-                        name = info.name,
-                        version = info.version,
-                        displayName = info.displayName
-                    }
-                    : default;
+                localInfo = info != default ? ToLocalInfo(info) : default;
+
+                if (localInfo == default
+                    && PackageCacheManager.TryGetByInstallUrl(packageInstallUrl, out var cache))
+                {
+                    localInfo = ToLocalInfo(cache);
+                    isCachePackage = true;
+                }
             }
             finally
             {
@@ -66,8 +69,8 @@ namespace SmartGitUPM.Editor
 
             if (localInfo != default)
             {
-                localPackagePath = Path.Combine(rootPath, localInfo.name);
-                absoluteLocalPackageJsonPath = Path.Combine(localPackagePath, packageJsonPath);
+                localPackagePath = rootPath + "/" + localInfo.name;
+                absoluteLocalPackageJsonPath = localPackagePath + "/" + packageJsonPath;
                 if (!File.Exists(absoluteLocalPackageJsonPath))
                 {
                     absoluteLocalPackageJsonPath = default;
@@ -81,7 +84,7 @@ namespace SmartGitUPM.Editor
                 var serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
                 if (serverInfo != default)
                 {
-                    return new PackageInfoDetails(localInfo, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
             }
             
@@ -119,9 +122,15 @@ namespace SmartGitUPM.Editor
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
+                    // var error = await process.StandardError.ReadToEndAsync();
                     process.WaitForExit();
                     await WaitForProcessExitAsync(process);
-
+                    
+                    // if (!string.IsNullOrEmpty(error))
+                    // {
+                    //     UnityEngine.Debug.LogWarning(error);
+                    // }
+                    
                     var serverInfo = default(PackageServerInfo);
                     if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
                     {
@@ -130,39 +139,46 @@ namespace SmartGitUPM.Editor
                         
                         if (serverInfo == default)
                         {
-                            throw new InvalidOperationException("Failed to parse the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to parse the package.json.");
                         }
                     }
                     else
                     {
-                        var absolutePackageJsonPath = Path.Combine(tempPath, packageJsonPath);
-                        
+                        var absolutePackageJsonPath = tempPath + "/" + packageJsonPath;
                         if (!File.Exists(absolutePackageJsonPath))
                         {
-                            throw new InvalidOperationException("Failed to find the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to find the package.json.");
                         }
-
+                        
                         var jsonString = await File.ReadAllTextAsync(absolutePackageJsonPath, token);
                         serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
                         
                         if (serverInfo == default)
                         {
-                            throw new InvalidOperationException("Failed to parse the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to parse the package.json.");
                         }
-
-                        localPackagePath = Path.Combine(rootPath, serverInfo.name);
+                        
+                        localPackagePath = rootPath + "/" + serverInfo.name;
                         if (Directory.Exists(localPackagePath))
                         {
                             Directory.Delete(localPackagePath, true);
                         }
                         Directory.Move(tempPath, localPackagePath);
+                        
+                        var cache = new PackageCacheInfo(
+                            packageInstallUrl,
+                            serverInfo.name,
+                            serverInfo.displayName,
+                            serverInfo.version);
+                        PackageCacheManager.Add(cache);
+                        PackageCacheManager.Save();
                     }
                     
-                    return new PackageInfoDetails(localInfo, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
                 else
                 {
-                    throw new InvalidOperationException("Failed to start the process. packageInstallUrl: " + packageInstallUrl);
+                    throw new InvalidOperationException("Failed to start the process.");
                 }
             }
             catch (Exception ex)
@@ -179,20 +195,29 @@ namespace SmartGitUPM.Editor
                 }
                 message += "Install url: " + packageInstallUrl;
                 
-                if (ex.GetType() == typeof(HttpRequestException))
-                {
-                    throw new HttpRequestException(message, ex);
-                }
-                else
-                {
-                    throw new Exception(message, ex);
-                }
+                throw new Exception(message, ex);
             }
             finally
             {
                 IsProcessing = false;
             }
         }
+        
+        static PackageLocalInfo ToLocalInfo(PackageInfo info)
+            => new PackageLocalInfo
+            {
+                name = info.name,
+                version = info.version,
+                displayName = info.displayName
+            };
+        
+        static PackageLocalInfo ToLocalInfo(PackageCacheInfo info)
+            => new PackageLocalInfo
+            {
+                name = info.Name,
+                version = info.Version,
+                displayName = info.DisplayName
+            };
         
         static Task WaitForProcessExitAsync(Process process)
         {
