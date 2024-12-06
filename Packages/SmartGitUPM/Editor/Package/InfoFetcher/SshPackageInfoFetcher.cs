@@ -43,6 +43,7 @@ namespace SmartGitUPM.Editor
                 ? ExtractPathFromQuery(query) + "/" + HttpPackageInfoFetcher.PackageJsonFileName
                 : HttpPackageInfoFetcher.PackageJsonFileName;
             var localInfo = default(PackageLocalInfo);
+            var isCachePackage = false;
             var localPackagePath = default(string);
             var absoluteLocalPackageJsonPath = default(string);
             
@@ -58,6 +59,7 @@ namespace SmartGitUPM.Editor
                     && PackageCacheManager.TryGetByInstallUrl(packageInstallUrl, out var cache))
                 {
                     localInfo = ToLocalInfo(cache);
+                    isCachePackage = true;
                 }
             }
             finally
@@ -82,7 +84,7 @@ namespace SmartGitUPM.Editor
                 var serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
                 if (serverInfo != default)
                 {
-                    return new PackageInfoDetails(localInfo, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
             }
             
@@ -172,7 +174,7 @@ namespace SmartGitUPM.Editor
                         PackageCacheManager.Save();
                     }
                     
-                    return new PackageInfoDetails(localInfo, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
                 else
                 {
