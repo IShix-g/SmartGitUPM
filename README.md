@@ -3,7 +3,7 @@
 [README - 日本語版](README_jp.md)
 
 > [!IMPORTANT]
-> DISCLAIMER: SmartGitUPM is an open-source service, not an official service provided by Unity Technologies Inc.~~~~
+> DISCLAIMER: SmartGitUPM is an open-source service, not an official service provided by Unity Technologies Inc.
 
 # SmartGitUPM
 A plugin for managing packages within Git repositories efficiently in Unity Editor.
