@@ -19,13 +19,18 @@ namespace SmartGitUPM.Editor
                 FirstInit();
                 IsFirstInit = true;
             }
+
+            OnProjectLoadedInEditor();
         }
-        
+
         static void FirstInit()
         {
             var updater = new PackageUpdateChecker();
             updater.CheckUpdate()
                 .Handled(_ => updater.Dispose());
         }
+        
+        static void OnProjectLoadedInEditor()
+            => PackageCacheManager.Initialize();
     }
 }

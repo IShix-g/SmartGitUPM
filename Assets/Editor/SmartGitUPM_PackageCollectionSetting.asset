@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d87f975618484b2086366b9fb7391f96, type: 3}
   m_Name: SmartGitUPM_PackageCollectionSetting
   m_EditorClassIdentifier: 
-  _packages: []
+  _packages:
+  - UpdateNotify: 0
+    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
+    Branch: main

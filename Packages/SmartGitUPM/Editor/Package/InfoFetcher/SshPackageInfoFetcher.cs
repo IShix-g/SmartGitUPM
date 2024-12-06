@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
@@ -30,6 +31,8 @@ namespace SmartGitUPM.Editor
                 throw new ArgumentException("Specify the URL of " + SupportProtocol + ". packageInstallUrl: " + packageInstallUrl, nameof(packageInstallUrl));
             }
             
+            PackageCacheManager.Initialize();
+            
             var (absolutePath, query) = ParsePath(packageInstallUrl);
             var rootPath = Application.dataPath + "/../" + PackageCachePath;
             var tempPath = rootPath + "/.tmp_" + CreateUniqID();
@@ -49,14 +52,13 @@ namespace SmartGitUPM.Editor
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
                 var info = await _installer.GetInfoByPackageId(packageInstallUrl, _tokenSource.Token);
-                localInfo = info != default
-                    ? new PackageLocalInfo
-                    {
-                        name = info.name,
-                        version = info.version,
-                        displayName = info.displayName
-                    }
-                    : default;
+                localInfo = info != default ? ToLocalInfo(info) : default;
+
+                if (localInfo == default
+                    && PackageCacheManager.TryGetByInstallUrl(packageInstallUrl, out var cache))
+                {
+                    localInfo = ToLocalInfo(cache);
+                }
             }
             finally
             {
@@ -118,10 +120,14 @@ namespace SmartGitUPM.Editor
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
-                    // string error = process.StandardError.ReadToEnd();
+                    // var error = await process.StandardError.ReadToEndAsync();
                     process.WaitForExit();
                     await WaitForProcessExitAsync(process);
-                    // Debug.LogError(error);
+                    
+                    // if (!string.IsNullOrEmpty(error))
+                    // {
+                    //     UnityEngine.Debug.LogWarning(error);
+                    // }
                     
                     var serverInfo = default(PackageServerInfo);
                     if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
@@ -156,6 +162,14 @@ namespace SmartGitUPM.Editor
                             Directory.Delete(localPackagePath, true);
                         }
                         Directory.Move(tempPath, localPackagePath);
+                        
+                        var cache = new PackageCacheInfo(
+                            packageInstallUrl,
+                            serverInfo.name,
+                            serverInfo.displayName,
+                            serverInfo.version);
+                        PackageCacheManager.Add(cache);
+                        PackageCacheManager.Save();
                     }
                     
                     return new PackageInfoDetails(localInfo, serverInfo, packageInstallUrl);
@@ -186,6 +200,22 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
+        
+        static PackageLocalInfo ToLocalInfo(PackageInfo info)
+            => new PackageLocalInfo
+            {
+                name = info.name,
+                version = info.version,
+                displayName = info.displayName
+            };
+        
+        static PackageLocalInfo ToLocalInfo(PackageCacheInfo info)
+            => new PackageLocalInfo
+            {
+                name = info.Name,
+                version = info.Version,
+                displayName = info.DisplayName
+            };
         
         static Task WaitForProcessExitAsync(Process process)
         {
