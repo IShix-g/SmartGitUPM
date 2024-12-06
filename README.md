@@ -2,11 +2,11 @@
 
 [README - 日本語版](README_jp.md)
 
+> [!IMPORTANT]
+> DISCLAIMER: SmartGitUPM is an open-source service, not an official service provided by Unity Technologies Inc.~~~~
+
 # SmartGitUPM
 A plugin for managing packages within Git repositories efficiently in Unity Editor.
-
-> [!IMPORTANT]
-> DISCLAIMER: SmartGitUPM is an open-source service, not an official service provided by Unity Technologies Inc.
 
 ![Header](Docs/header.png)
 
@@ -25,9 +25,8 @@ Supports packages in private repositories (SSL connection). You can check update
 ![Update](Docs/private_repo.jpg)
 
 - Configure SSL and set the SSL URL, for example, `git@github.com:IShix-g/SmartGitUPM.git`
-- Large private repositories may take time to display and are not recommended for use.
+- Large private repositories take longer to display the first time.
 - The size of a public repository does not affect display speed.
-- Installing from a private repository uses the Unity Package Manager (UPM) feature.
 
 ## Update Notifications
 
@@ -70,7 +69,7 @@ Click on the gear button or the settings button, which is only shown when not co
 | Field           | Description                                   | Example                                                                                                                                                                         |
 |-----------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Update Notify   | Receive update notifications when the Unity Editor starts? | [Checked] Receive updates                                                                                                                                                      |
-| Install Url     | URL for package installation (https or SSL)   | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/ |
+| Install Url     | URL for package installation (https or SSL)   | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
 | Branch          | Specify the main branch                       | e.g., main or master                                                                                                                                                            |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
@@ -107,7 +106,7 @@ After configuration, click the reload button to complete the setup. Next time, t
 
 ## Role Sharing with UPM
 
-SmartGitUPM visualizes Git version information and notifies updates that Unity Package Manager does not. Actual installation or uninstallation is delegated to Unity Package Manager.
+SmartGitUPM visualizes Git version information and notifies updates that Unity Package Manager(UPM) does not. Actual installation or uninstallation is delegated to Unity Package Manager.
 
 <img alt="Role" src="Docs/role.jpg" width="600"/>
 
@@ -119,6 +118,6 @@ OpenUPM is a registry for open-source packages. Registered packages can be manag
 ### SmartGitUPM
 SmartGitUPM does not require registration and allows users to manage the necessary packages themselves. It is capable of flexible management through its unique interface (UI) regardless of public or private packages.
 
-_※ The logos look similar, but it was not intentional. The idea was "**package = cardboard = cat**", thinking of a logo where a cat that loves cardboard plays with a box, and coincidentally looked similar. It's too cute to change, so I'll keep it for a while. Sorry. Thank you._
+_※ The logo is almost the same, but I didn't aim for that.**"Package = Cardboard = Cat ”** I tried to make a logo of a cat that loves cardboard boxes playing with them, but it ended up looking like the same logo. I didn't want to change it because it was too cute, so please let me keep it as it is for a while. I'm sorry._
 
 <img alt="Logos" src="Docs/logos.png" width="600"/>
