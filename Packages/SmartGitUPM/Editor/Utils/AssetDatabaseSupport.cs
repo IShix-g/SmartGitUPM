@@ -1,5 +1,4 @@
 
-using System;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -7,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace SmartGitUPM.Editor
 {
-    internal static class AssetDatabaseSupport
+    public static class AssetDatabaseSupport
     {
         public static T CreateOrLoad<T>(string path) where T : ScriptableObject
         {
@@ -17,7 +16,7 @@ namespace SmartGitUPM.Editor
                 return asset;
             }
             
-            CreateDirectory(path);
+            CreateDirectories(path);
             asset = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
@@ -47,33 +46,35 @@ namespace SmartGitUPM.Editor
             return asset;
         }
 
-        public static void CreateDirectory(string path) 
+        public static void CreateDirectories(string path)
         {
             if (!path.StartsWith("Assets"))
             {
-                throw new ArgumentException("Specify a path starting with Assets.");
+                Debug.LogError("The path must start with 'Assets/' ");
+                return;
             }
-            
-            var directory = Path.HasExtension(path)
-                    ? Path.GetDirectoryName(path)
-                    : path;
 
-            if (AssetDatabase.IsValidFolder(directory))
+            path = Path.HasExtension(path)
+                ? Path.GetDirectoryName(path)
+                : path;
+
+            if (string.IsNullOrEmpty(path)
+                || AssetDatabase.IsValidFolder(path))
             {
                 return;
             }
             
-            var parentFolder = "Assets";
-            var folders = directory.Substring(parentFolder.Length).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var folders = path.Split('/');
+            var parentFolder = folders[0];
 
-            foreach (var folder in folders)
+            for (var i = 1; i < folders.Length; i++)
             {
-                var newFolder = Path.Combine(parentFolder, folder);
-                if (!AssetDatabase.IsValidFolder(newFolder)) 
+                var newFolder = parentFolder + "/" + folders[i];
+                if (!AssetDatabase.IsValidFolder(newFolder))
                 {
-                    AssetDatabase.CreateFolder(parentFolder, folder);
+                    AssetDatabase.CreateFolder(parentFolder, folders[i]);
                 }
-                parentFolder = newFolder;   
+                parentFolder = newFolder;
             }
         }
     }

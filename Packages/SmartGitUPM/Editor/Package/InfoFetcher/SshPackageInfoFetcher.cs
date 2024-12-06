@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -32,13 +31,13 @@ namespace SmartGitUPM.Editor
             }
             
             var (absolutePath, query) = ParsePath(packageInstallUrl);
-            var rootPath = Path.Combine(Application.dataPath + "/../", PackageCachePath);
-            var tempPath = Path.Combine(rootPath, ".tmp_" + CreateUniqID());
+            var rootPath = Application.dataPath + "/../" + PackageCachePath;
+            var tempPath = rootPath + "/.tmp_" + CreateUniqID();
             var command = "git";
             var arguments = default(string);
             var packagePath = ExtractPathFromQuery(query);
             var packageJsonPath = !string.IsNullOrEmpty(packagePath)
-                ? Path.Combine(ExtractPathFromQuery(query), HttpPackageInfoFetcher.PackageJsonFileName)
+                ? ExtractPathFromQuery(query) + "/" + HttpPackageInfoFetcher.PackageJsonFileName
                 : HttpPackageInfoFetcher.PackageJsonFileName;
             var localInfo = default(PackageLocalInfo);
             var localPackagePath = default(string);
@@ -66,8 +65,8 @@ namespace SmartGitUPM.Editor
 
             if (localInfo != default)
             {
-                localPackagePath = Path.Combine(rootPath, localInfo.name);
-                absoluteLocalPackageJsonPath = Path.Combine(localPackagePath, packageJsonPath);
+                localPackagePath = rootPath + "/" + localInfo.name;
+                absoluteLocalPackageJsonPath = localPackagePath + "/" + packageJsonPath;
                 if (!File.Exists(absoluteLocalPackageJsonPath))
                 {
                     absoluteLocalPackageJsonPath = default;
@@ -119,9 +118,11 @@ namespace SmartGitUPM.Editor
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
+                    // string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
                     await WaitForProcessExitAsync(process);
-
+                    // Debug.LogError(error);
+                    
                     var serverInfo = default(PackageServerInfo);
                     if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
                     {
@@ -130,27 +131,26 @@ namespace SmartGitUPM.Editor
                         
                         if (serverInfo == default)
                         {
-                            throw new InvalidOperationException("Failed to parse the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to parse the package.json.");
                         }
                     }
                     else
                     {
-                        var absolutePackageJsonPath = Path.Combine(tempPath, packageJsonPath);
-                        
+                        var absolutePackageJsonPath = tempPath + "/" + packageJsonPath;
                         if (!File.Exists(absolutePackageJsonPath))
                         {
-                            throw new InvalidOperationException("Failed to find the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to find the package.json.");
                         }
-
+                        
                         var jsonString = await File.ReadAllTextAsync(absolutePackageJsonPath, token);
                         serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
                         
                         if (serverInfo == default)
                         {
-                            throw new InvalidOperationException("Failed to parse the package.json. packageInstallUrl: " + packageInstallUrl);
+                            throw new InvalidOperationException("Failed to parse the package.json.");
                         }
-
-                        localPackagePath = Path.Combine(rootPath, serverInfo.name);
+                        
+                        localPackagePath = rootPath + "/" + serverInfo.name;
                         if (Directory.Exists(localPackagePath))
                         {
                             Directory.Delete(localPackagePath, true);
@@ -162,7 +162,7 @@ namespace SmartGitUPM.Editor
                 }
                 else
                 {
-                    throw new InvalidOperationException("Failed to start the process. packageInstallUrl: " + packageInstallUrl);
+                    throw new InvalidOperationException("Failed to start the process.");
                 }
             }
             catch (Exception ex)
@@ -179,14 +179,7 @@ namespace SmartGitUPM.Editor
                 }
                 message += "Install url: " + packageInstallUrl;
                 
-                if (ex.GetType() == typeof(HttpRequestException))
-                {
-                    throw new HttpRequestException(message, ex);
-                }
-                else
-                {
-                    throw new Exception(message, ex);
-                }
+                throw new Exception(message, ex);
             }
             finally
             {

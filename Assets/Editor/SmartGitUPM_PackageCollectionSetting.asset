@@ -12,16 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d87f975618484b2086366b9fb7391f96, type: 3}
   m_Name: SmartGitUPM_PackageCollectionSetting
   m_EditorClassIdentifier: 
-  _packages:
-  - UpdateNotify: 1
-    InstallUrl: https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex
-    Branch: main
-  - UpdateNotify: 1
-    InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator
-    Branch: main
-  - UpdateNotify: 1
-    InstallUrl: https://github.com/IShix-g/IDReference.git?path=Assets/Plugins/IDReference#v1.1.4
-    Branch: master
-  - UpdateNotify: 1
-    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
-    Branch: main
+  _packages: []

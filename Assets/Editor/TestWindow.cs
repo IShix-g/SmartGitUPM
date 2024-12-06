@@ -8,6 +8,12 @@ namespace Editor
 {
     public class TestWindow
     {
+        [MenuItem("Tests/Create Path")]
+        public static void CreatePath()
+        {
+            AssetDatabaseSupport.CreateDirectories("Assets/Test/Test2");
+        }
+        
         [MenuItem("Tests/Install Package")]
         public static void InstallPackage()
         {

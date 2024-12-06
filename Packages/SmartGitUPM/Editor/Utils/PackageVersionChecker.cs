@@ -77,7 +77,7 @@ namespace SmartGitUPM.Editor
 
         public PackageJson GetLocalInfo(string packageName)
         {
-            var path = Path.Combine($"Packages/{packageName}/", "package.json");
+            var path = "Packages/" + packageName + "/package.json";
             var json = File.ReadAllText(path);
             return JsonUtility.FromJson<PackageJson>(json);
         }
