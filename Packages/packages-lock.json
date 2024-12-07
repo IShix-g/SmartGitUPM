@@ -8,7 +8,7 @@
         "com.unity.nuget.newtonsoft-json": "3.2.1",
         "com.unity.editorcoroutines": "1.0.0"
       },
-      "hash": "3765878b4638875d4284f01f0b675a6f3a5328cf"
+      "hash": "ddedee246cdc93af13950e7ac74eec472c5c141e"
     },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",

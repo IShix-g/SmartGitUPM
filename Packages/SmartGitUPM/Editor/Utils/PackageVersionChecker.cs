@@ -45,9 +45,25 @@ namespace SmartGitUPM.Editor
             {
                 throw new InvalidOperationException("ServerInfo is not loaded.");
             }
-            var current = new Version(ServerInfo.version);
-            var server = new Version(LocalInfo.version);
-            return current.CompareTo(server) >= 0;
+            
+            var serverParts = ServerInfo.version.Split('.');
+            var localParts = LocalInfo.version.Split('.');
+            
+            for (var i = 0; i < Math.Min(serverParts.Length, localParts.Length); i++)
+            {
+                if (!int.TryParse(serverParts[i], out var serverVersion)
+                    || !int.TryParse(localParts[i], out var localVersion))
+                {
+                    continue;
+                }
+                
+                if (serverVersion > localVersion)
+                    return true;
+                if (serverVersion < localVersion)
+                    return false;
+            }
+            
+            return serverParts.Length > localParts.Length;
         }
         
         public async Task Fetch()
@@ -87,17 +103,11 @@ namespace SmartGitUPM.Editor
             _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             var localVersion = LocalInfo.VersionString;
             var serverVersion = ServerInfo.VersionString;
+
             if (HasNewVersion())
             {
-                EditorUtility.DisplayDialog(
-                    "You have the latest version.",
-                    "Editor: " + localVersion + " | GitHub: " + serverVersion + "\nThe current version is the latest release.",
-                    "Close");
-            }
-            else
-            {
                 var isOpen = EditorUtility.DisplayDialog(
-                    localVersion + " -> " + serverVersion, "There is a newer version (" + serverVersion + ").",
+                    localVersion + " -> " + serverVersion, "There is a newer version " + serverVersion + ".",
                     "Update",
                     "Close");
                         
@@ -105,6 +115,13 @@ namespace SmartGitUPM.Editor
                 {
                     _packageInstaller.Install(GitInstallUrl, _tokenSource.Token).Handled();
                 }
+            }
+            else
+            {
+                EditorUtility.DisplayDialog(
+                    "You have the latest version.",
+                    "Editor: " + localVersion + " | GitHub: " + serverVersion + "\nThe current version is the latest release.",
+                    "Close");
             }
         }
         
