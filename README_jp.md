@@ -50,7 +50,7 @@ Unity Editorを開く度に、パッケージの更新があれば通知を受�
 
 URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
-![Update](Docs/package_manager.png)
+![Update](Docs/add_package.png)
 
 ## SmartGitUPMを開く
 

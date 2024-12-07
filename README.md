@@ -50,7 +50,7 @@ Internally, it uses Unity Package Manager (UPM) for package management, making i
 
 URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
-![Update](Docs/package_manager.png)
+![Update](Docs/add_package.png)
 
 ## Open SmartGitUPM
 
