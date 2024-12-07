@@ -97,8 +97,8 @@ namespace SmartGitUPM.Editor
             else
             {
                 var isOpen = EditorUtility.DisplayDialog(
-                    localVersion + " -> " + serverVersion, "There is a newer version (" + serverVersion + "), please update from Package Manager.",
-                    "Open Package Manager",
+                    localVersion + " -> " + serverVersion, "There is a newer version (" + serverVersion + ").",
+                    "Update",
                     "Close");
                         
                 if (isOpen)
