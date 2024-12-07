@@ -54,22 +54,22 @@ namespace SmartGitUPM.Editor
                 return;
             }
 
-            path = Path.HasExtension(path)
-                ? Path.GetDirectoryName(path)
-                : path;
+            path = Path.HasExtension(path) ? Path.GetDirectoryName(path) : path;
+            path = path.Replace("\\", "/");
 
             if (string.IsNullOrEmpty(path)
                 || AssetDatabase.IsValidFolder(path))
             {
                 return;
             }
-            
+    
             var folders = path.Split('/');
             var parentFolder = folders[0];
-
+    
             for (var i = 1; i < folders.Length; i++)
             {
                 var newFolder = parentFolder + "/" + folders[i];
+                Debug.Log(newFolder + " : " + AssetDatabase.IsValidFolder(newFolder));
                 if (!AssetDatabase.IsValidFolder(newFolder))
                 {
                     AssetDatabase.CreateFolder(parentFolder, folders[i]);

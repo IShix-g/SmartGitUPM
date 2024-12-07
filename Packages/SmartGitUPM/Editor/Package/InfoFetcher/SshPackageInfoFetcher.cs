@@ -98,7 +98,7 @@ namespace SmartGitUPM.Editor
                     arguments = $"/C {command} {arguments}";
                     command = "cmd.exe";
                     break;
-                case RuntimePlatform.OSXEditor:
+                default:
                     arguments = $"-c \"{command} {arguments}\"";
                     command = "/bin/bash";
                     break;
