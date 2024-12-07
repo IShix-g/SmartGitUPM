@@ -45,25 +45,9 @@ namespace SmartGitUPM.Editor
             {
                 throw new InvalidOperationException("ServerInfo is not loaded.");
             }
-            
-            var serverParts = ServerInfo.version.Split('.');
-            var localParts = LocalInfo.version.Split('.');
-            
-            for (var i = 0; i < Math.Min(serverParts.Length, localParts.Length); i++)
-            {
-                if (!int.TryParse(serverParts[i], out var serverVersion)
-                    || !int.TryParse(localParts[i], out var localVersion))
-                {
-                    continue;
-                }
-                
-                if (serverVersion > localVersion)
-                    return true;
-                if (serverVersion < localVersion)
-                    return false;
-            }
-            
-            return serverParts.Length > localParts.Length;
+            var current = new Version(ServerInfo.version);
+            var server = new Version(LocalInfo.version);
+            return current.CompareTo(server) > 0;
         }
         
         public async Task Fetch()
@@ -113,7 +97,7 @@ namespace SmartGitUPM.Editor
                         
                 if (isOpen)
                 {
-                    _packageInstaller.Install(GitInstallUrl, _tokenSource.Token).Handled();
+                    _packageInstaller.Install(new []{ GitInstallUrl }, _tokenSource.Token).Handled();
                 }
             }
             else

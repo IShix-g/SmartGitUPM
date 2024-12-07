@@ -151,6 +151,8 @@ namespace SmartGitUPM.Editor
         public async Task<UnityEditor.PackageManager.PackageCollection> Install(string[] packageIds, CancellationToken token = default, bool showProgressBar = true)
         {
             var op = _pool.Get();
+            var infos = ListPool<PackageInfo>.Get();
+            var specifiedVersions = ListPool<string>.Get();
             try
             {
                 if (showProgressBar)
@@ -158,16 +160,14 @@ namespace SmartGitUPM.Editor
                     EditorUtility.DisplayProgressBar("Package operations", "Please wait...", 0.2f);
                 }
                 
-                var infos = new PackageInfo[packageIds.Length];
-                var specifiedVersions = new string[packageIds.Length];
-                for (var i = 0; i < packageIds.Length; i++)
+                foreach (var packageId in packageIds)
                 {
-                    var info = await GetInfoByPackageId(packageIds[i], token);
+                    var info = await GetInfoByPackageId(packageId, token);
                     var specifiedVersion = info != default
-                            ? GetVersionFromPackageID(info.packageId)
-                            : string.Empty;
-                    infos[i] = info;
-                    specifiedVersions[i] = specifiedVersion;
+                        ? GetVersionFromPackageID(info.packageId)
+                        : string.Empty;
+                    infos.Add(info);
+                    specifiedVersions.Add(specifiedVersion);
                 }
                 
                 if (showProgressBar)
@@ -264,6 +264,9 @@ namespace SmartGitUPM.Editor
             finally
             {
                 _pool.Release(op);
+                ListPool<PackageInfo>.Release(infos);
+                ListPool<string>.Release(specifiedVersions);
+                
                 if (_tokenSource != default)
                 {
                     _tokenSource.Dispose();
