@@ -1,5 +1,15 @@
 {
   "dependencies": {
+    "com.ishix.cmsunivortex": {
+      "version": "https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.editorcoroutines": "1.0.0"
+      },
+      "hash": "ddedee246cdc93af13950e7ac74eec472c5c141e"
+    },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",
       "depth": 0,
@@ -125,6 +135,13 @@
     "com.unity.collab-proxy": {
       "version": "2.5.2",
       "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.editorcoroutines": {
+      "version": "1.0.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"

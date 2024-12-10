@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
@@ -68,7 +69,7 @@ namespace SmartGitUPM.Editor
                 }
                 catch (Exception e)
                 {
-                    UnityEngine.Debug.LogError(e);
+                    Debug.LogError(e);
                 }
             }
             _tokenSource.Dispose();

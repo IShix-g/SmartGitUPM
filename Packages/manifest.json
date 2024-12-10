@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.ishix.cmsunivortex": "https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex",
     "com.ishix.test.unitydependencypackage": "https://github.com/IShix-g/TestPackage.git?path=Packages/UnityDependencyPackage",
     "com.unity.collab-proxy": "2.5.2",
     "com.unity.feature.2d": "2.0.1",

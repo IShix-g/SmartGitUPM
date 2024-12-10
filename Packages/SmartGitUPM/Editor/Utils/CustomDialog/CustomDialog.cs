@@ -10,18 +10,14 @@ namespace SmartGitUPM.Editor
         Vector2 _scrollPos;
         Texture2D _logo;
         
-        public static void Open(CustomDialogContents contents, string dialogTitle = default)
+        public static void Open(CustomDialogContents contents, Texture2D logo, string dialogTitle = default)
         {
             var window = GetWindow<CustomDialog>(dialogTitle);
             window.minSize = new Vector2(440, 300);
             window.maxSize = new Vector2(440, 300);
             window._contents = contents;
+            window._logo = logo;
             window.ShowUtility();
-        }
-
-        void OnEnable()
-        {
-            _logo = PackageCollectionWindow.GetLogo();
         }
 
         void OnDestroy()

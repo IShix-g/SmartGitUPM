@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace SmartGitUPM.Editor
@@ -25,13 +26,10 @@ namespace SmartGitUPM.Editor
             var metas = ListPool<PackageMetaData>.Get();
             foreach (var meta in manager.Collection.Metas)
             {
-                var version = GetVersionFromUrl(meta.InstallUrl);
-                if (!meta.UpdateNotify
-                    || !string.IsNullOrEmpty(version))
+                if (meta.UpdateNotify)
                 {
-                    continue;
+                    metas.Add(meta);
                 }
-                metas.Add(meta);
             }
 
             if (metas.Count == 0)
@@ -50,8 +48,9 @@ namespace SmartGitUPM.Editor
                        && details.Count > index)
                 {
                     var detail = details[index];
-                    if(!detail.HasUpdate 
-                       || detail.IsFixedVersion)
+                    if(detail.IsInstalled
+                       && (!detail.HasUpdate 
+                           || detail.IsFixedVersion))
                     {
                         details.RemoveAt(index);
                         continue;
@@ -74,7 +73,8 @@ namespace SmartGitUPM.Editor
                         "Manage Packages",
                         "Close"
                     );
-                    CustomDialog.Open(contents, "Package Update Alert");
+                    var logo = PackageCollectionWindow.GetLogo();
+                    CustomDialog.Open(contents, logo, "Package Update Alert");
                 }
             }
             finally

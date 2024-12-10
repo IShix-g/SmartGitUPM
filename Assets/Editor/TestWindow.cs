@@ -76,7 +76,7 @@ namespace Editor
                     "Close",
                     isClickedYes => Debug.Log("Closed. Clicked Yes: " + isClickedYes)
                 );
-            CustomDialog.Open(contents, "Notice");
+            CustomDialog.Open(contents, default, "Notice");
         }
 
         [MenuItem("Tests/Print Package Cache")]

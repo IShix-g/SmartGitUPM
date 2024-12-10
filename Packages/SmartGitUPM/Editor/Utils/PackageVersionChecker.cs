@@ -11,9 +11,13 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class PackageVersionChecker : IDisposable
     {
+        public const string PackageJsonFileName = "package.json";
+        public const string GitHubRawUrl = "https://raw.githubusercontent.com";
+        
         public readonly string GitInstallUrl;
         public readonly string BranchName;
         public readonly string PackageName;
+        
         public bool IsProcessing => _isNowLoading || _packageInstaller.IsProcessing;
         public bool IsLoaded => ServerInfo != default && LocalInfo != default;
         public PackageJson ServerInfo { get; private set; }
@@ -53,7 +57,7 @@ namespace SmartGitUPM.Editor
         public async Task Fetch()
         {
             _isNowLoading = true;
-            var gitPackageJsonUrl = HttpPackageInfoFetcher.ToRawPackageJsonURL(GitInstallUrl, BranchName);
+            var gitPackageJsonUrl = ToRawPackageJsonURL(GitInstallUrl, BranchName);
             var request = UnityWebRequest.Get(gitPackageJsonUrl);
             
             try
@@ -75,6 +79,49 @@ namespace SmartGitUPM.Editor
             }
         }
 
+        public static string ToRawPackageJsonURL(string packageInstallUrl, string branch)
+        {
+            var rootUrl = ToRawPackageRootURL(packageInstallUrl, branch);
+            return rootUrl + "/" + PackageJsonFileName;
+        }
+        
+        public static string ToRawPackageRootURL(string packageInstallUrl, string branch)
+        {
+            if (!packageInstallUrl.StartsWith("https://github.com")
+                && !packageInstallUrl.StartsWith("https://bitbucket.org")
+                && !packageInstallUrl.StartsWith("https://gitlab.com"))
+            {
+                throw new ArgumentException("Specify the URL of GitHub, Bitbucket, or GitLab. : " + packageInstallUrl, nameof(packageInstallUrl));
+            }
+            
+            var uri = new Uri(packageInstallUrl);
+            var pathWithoutFileName = uri.AbsolutePath;
+            if (pathWithoutFileName.EndsWith(".git"))
+            {
+                pathWithoutFileName = pathWithoutFileName.Replace(".git", string.Empty);
+            }
+            var query = uri.Query;
+            var path = ExtractPathFromQuery(query);
+            var resultUrl = packageInstallUrl.Contains("github.com") ? GitHubRawUrl + pathWithoutFileName : uri.GetLeftPart(UriPartial.Authority) + pathWithoutFileName;
+            var raw = packageInstallUrl.Contains("github.com") ? $"refs/heads/{branch}" : $"raw/{branch}";
+            return $"{resultUrl}/{raw}/{path}";
+        }
+
+        static string ExtractPathFromQuery(string query)
+        {
+            var parameters = query.TrimStart('?').Split('&');
+            foreach (var param in parameters)
+            {
+                var keyValue = param.Split('=');
+                if (keyValue.Length == 2
+                    && keyValue[0] == "path")
+                {
+                    return Uri.UnescapeDataString(keyValue[1]);
+                }
+            }
+            return string.Empty;
+        }
+        
         public PackageJson GetLocalInfo(string packageName)
         {
             var path = "Packages/" + packageName + "/package.json";
