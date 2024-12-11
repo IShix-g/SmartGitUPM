@@ -8,18 +8,18 @@ namespace SmartGitUPM.Editor
     public class PackageInfoDetails
     {
         public PackageLocalInfo Local { get; private set; }
-        public PackageServerInfo Server { get; private set; }
+        public PackageRemoteInfo Remote { get; private set; }
         public string PackageInstallUrl { get; private set; }
         public bool HasUpdate { get; private set; }
         public bool IsInstalled => Local != default;
-        public bool IsLoaded => Server != default;
+        public bool IsLoaded => Remote != default;
         public bool IsFixedVersion { get; private set; }
         
         enum PreReleaseType { None, Beta, Alpha, Preview, Rc }
         
-        public PackageInfoDetails(PackageLocalInfo local, PackageServerInfo server, string packageInstallUrl)
+        public PackageInfoDetails(PackageLocalInfo local, PackageRemoteInfo remote, string packageInstallUrl)
         {
-            Server = server;
+            Remote = remote;
             PackageInstallUrl = packageInstallUrl;
             Installed(local);
             IsFixedVersion = !string.IsNullOrEmpty(GetVersionParam());
@@ -39,9 +39,9 @@ namespace SmartGitUPM.Editor
                 {
                     return true;
                 }
-                var localParsed = ParseVersion(Local.version);
-                var serverParsed = ParseVersion(Server.version);
-                return CompareVersions(localParsed, serverParsed) < 0;
+                var local = ParseVersion(Local.version);
+                var remote = ParseVersion(Remote.version);
+                return CompareVersions(local, remote) < 0;
             }
             catch
             {

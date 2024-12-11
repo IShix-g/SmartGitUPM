@@ -81,7 +81,7 @@ namespace SmartGitUPM.Editor
                 && !string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
             {
                 var jsonString = await File.ReadAllTextAsync(absoluteLocalPackageJsonPath, token);
-                var serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
+                var serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
                 if (serverInfo != default)
                 {
                     return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
@@ -131,11 +131,11 @@ namespace SmartGitUPM.Editor
                     //     UnityEngine.Debug.LogWarning(error);
                     // }
                     
-                    var serverInfo = default(PackageServerInfo);
+                    var serverInfo = default(PackageRemoteInfo);
                     if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
                     {
                         var jsonString = await File.ReadAllTextAsync(absoluteLocalPackageJsonPath, token);
-                        serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
+                        serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
                         
                         if (serverInfo == default)
                         {
@@ -151,7 +151,7 @@ namespace SmartGitUPM.Editor
                         }
                         
                         var jsonString = await File.ReadAllTextAsync(absolutePackageJsonPath, token);
-                        serverInfo = JsonUtility.FromJson<PackageServerInfo>(jsonString);
+                        serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
                         
                         if (serverInfo == default)
                         {

@@ -1,6 +1,5 @@
 
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -75,7 +74,7 @@ namespace SmartGitUPM.Editor
             }
         }
         
-        public async Task<PackageServerInfo> FetchPackageInfo(string packageJsonUrl)
+        public async Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl)
         {
             if (!packageJsonUrl.EndsWith(PackageJsonFileName))
             {
@@ -88,7 +87,7 @@ namespace SmartGitUPM.Editor
                 await op.SendWebRequest();
                 if (op.isDone)
                 {
-                    return JsonUtility.FromJson<PackageServerInfo>(op.downloadHandler.text);
+                    return JsonUtility.FromJson<PackageRemoteInfo>(op.downloadHandler.text);
                 }
 
                 throw new InvalidOperationException(op.error);

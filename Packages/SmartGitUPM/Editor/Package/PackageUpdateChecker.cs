@@ -1,10 +1,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.Pool;
 
 namespace SmartGitUPM.Editor
@@ -89,25 +87,17 @@ namespace SmartGitUPM.Editor
             var msg = string.Empty;
             foreach (var detail in details)
             {
-                msg += "- " + detail.Server.displayName;
+                msg += "- " + detail.Remote.displayName;
                 if (detail.Local == default)
                 {
-                    msg += " v" + detail.Server.version + " is not installed.\n";
+                    msg += " v" + detail.Remote.version + " is not installed.\n";
                 }
-                else if (detail.Server.version != detail.Local.version)
+                else if (detail.Remote.version != detail.Local.version)
                 {
-                    msg += " v" + detail.Local.version + " \u2192 v" + detail.Server.version + " Update available.\n";
+                    msg += " v" + detail.Local.version + " \u2192 v" + detail.Remote.version + " Update available.\n";
                 }
             }
             return msg;
-        }
-        
-        static string GetVersionFromUrl(string url)
-        {
-            var match = Regex.Match(url, @"#([\d.]+)$");
-            return match.Success
-                ? match.Groups[1].Value
-                : string.Empty;
         }
         
         public void Dispose()

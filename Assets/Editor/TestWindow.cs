@@ -53,7 +53,7 @@ namespace Editor
                     }
                     
                     var details = task.Result;
-                    Debug.Log("Server: \n" + JsonUtility.ToJson(details.Server, true) + "\nLocal: \n" + JsonUtility.ToJson(details.Local, true));
+                    Debug.Log("Server: \n" + JsonUtility.ToJson(details.Remote, true) + "\nLocal: \n" + JsonUtility.ToJson(details.Local, true));
                 });
         }
 

@@ -92,7 +92,7 @@ namespace SmartGitUPM.Editor
                     _hasFixed = true;
                 }
                 
-                var displayName = detail.IsLoaded ? detail.Server.displayName : "Unknown";
+                var displayName = detail.IsLoaded ? detail.Remote.displayName : "Unknown";
                 GUILayout.Label(displayName, GUILayout.Width(130));
                 
                 var color = GUI.color;
@@ -196,7 +196,7 @@ namespace SmartGitUPM.Editor
             => details.IsInstalled ? "v" + details.Local.version : string.Empty;
 
         string ToServerVersionString(PackageInfoDetails details)
-            => details.IsLoaded ? "v" + details.Server.version : string.Empty;
+            => details.IsLoaded ? "v" + details.Remote.version : string.Empty;
 
         string ToFixedVersion(PackageInfoDetails details)
         {

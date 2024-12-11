@@ -28,6 +28,12 @@ namespace SmartGitUPM.Editor
         
         void OnGUI()
         {
+            if (_contents == default)
+            {
+                Close();
+                return;
+            }
+            if(_logo != default )
             {
                 var style = new GUIStyle(GUI.skin.label)
                 {

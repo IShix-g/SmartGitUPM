@@ -4,7 +4,7 @@ using System;
 namespace SmartGitUPM.Editor
 {
     [Serializable]
-    public class PackageServerInfo
+    public class PackageRemoteInfo
     {
         public string name;
         public string displayName;
