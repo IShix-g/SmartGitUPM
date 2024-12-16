@@ -48,6 +48,9 @@ namespace SmartGitUPM.Editor
             _manager = factory.Create();
             _settingView ??= new PackageCollectionSettingView(_manager.Setting, _manager.Collection.GetSupportProtocols(), this);
             _collectionView ??= new PackageCollectionView(_manager.Installer, _manager.Collection, OpenSettingAction, this);
+
+            _collectionView.OnInstall += FetchPackagesNextFrame;
+            _collectionView.OnUnInstall += FetchPackagesNextFrame;
             
             if (_viewSwitcher == default)
             {
@@ -62,6 +65,10 @@ namespace SmartGitUPM.Editor
 
         void OnDestroy()
         {
+            _collectionView.OnInstall -= FetchPackagesNextFrame;
+            _collectionView.OnUnInstall -= FetchPackagesNextFrame;
+            EditorApplication.delayCall -= FetchPackagesNextFrame;
+            
             _manager?.Dispose();
             _versionChecker?.Dispose();
             _viewSwitcher?.Dispose();
@@ -148,14 +155,25 @@ namespace SmartGitUPM.Editor
                     if (GUILayout.Button("Install All", GUILayout.Width(70))
                         && _manager.Collection.HasMetas)
                     {
-                        var packageUrls = _manager.Collection.GetInstallPackageUrls();
-                        _tokenSource = new CancellationTokenSource();
-                        _manager.Installer.Install(packageUrls, _tokenSource.Token)
-                            .Handled(_ =>
-                            {
-                                _tokenSource.Dispose();
-                                _tokenSource = default;
-                            });
+                        var userAgreed = EditorUtility.DisplayDialog(
+                            "Install All",
+                            "This will install all the SDKs and Mediations listed below. If there are updates available, they will be applied as well.",
+                            "Install All",
+                            "Close"
+                        );
+
+                        if (userAgreed)
+                        {
+                            var packageUrls = _manager.Collection.GetInstallPackageUrls();
+                            _tokenSource = new CancellationTokenSource();
+                            _manager.Installer.Install(packageUrls, _tokenSource.Token)
+                                .Handled(_ =>
+                                {
+                                    _tokenSource.Dispose();
+                                    _tokenSource = default;
+                                    EditorApplication.delayCall += FetchPackagesNextFrame;
+                                });
+                        }
                     }
                     EditorGUI.EndDisabledGroup();
                 }
@@ -166,6 +184,12 @@ namespace SmartGitUPM.Editor
             {
                 _viewSwitcher.Update();
             }
+        }
+        
+        void FetchPackagesNextFrame()
+        {
+            EditorApplication.delayCall -= FetchPackagesNextFrame;
+            FetchPackages(false);
         }
         
         void FetchPackages(bool superReload)

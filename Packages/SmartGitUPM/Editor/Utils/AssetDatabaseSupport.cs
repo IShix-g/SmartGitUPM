@@ -2,7 +2,6 @@
 using System.IO;
 using UnityEngine;
 using UnityEditor;
-using JetBrains.Annotations;
 
 namespace SmartGitUPM.Editor
 {
@@ -23,7 +22,6 @@ namespace SmartGitUPM.Editor
             return asset;
         }
         
-        [CanBeNull]
         public static T LoadAsset<T>(string path) where T : ScriptableObject
         {
             var asset = AssetDatabase.LoadAssetAtPath<T>(path);

@@ -9,6 +9,9 @@ namespace SmartGitUPM.Editor
 {
     public sealed class PackageCollectionView : EditorView
     {
+        public event Action OnInstall = delegate { };
+        public event Action OnUnInstall = delegate { };
+        
         readonly PackageInstaller _installer;
         readonly PackageCollection _collection;
         Action _openSettingAction;
@@ -138,6 +141,7 @@ namespace SmartGitUPM.Editor
                         {
                             _tokenSource?.Dispose();
                             _tokenSource = default;
+                            OnInstall();
                         });
                     }
                     else if(detail.IsInstalled)
@@ -149,6 +153,7 @@ namespace SmartGitUPM.Editor
                             {
                                 _tokenSource?.Dispose();
                                 _tokenSource = default;
+                                OnUnInstall();
                             });
                     }
                 }

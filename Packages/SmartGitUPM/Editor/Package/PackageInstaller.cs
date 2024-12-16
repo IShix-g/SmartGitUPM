@@ -358,7 +358,7 @@ namespace SmartGitUPM.Editor
                 }
                 
                 IsProcessing = true;
-                var ids = ToIds(infos);
+                var ids = ToNames(infos);
                 var request = Client.AddAndRemove(default, ids);
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
                 await op.StartAsync(() => request.IsCompleted, _tokenSource.Token);
@@ -416,16 +416,16 @@ namespace SmartGitUPM.Editor
             _tokenSource = default;
         }
         
-        string[] ToIds(in HashSet<PackageInfo> infos)
+        string[] ToNames(in HashSet<PackageInfo> infos)
         {
-            var ids = new string[infos.Count];
+            var names = new string[infos.Count];
             var index = 0;
             foreach (var info in infos)
             {
-                ids[index] = info.packageId;
+                names[index] = info.name;
                 index++;
             }
-            return ids;
+            return names;
         }
         
         string GetVersionFromPackageID(string url)
