@@ -15,10 +15,13 @@ MonoBehaviour:
   _packages:
   - UpdateNotify: 1
     InstallUrl: https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex
-    Branch: main
+    Branch: 
   - UpdateNotify: 1
-    InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator#1.0.9
-    Branch: main
+    InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator
+    Branch: 
+  - UpdateNotify: 1
+    InstallUrl: https://github.com/IShix-g/IDReference.git?path=Assets/Plugins/IDReference#1.1.4
+    Branch: 
   - UpdateNotify: 1
     InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
-    Branch: main
+    Branch: 

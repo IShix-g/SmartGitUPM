@@ -1,3 +1,4 @@
+// #define DEBUG_PROSESS
 
 using System;
 using System.IO;
@@ -87,9 +88,14 @@ namespace SmartGitUPM.Editor
                     return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
             }
+
+            if (!string.IsNullOrEmpty(branch))
+            {
+                branch = "-b " + branch;
+            }
             
             arguments = string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
-                ? $"clone --single-branch --no-tags -b {branch} {absolutePath} {tempPath}"
+                ? $"clone --single-branch --no-tags {branch} {absolutePath} {tempPath}"
                 : $"pull origin {branch}";
 
             switch (Application.platform)
@@ -104,6 +110,12 @@ namespace SmartGitUPM.Editor
                     break;
             }
 
+            var workingDirectory
+                    = localInfo != default
+                      && !string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
+                        ? localPackagePath
+                        : rootPath;
+            
             var startInfo = new ProcessStartInfo
             {
                 FileName = command,
@@ -112,7 +124,7 @@ namespace SmartGitUPM.Editor
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = localInfo != default ? localPackagePath : rootPath
+                WorkingDirectory = workingDirectory
             };
 
             try
@@ -122,15 +134,18 @@ namespace SmartGitUPM.Editor
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
-                    // var error = await process.StandardError.ReadToEndAsync();
+#if DEBUG_PROSESS
+                    var error = await process.StandardError.ReadToEndAsync();
+#endif
                     process.WaitForExit();
                     await WaitForProcessExitAsync(process);
-                    
-                    // if (!string.IsNullOrEmpty(error))
-                    // {
-                    //     UnityEngine.Debug.LogWarning(error);
-                    // }
-                    
+#if DEBUG_PROSESS
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        UnityEngine.Debug.LogWarning(error);
+                    }
+#endif
+
                     var serverInfo = default(PackageRemoteInfo);
                     if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
                     {

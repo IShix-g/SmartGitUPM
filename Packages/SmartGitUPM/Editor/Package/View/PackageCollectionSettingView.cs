@@ -41,6 +41,7 @@ namespace SmartGitUPM.Editor
             GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
             EditorGUILayout.HelpBox("UpdateNotify:\nYou will receive update notifications when you open the Unity Editor.", MessageType.Info);
             EditorGUILayout.HelpBox("InstallUrl:\nThe URL should only be from Git. Please specify the URL in the format required by \"Package Manager > Add package from git URL...\".", MessageType.Info);
+            EditorGUILayout.HelpBox("Branch:\nBranch name (Optional). Leave empty to use default.", MessageType.Info);
             EditorGUILayout.HelpBox("Supported Protocols:\n" + _supportProtocols, MessageType.Info);
             GUILayout.EndVertical();
             

@@ -33,7 +33,7 @@ namespace SmartGitUPM.Editor
             _installer = installer;
             _collection = collection;
             _openSettingAction = openSettingAction;
-            _installedIcon = EditorGUIUtility.IconContent("d_Progress");
+            _installedIcon = EditorGUIUtility.IconContent("Progress");
             _updateIcon = EditorGUIUtility.IconContent("Update-Available");
         }
         

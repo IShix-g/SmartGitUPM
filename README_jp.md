@@ -66,11 +66,11 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 ## パッケージを設定
 
-| フィールド        | 説明                              | 例                                                                                                                                                                        |
-|--------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Update Notify | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                                   |
-| Install Url  | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
-| Branch       | メインのブランチを指定                     | main や masterなど                                                                                                                                                          |
+| フィールド             | 説明                              | 例                                                                                                                                                           |
+|-------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Update Notify     | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                      |
+| Install Url       | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
+| Branch (Optional) | 必要あればブランチ名を指定                   | 空欄 または `main` や `master` など                                                                                                                          |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 

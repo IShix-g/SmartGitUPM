@@ -53,10 +53,6 @@ namespace SmartGitUPM.Editor
                     {
                         throw new InvalidOperationException("Package install URL is not set.");
                     }
-                    if (string.IsNullOrEmpty(meta.Branch))
-                    {
-                        throw new InvalidOperationException("Package Branch is not set.");
-                    }
                     var fetcher = GetInfoFetcher(meta.InstallUrl);
                     if (fetcher == default)
                     {

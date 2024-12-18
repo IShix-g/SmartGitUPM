@@ -11,6 +11,7 @@ namespace SmartGitUPM.Editor
         public bool UpdateNotify;
         [Tooltip("The URL should only be from Git. Please specify the URL in the format required by \"Package Manager > Add package from git URL...\"")]
         public string InstallUrl;
-        public string Branch = "main";
+        [Tooltip("Branch name (Optional). Leave empty to use default.")]
+        public string Branch;
     }
 }
