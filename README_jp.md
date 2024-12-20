@@ -66,11 +66,12 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 ## パッケージを設定
 
-| フィールド             | 説明                              | 例                                                                                                                                                           |
-|-------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Update Notify     | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                      |
-| Install Url       | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
-| Branch (Optional) | 必要あればブランチ名を指定                   | 空欄 または `main` や `master` など                                                                                                                          |
+| フィールド                    | 説明                              | 例                                                                                                                                                           |
+|--------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Update Notify            | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                      |
+| Install Url              | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
+| Branch (Optional)        | 必要あればブランチ名を指定                   | 空欄 または `main` や `master` など                                                                                                                                 |
+| Help Page Url (Optional) | 必要あればヘルプページを指定                  | 空欄 または https://github.com/IShix-g/CMSuniVortex                                                                                                                                            |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 
@@ -102,7 +103,7 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 1. 最新バージョンのインストール済み
 2. インストール済み、且つ更新可能な新バージョンあり v1.0.9 (現在) -> v1.0.10 (新)
-3. インストール済み、且つバージョンの固定、URLの最後に`#1.0.0`などのバージョンを指定する事で固定可
+3. インストール済み、且つバージョンの固定、URLの最後に`#1.1.4`などのバージョンを指定する事で固定可
 4. 未インストール
 
 ## UPMとの役割分担

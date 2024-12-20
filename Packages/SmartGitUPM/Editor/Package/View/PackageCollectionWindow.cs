@@ -46,8 +46,18 @@ namespace SmartGitUPM.Editor
             
             var factory = new SGUPackageManagerFactory();
             _manager = factory.Create();
-            _settingView ??= new PackageCollectionSettingView(_manager.Setting, _manager.Collection.GetSupportProtocols(), this);
-            _collectionView ??= new PackageCollectionView(_manager.Installer, _manager.Collection, OpenSettingAction, this);
+            _settingView ??= new PackageCollectionSettingView(
+                    _manager.Setting,
+                    _manager.Collection.GetSupportProtocols(),
+                    this
+                );
+            _collectionView ??= new PackageCollectionView(
+                    _manager.Installer,
+                    _manager.Setting,
+                    _manager.Collection,
+                    OpenSettingAction,
+                    this
+                );
 
             _collectionView.OnInstall += FetchPackagesNextFrame;
             _collectionView.OnUnInstall += FetchPackagesNextFrame;

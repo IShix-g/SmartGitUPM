@@ -12,25 +12,27 @@ namespace SmartGitUPM.Editor
         public event Action OnInstall = delegate { };
         public event Action OnUnInstall = delegate { };
         
-        readonly PackageInstaller _installer;
-        readonly PackageCollection _collection;
+        PackageInstaller _installer;
+        PackageCollection _collection;
+        PackageCollectionSetting _setting;
         Action _openSettingAction;
         Vector2 _scrollPos;
-        readonly GUIContent _installedIcon;
-        readonly GUIContent _updateIcon;
-        
+        GUIContent _installedIcon;
+        GUIContent _updateIcon;
         CancellationTokenSource _tokenSource;
         bool _hasFixed;
         bool _hasUpdate;
         
         public PackageCollectionView(
             PackageInstaller installer,
+            PackageCollectionSetting setting,
             PackageCollection collection,
             Action openSettingAction,
             EditorWindow window)
             : base(window)
         {
             _installer = installer;
+            _setting = setting;
             _collection = collection;
             _openSettingAction = openSettingAction;
             _installedIcon = EditorGUIUtility.IconContent("Progress");
@@ -64,13 +66,14 @@ namespace SmartGitUPM.Editor
                 return;
             }
             
-            var position = Window.position;
-            _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(position.width));
+            _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(Window.position.width));
             GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
             
             foreach (var detail in _collection.Details)
             {
                 GUILayout.BeginHorizontal(GUI.skin.box);
+                
+                var setting = _setting.GetPackage(detail.PackageInstallUrl);
                 var versionText = ToLocalVersionString(detail);
                 if (detail.HasUpdate
                     && !detail.IsFixedVersion)
@@ -96,7 +99,27 @@ namespace SmartGitUPM.Editor
                 }
                 
                 var displayName = detail.IsLoaded ? detail.Remote.displayName : "Unknown";
-                GUILayout.Label(displayName, GUILayout.Width(130));
+
+                if (string.IsNullOrEmpty(setting.HelpPageUrl))
+                {
+                    GUILayout.Label(displayName, GUILayout.Width(150));
+                }
+                else
+                {
+                    var linkStyle = new GUIStyle(GUI.skin.label)
+                    {
+                        fontStyle = FontStyle.Bold,
+                        fixedWidth = 150,
+                        fixedHeight = EditorGUIUtility.singleLineHeight,
+                    };
+                    if (GUILayout.Button(displayName, linkStyle))
+                    {
+                        Application.OpenURL(setting.HelpPageUrl);
+                    }
+                    
+                    var lastRect = GUILayoutUtility.GetLastRect();
+                    EditorGUIUtility.AddCursorRect(lastRect, MouseCursor.Link);
+                }
                 
                 var color = GUI.color;
                 if (detail.IsInstalled
@@ -179,8 +202,14 @@ namespace SmartGitUPM.Editor
 
         protected override void OnDestroy()
         {
+            _setting = default;
+            _installer = default;
+            _collection = default;
             _openSettingAction = default;
             _tokenSource?.SafeCancelAndDispose();
+            
+            _installedIcon = default;
+            _updateIcon = default;
         }
         
         string GetButtonText(PackageInfoDetails details)
@@ -198,10 +227,14 @@ namespace SmartGitUPM.Editor
         }
 
         string ToLocalVersionString(PackageInfoDetails details)
-            => details.IsInstalled ? "v" + details.Local.version : string.Empty;
+            => details.IsInstalled 
+                ? "v" + details.Local.version
+                : string.Empty;
 
         string ToServerVersionString(PackageInfoDetails details)
-            => details.IsLoaded ? "v" + details.Remote.version : string.Empty;
+            => details.IsLoaded
+                ? "v" + details.Remote.version
+                : string.Empty;
 
         string ToFixedVersion(PackageInfoDetails details)
         {
@@ -209,10 +242,7 @@ namespace SmartGitUPM.Editor
             {
                 return "v" + details.Local.version;
             }
-            else
-            {
-                return "v" + details.GetVersionParam();
-            }
+            return "v" + details.GetVersionParam();
         }
     }
 }

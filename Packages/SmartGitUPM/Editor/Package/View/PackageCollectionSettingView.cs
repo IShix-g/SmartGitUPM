@@ -12,7 +12,12 @@ namespace SmartGitUPM.Editor
         PackageCollectionSetting _setting;
         readonly string _supportProtocols;
         
-        public PackageCollectionSettingView(PackageCollectionSetting setting, string[] supportProtocols, EditorWindow window) : base(window)
+        public PackageCollectionSettingView(
+                PackageCollectionSetting setting,
+                string[] supportProtocols,
+                EditorWindow window
+            )
+            : base(window)
         {
             _setting = setting;
             _supportProtocols = String.Join(", ", supportProtocols);;
@@ -23,14 +28,10 @@ namespace SmartGitUPM.Editor
         public override string ViewDisplayName => "Setting";
 
         protected override void OnOpen()
-        {
-            _serializedObject = new SerializedObject(_setting);
-        }
+            => _serializedObject = new SerializedObject(_setting);
 
         protected override void OnClose()
-        {
-            _serializedObject = null;
-        }
+            => _serializedObject = default;
         
         protected override void OnUpdate()
         {
@@ -60,7 +61,7 @@ namespace SmartGitUPM.Editor
         protected override void OnDestroy()
         {
             _setting = default;
-            _serializedObject = null;
+            _serializedObject = default;
         }
     }
 }

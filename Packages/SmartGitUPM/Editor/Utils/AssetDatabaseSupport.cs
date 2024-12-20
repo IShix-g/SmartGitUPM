@@ -52,7 +52,9 @@ namespace SmartGitUPM.Editor
                 return;
             }
 
-            path = Path.HasExtension(path) ? Path.GetDirectoryName(path) : path;
+            path = Path.HasExtension(path)
+                ? Path.GetDirectoryName(path)
+                : path;
             path = path.Replace("\\", "/");
 
             if (string.IsNullOrEmpty(path)

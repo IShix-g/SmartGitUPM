@@ -13,5 +13,7 @@ namespace SmartGitUPM.Editor
         public string InstallUrl;
         [Tooltip("Branch name (Optional). Leave empty to use default.")]
         public string Branch;
+        [Tooltip( "Help page URL (Optional) for this package. Leave blank to use the default." )]
+        public string HelpPageUrl;
     }
 }

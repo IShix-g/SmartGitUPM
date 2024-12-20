@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 
 namespace SmartGitUPM.Editor
@@ -8,5 +9,17 @@ namespace SmartGitUPM.Editor
     {
         [SerializeField] PackageMetaData[] _packages;
         public PackageMetaData[] Packages => _packages;
+
+        public PackageMetaData GetPackage(string installUrl)
+        {
+            foreach (var package in _packages)
+            {
+                if (package.InstallUrl.Contains(installUrl))
+                {
+                    return package;
+                }
+            }
+            throw new ArgumentException("Package not found: " + installUrl, nameof(installUrl));
+        }
     }
 }
