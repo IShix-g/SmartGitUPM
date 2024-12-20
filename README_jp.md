@@ -71,7 +71,7 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 | Update Notify            | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                      |
 | Install Url              | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
 | Branch (Optional)        | 必要あればブランチ名を指定                   | 空欄 または `main` や `master` など                                                                                                                                 |
-| Help Page Url (Optional) | 必要あればヘルプページを指定                  | 空欄 または https://github.com/IShix-g/CMSuniVortex                                                                                                                                            |
+| Help Page Url (Optional) | 必要あればヘルプページを指定                  | 空欄 または ヘルプページのURL https://github.com/IShix-g/CMSuniVortex など                                                                                                |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 

@@ -71,7 +71,7 @@ Click on the gear button or the settings button, which is only shown when not co
 | Update Notify   | Receive update notifications when the Unity Editor starts? | [Checked] Receive updates                                                                                                                                                      |
 | Install Url     | URL for package installation (https or SSL)   | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
 | Branch (Optional) | Specify the branch name if needed                | Leave blank, or use `main` or `master`, etc.|
-| Help Page Url (Optional) | Specify the help page URL if needed          | Leave blank or use https://github.com/IShix-g/CMSuniVortex                                                                                              |
+| Help Page Url (Optional) | Specify the help page URL if needed          | Leave it blank or provide a help page URL, e.g., https://github.com/IShix-g/CMSuniVortex                                                                    |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 
