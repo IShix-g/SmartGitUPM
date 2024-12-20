@@ -86,11 +86,20 @@ After configuration, click the reload button to complete the setup. Next time, t
 
 <img alt="Buttons" src="Docs/buttons.jpg" width="500"/>
 
-1. Configure the package
-2. Reload package update information
+1. Display package settings
+2. Refresh package update information
 3. Open Unity Package Manager
-4. Open Smart Git UPM GitHub page
-5. Check for the latest version of Smart Git UPM by clicking
+4. Open the Smart Git UPM GitHub page
+5. Smart Git UPM version. Click to check for the latest version.
+6. Open the help page
+7. Install or update all packages
+8. Package-specific buttons, with the following states:
+
+| Button Name | On Button Click           | Package State          |
+|-------------|---------------------------|------------------------|
+| Install     | Installs the package      | Not installed          |
+| Update      | Updates the package       | Installed, updates available |
+| Remove      | Removes the package       | Latest version installed |
 
 ## Current Package State Display
 

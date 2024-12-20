@@ -19,6 +19,7 @@ namespace SmartGitUPM.Editor
         Vector2 _scrollPos;
         GUIContent _installedIcon;
         GUIContent _updateIcon;
+        GUIContent _linkIcon;
         CancellationTokenSource _tokenSource;
         bool _hasFixed;
         bool _hasUpdate;
@@ -37,6 +38,7 @@ namespace SmartGitUPM.Editor
             _openSettingAction = openSettingAction;
             _installedIcon = EditorGUIUtility.IconContent("Progress");
             _updateIcon = EditorGUIUtility.IconContent("Update-Available");
+            _linkIcon = EditorGUIUtility.IconContent("Linked");
         }
         
         public override string ViewID => "collection-view";
@@ -106,16 +108,27 @@ namespace SmartGitUPM.Editor
                 }
                 else
                 {
+                    GUILayout.BeginHorizontal(GUILayout.Width(150));
                     var linkStyle = new GUIStyle(GUI.skin.label)
                     {
-                        fontStyle = FontStyle.Bold,
-                        fixedWidth = 150,
+                        stretchWidth = false,
                         fixedHeight = EditorGUIUtility.singleLineHeight,
                     };
                     if (GUILayout.Button(displayName, linkStyle))
                     {
                         Application.OpenURL(setting.HelpPageUrl);
                     }
+                    
+                    var iconStyle = new GUIStyle(GUI.skin.label)
+                    {
+                        fixedWidth = 25,
+                        fixedHeight = EditorGUIUtility.singleLineHeight,
+                    };
+                    if (GUILayout.Button(_linkIcon, iconStyle))
+                    {
+                        Application.OpenURL(setting.HelpPageUrl);
+                    }
+                    GUILayout.EndHorizontal();
                     
                     var lastRect = GUILayoutUtility.GetLastRect();
                     EditorGUIUtility.AddCursorRect(lastRect, MouseCursor.Link);
@@ -210,6 +223,7 @@ namespace SmartGitUPM.Editor
             
             _installedIcon = default;
             _updateIcon = default;
+            _linkIcon = default;
         }
         
         string GetButtonText(PackageInfoDetails details)
