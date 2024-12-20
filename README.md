@@ -10,15 +10,15 @@ A plugin for managing packages within Git repositories efficiently in Unity Edit
 
 ![Header](Docs/header.png)
 
-# Why Use This Plugin
+## Why Use This Plugin
 
-## View Updates at a Glance
+### View Updates at a Glance
 
 Unity Package Manager doesn’t provide update information for packages published via Git. With `SmartGitUPM`, you can easily check updates with its user-friendly UI.
 
 ![Update](Docs/update.jpg)
 
-## Support for Private Repository Update Checks
+### Support for Private Repository Update Checks
 
 Supports packages in private repositories (SSL connection). You can check updates even in private repositories.
 
@@ -28,23 +28,21 @@ Supports packages in private repositories (SSL connection). You can check update
 - Large private repositories take longer to display the first time.
 - The size of a public repository does not affect display speed.
 
-## Update Notifications
+### Update Notifications
 
 Receive notifications of package updates every time you open Unity Editor. (Notifications can be turned off)
 
 <img alt="Alert" src="Docs/alert.jpg" width="550"/>
 
-## Uses UPM Internally, So It's Safe
+### Uses UPM Internally, So It's Safe
 
 Internally, it uses Unity Package Manager (UPM) for package management, making it reliable. If you don't like `SmartGitUPM`, you can simply remove it. Afterward, manage your packages normally via UPM.
 
 ![Update](Docs/upm.jpg)
 
-***
+## Getting Started
 
-# Getting Started
-
-## Install from Git URL
+### Install from Git URL
 
 "Unity Editor : Window > Package Manager > Add package from git URL...".
 
@@ -52,19 +50,19 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 ![Update](Docs/add_package.png)
 
-## Open SmartGitUPM
+### Open SmartGitUPM
 
 `Unity Editor : Window > Smart Git UPM`
 
 ![Update](Docs/open_sgupm.jpg)
 
-## Open Settings
+### Open Settings
 
 Click on the gear button or the settings button, which is only shown when not configured.
 
 <img alt="Configure" src="Docs/click_configure.jpg" width="550"/>
 
-## Configure Package
+### Configure Package
 
 | Field           | Description                                   | Example                                                                                                                                                                         |
 |-----------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -75,7 +73,7 @@ Click on the gear button or the settings button, which is only shown when not co
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 
-## Reload
+### Reload
 
 After configuration, click the reload button to complete the setup. Next time, the reload process will run at the following times:
 
@@ -83,8 +81,6 @@ After configuration, click the reload button to complete the setup. Next time, t
 - When displaying Smart Git UPM
 
 <img alt="SGUPM" src="Docs/sgupm.jpg" width="500"/>
-
-***
 
 ## Button Descriptions
 

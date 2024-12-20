@@ -8,16 +8,16 @@ Unity Editorで、Gitリポジトリ内のパッケージを効率的に管理�
 
 ![Header](Docs/header.png)
 
-# このプラグインを利用する理由
+## このプラグインを利用する理由
 
-## アップデートを一目で確認
+### アップデートを一目で確認
 
 Unity Package Managerは、Gitで公開されているパッケージのアップデート情報を知る事ができません。
 `SmartGitUPM`なら分かりやすいUIで確認できます。
 
 ![Update](Docs/update.jpg)
 
-## プライベートリポジトリの更新確認に対応
+### プライベートリポジトリの更新確認に対応
 
 プライベートリポジトリ(SSL接続)のパッケージに対応。更新確認がプライベートリポジトリでも可能です。
 
@@ -27,24 +27,22 @@ Unity Package Managerは、Gitで公開されているパッケージのアッ�
 - 大きなプライベートリポジトリは、初回の表示に時間がかかります。
 - パブリックリポジトリに大小は関係なく、表示速度は変わりません。
 
-## 更新通知
+### 更新通知
 
 Unity Editorを開く度に、パッケージの更新があれば通知を受け取る事ができます。(通知の停止可)
 
 <img alt="Alert" src="Docs/alert.jpg" width="550"/>
 
-## 内部ではUPMを利用しているので安心
+### 内部ではUPMを利用しているので安心
 
 内部では、Unity Package Manager(UPM)を利用しパッケージ管理をしているので安心。
 もし、`SmartGitUPM`が気に入らなくなっても削除すればおしまいです。以降は、UPMで通常通り管理できます。
 
 ![Update](Docs/upm.jpg)
 
-***
+## Getting Started
 
-# Getting Started
-
-## Git Urlからインストール
+### Git Urlからインストール
 
 "Unity Editor : Window > Package Manager > Add package from git URL...".
 
@@ -52,19 +50,19 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 ![Update](Docs/add_package.png)
 
-## SmartGitUPMを開く
+### SmartGitUPMを開く
 
 `Unity Editor : Window > Smart Git UPM`
 
 ![Update](Docs/open_sgupm.jpg)
 
-## 設定を開く
+### 設定を開く
 
 歯車ボタン、もしくは未設定時のみ表示される設定ボタンをクリック
 
 <img alt="Configure" src="Docs/click_configure.jpg" width="550"/>
 
-## パッケージを設定
+### パッケージを設定
 
 | フィールド                    | 説明                              | 例                                                                                                                                                           |
 |--------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -75,7 +73,7 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 
-## リロード
+### リロード
 
 設定後、リロードボタンをクリックして完了です。
 次回からは、下記タイミングでリロード処理が実行されます。
@@ -84,8 +82,6 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 - Smart Git UPMを表示した時
 
 <img alt="SGUPM" src="Docs/sgupm.jpg" width="500"/>
-
-***
 
 ## 各ボタンの説明
 
