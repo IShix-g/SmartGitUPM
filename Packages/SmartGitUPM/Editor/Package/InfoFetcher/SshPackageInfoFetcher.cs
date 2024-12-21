@@ -12,8 +12,6 @@ namespace SmartGitUPM.Editor
 {
     public sealed class SshPackageInfoFetcher : IPackageInfoFetcher
     {
-        public const string PackageCachePath = "Library/PackageCache-SmartGitUPM";
-        
         public bool IsProcessing{ get; private set; }
         public string SupportProtocol { get; } = "SSH";
         
@@ -35,7 +33,7 @@ namespace SmartGitUPM.Editor
             PackageCacheManager.Initialize();
             
             var (absolutePath, query) = ParsePath(packageInstallUrl);
-            var rootPath = Application.dataPath + "/../" + PackageCachePath;
+            var rootPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath;
             var tempPath = rootPath + "/.tmp_" + CreateUniqID();
             var command = "git";
             var arguments = default(string);

@@ -1,5 +1,7 @@
 
 using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -11,8 +13,8 @@ namespace SmartGitUPM.Editor
     public sealed class HttpPackageInfoFetcher : IPackageInfoFetcher
     {
         public const string PackageJsonFileName = "package.json";
-        public const string GitHubRawUrl = "https://raw.githubusercontent.com";
-
+        public const string PackageCachePath = "Library/PackageCache";
+        public const string SgUpmPackageCachePath = "Library/PackageCache-SmartGitUPM";
         public bool IsProcessing{ get; private set; }
         public string SupportProtocol { get; } = "https";
 
@@ -31,10 +33,10 @@ namespace SmartGitUPM.Editor
                 throw new ArgumentException("Specify the URL of " + SupportProtocol + ". packageInstallUrl: " + packageInstallUrl, nameof(packageInstallUrl));
             }
             var gitPackageJsonUrl = ToRawPackageJsonURL(packageInstallUrl, branch);
-            return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, token);
+            return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, supperReload, token);
         }
         
-        public async Task<PackageInfoDetails> FetchPackageInfoByPackageJsonUrl(string packageInstallUrl, string gitPackageJsonUrl, CancellationToken token = default)
+        public async Task<PackageInfoDetails> FetchPackageInfoByPackageJsonUrl(string packageInstallUrl, string gitPackageJsonUrl, bool supperReload, CancellationToken token = default)
         {
             var info = default(PackageInfo);
             try
@@ -51,7 +53,31 @@ namespace SmartGitUPM.Editor
                         displayName = info.displayName
                     }
                     : default;
-                var server = await FetchPackageInfo(gitPackageJsonUrl);
+                
+                var server = default(PackageRemoteInfo);
+                var fileNameFromUrl = GenerateFileNameFromUrl(packageInstallUrl);
+                if (!supperReload)
+                {
+                    if (local != default)
+                    {
+                        server = await GetPackageInfoFromCache(local.name, token);
+                    }
+                    else
+                    {
+                        server = await GetPackageInfoFromSgUpmCache(fileNameFromUrl, token);
+                    }
+                }
+                
+                if(server == default)
+                {
+                    server = await FetchPackageInfo(gitPackageJsonUrl);
+                    if (server != default
+                        && local == default)
+                    {
+                        await SavePackageInfoFromSgUpmCache(fileNameFromUrl, server, token);
+                    }
+                }
+                
                 return new PackageInfoDetails(local, server, packageInstallUrl);
             }
             catch (Exception ex)
@@ -97,7 +123,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-
+        
         public static string ToRawPackageJsonURL(string packageInstallUrl, string branch)
         {
             var rootUrl = ToRawPackageRootURL(packageInstallUrl, branch);
@@ -129,6 +155,71 @@ namespace SmartGitUPM.Editor
             return $"{resultUrl}/raw/{branch}/{path}";
         }
 
+                public static async Task<PackageRemoteInfo> GetPackageInfoFromCache(string packageName, CancellationToken token = default)
+        {
+            var rootDir = Application.dataPath + "/../" + PackageCachePath;
+            if (!Directory.Exists(rootDir))
+            {
+                return default;
+            }
+            var allFiles = Directory.GetDirectories(rootDir, "*.*", SearchOption.TopDirectoryOnly);
+            foreach (var file in allFiles)
+            {
+                if (file.Contains(packageName))
+                {
+                    var filePath = file + "/package.json";
+                    var jsonString = await File.ReadAllTextAsync(filePath, token);
+                    return JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
+                }
+            }
+            return default;
+        }
+        
+        public static async Task<PackageRemoteInfo> GetPackageInfoFromSgUpmCache(string packageName, CancellationToken token = default)
+        {
+            var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
+            if (!File.Exists(filePath))
+            {
+                return default;
+            }
+            var jsonString = await File.ReadAllTextAsync(filePath, token);
+            return JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
+        }
+        
+        public static async Task<bool> SavePackageInfoFromSgUpmCache(string packageName, PackageRemoteInfo info, CancellationToken token = default)
+        {
+            var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
+            var jsonString = JsonUtility.ToJson(info);
+            if (!string.IsNullOrEmpty(jsonString)
+                && jsonString != "[]")
+            {
+                await File.WriteAllTextAsync(filePath, jsonString, token);
+                return true;
+            }
+            return false;
+        }
+        
+        public static string GenerateFileNameFromUrl(string packageInstallUrl)
+        {
+            try
+            {
+                var uri = new Uri(packageInstallUrl);
+                var segments = uri.AbsolutePath.Split('/');
+                var userName = segments.Length > 1 ? segments[1] : string.Empty;
+                var repoName = segments.Length > 2 ? segments[^1] : string.Empty;
+                if (repoName.EndsWith(".git"))
+                {
+                    repoName = repoName.Substring(0, repoName.Length - 4);
+                }
+                return $"{userName}@{repoName}";
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"Error processing URL: {ex.Message}");
+                return string.Empty;
+            }
+        }
+        
         static string ExtractPathFromQuery(string query)
         {
             var parameters = query.TrimStart('?').Split('&');

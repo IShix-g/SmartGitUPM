@@ -14,18 +14,24 @@ namespace SmartGitUPM.Editor
         const string _packagePath = "Packages/" + _packageName + "/";
 
         [MenuItem("Window/Smart Git UPM")]
-        public static void Open() => Open(true);
+        public static void Open() => Open(IsFirstOpen);
         
         public static void Open(bool superReload)
         {
-            s_superReload = superReload;
             var window = GetWindow<PackageCollectionWindow>("Smart Git UPM");
             window.minSize = new Vector2(440, 450);
+            window._superReload = superReload;
             window.Show();
         }
         
-        static bool s_superReload;
+        public static bool IsFirstOpen
+        {
+            get => SessionState.GetBool("PackageCollectionWindow_IsFirstOpen", false);
+            set => SessionState.SetBool("PackageCollectionWindow_IsFirstOpen", value);
+        }
+        
         readonly PackageVersionChecker _versionChecker = new (_gitInstallUrl, _gitBranchName, _packageName);
+        bool _superReload;
         SGUPackageManager _manager;
         EditorViewSwitcher _viewSwitcher;
         PackageCollectionSettingView _settingView;
@@ -69,8 +75,9 @@ namespace SmartGitUPM.Editor
                 _viewSwitcher.ShowDefaultViewIfNeeded();
             }
             _versionChecker.Fetch().Handled();
-            FetchPackages(s_superReload);
-            s_superReload = false;
+            FetchPackages(_superReload);
+            _superReload = false;
+            IsFirstOpen = false;
         }
 
         void OnDestroy()
@@ -102,14 +109,10 @@ namespace SmartGitUPM.Editor
             var clickedStartReload = GUILayout.Button(_refreshIcon, width, height);
             var clickedOpenManager = GUILayout.Button("Package Manager", height);
             var clickedGitHub = GUILayout.Button("GitHub page", height);
+            var clickedVersion = false;
             if (_versionChecker.IsLoaded)
             {
-                var clickedVersion = GUILayout.Button(_versionChecker.LocalInfo.VersionString, height);
-                if (clickedVersion)
-                {
-                    _tokenSource = new CancellationTokenSource();
-                    _versionChecker.CheckVersion(_tokenSource.Token);
-                }
+                clickedVersion = GUILayout.Button(_versionChecker.LocalInfo.VersionString, height);
             }
             GUILayout.EndHorizontal();
             EditorGUI.EndDisabledGroup();
@@ -140,6 +143,11 @@ namespace SmartGitUPM.Editor
             else if (clickedOpenManager)
             {
                 PackageInstaller.OpenPackageManager();
+            }
+            else if (clickedVersion)
+            {
+                _tokenSource = new CancellationTokenSource();
+                _versionChecker.CheckVersion(_tokenSource.Token);
             }
 
             {
