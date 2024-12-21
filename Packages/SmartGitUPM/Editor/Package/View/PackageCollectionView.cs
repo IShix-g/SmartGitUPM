@@ -114,24 +114,21 @@ namespace SmartGitUPM.Editor
                         stretchWidth = false,
                         fixedHeight = EditorGUIUtility.singleLineHeight,
                     };
-                    if (GUILayout.Button(displayName, linkStyle))
-                    {
-                        Application.OpenURL(setting.HelpPageUrl);
-                    }
-                    
+                    var clickedHelp = GUILayout.Button(displayName, linkStyle);
                     var iconStyle = new GUIStyle(GUI.skin.label)
                     {
                         fixedWidth = 25,
                         fixedHeight = EditorGUIUtility.singleLineHeight,
                     };
-                    if (GUILayout.Button(_linkIcon, iconStyle))
-                    {
-                        Application.OpenURL(setting.HelpPageUrl);
-                    }
+                    clickedHelp |= GUILayout.Button(_linkIcon, iconStyle);
                     GUILayout.EndHorizontal();
                     
                     var lastRect = GUILayoutUtility.GetLastRect();
                     EditorGUIUtility.AddCursorRect(lastRect, MouseCursor.Link);
+                    if (clickedHelp)
+                    {
+                        Application.OpenURL(setting.HelpPageUrl);
+                    }
                 }
                 
                 var color = GUI.color;

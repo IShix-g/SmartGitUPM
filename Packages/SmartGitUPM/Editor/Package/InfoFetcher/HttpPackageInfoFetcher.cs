@@ -56,7 +56,7 @@ namespace SmartGitUPM.Editor
                 var fileNameFromUrl = GenerateFileNameFromUrl(packageInstallUrl);
                 if (!supperReload)
                 {
-                    server = await GetPackageInfoFromSgUpmCache(fileNameFromUrl, token);
+                    server = await GetPackageInfoFromCache(fileNameFromUrl, token);
                 }
                 
                 if(server == default)
@@ -64,7 +64,7 @@ namespace SmartGitUPM.Editor
                     server = await FetchPackageInfo(gitPackageJsonUrl);
                     if (server != default)
                     {
-                        await SavePackageInfoFromSgUpmCache(fileNameFromUrl, server, token);
+                        await SavePackageInfoToCache(fileNameFromUrl, server, token);
                     }
                 }
                 
@@ -145,7 +145,7 @@ namespace SmartGitUPM.Editor
             return $"{resultUrl}/raw/{branch}/{path}";
         }
         
-        public static async Task<PackageRemoteInfo> GetPackageInfoFromSgUpmCache(string packageName, CancellationToken token = default)
+        public static async Task<PackageRemoteInfo> GetPackageInfoFromCache(string packageName, CancellationToken token = default)
         {
             var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
             if (!File.Exists(filePath))
@@ -156,7 +156,7 @@ namespace SmartGitUPM.Editor
             return JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
         }
         
-        public static async Task<bool> SavePackageInfoFromSgUpmCache(string packageName, PackageRemoteInfo info, CancellationToken token = default)
+        public static async Task<bool> SavePackageInfoToCache(string packageName, PackageRemoteInfo info, CancellationToken token = default)
         {
             var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
             var jsonString = JsonUtility.ToJson(info);

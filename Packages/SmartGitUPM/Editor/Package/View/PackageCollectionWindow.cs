@@ -26,8 +26,8 @@ namespace SmartGitUPM.Editor
         
         public static bool IsFirstOpen
         {
-            get => SessionState.GetBool("PackageCollectionWindow_IsFirstOpen", false);
-            set => SessionState.SetBool("PackageCollectionWindow_IsFirstOpen", value);
+            get => SessionState.GetBool("SmartGitUPM_PackageCollectionWindow_IsFirstOpen", true);
+            set => SessionState.SetBool("SmartGitUPM_PackageCollectionWindow_IsFirstOpen", value);
         }
         
         readonly PackageVersionChecker _versionChecker = new (_gitInstallUrl, _gitBranchName, _packageName);
