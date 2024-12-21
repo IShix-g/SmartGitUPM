@@ -163,6 +163,7 @@ namespace SmartGitUPM.Editor
             if (!string.IsNullOrEmpty(jsonString)
                 && jsonString != "[]")
             {
+                CreateDirectories(filePath);
                 await File.WriteAllTextAsync(filePath, jsonString, token);
                 return true;
             }
@@ -203,6 +204,19 @@ namespace SmartGitUPM.Editor
                 }
             }
             return string.Empty;
+        }
+        
+        public static void CreateDirectories(string path)
+        {
+            path = Path.HasExtension(path)
+                ? Path.GetDirectoryName(path)
+                : path;
+            
+            if (!string.IsNullOrEmpty(path)
+                && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }
         
         public void Dispose()

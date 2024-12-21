@@ -127,7 +127,7 @@ namespace SmartGitUPM.Editor
 
             try
             {
-                CreateDirectories(rootPath);
+                HttpPackageInfoFetcher.CreateDirectories(rootPath);
                 
                 using var process = Process.Start(startInfo);
                 if (process != null)
@@ -252,19 +252,6 @@ namespace SmartGitUPM.Editor
                 .Replace("=", "")
                 .Replace("+", "")
                 .Replace("/", "");
-        }
-
-        static void CreateDirectories(string path)
-        {
-            path = Path.HasExtension(path)
-                ? Path.GetDirectoryName(path)
-                : path;
-            
-            if (!string.IsNullOrEmpty(path)
-                && !Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
         }
         
         static (string AbsolutePath, string Query) ParsePath(string path)

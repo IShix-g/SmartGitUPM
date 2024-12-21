@@ -102,9 +102,12 @@ namespace SmartGitUPM.Editor
             }
             var query = uri.Query;
             var path = ExtractPathFromQuery(query);
-            var resultUrl = packageInstallUrl.Contains("github.com") ? GitHubRawUrl + pathWithoutFileName : uri.GetLeftPart(UriPartial.Authority) + pathWithoutFileName;
-            var raw = packageInstallUrl.Contains("github.com") ? $"refs/heads/{branch}" : $"raw/{branch}";
-            return $"{resultUrl}/{raw}/{path}";
+            var resultUrl = uri.GetLeftPart(UriPartial.Authority) + pathWithoutFileName;
+            if (string.IsNullOrEmpty(branch))
+            {
+                branch = "HEAD";
+            }
+            return $"{resultUrl}/raw/{branch}/{path}";
         }
 
         static string ExtractPathFromQuery(string query)
