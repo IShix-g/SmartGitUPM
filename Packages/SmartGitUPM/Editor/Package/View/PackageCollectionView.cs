@@ -242,21 +242,30 @@ namespace SmartGitUPM.Editor
 
         string ToLocalVersionString(PackageInfoDetails details)
             => details.IsInstalled 
-                ? "v" + details.Local.version
+                ? !details.Local.version.StartsWith("v")
+                    ? "v" + details.Local.version
+                    : details.Local.version
                 : string.Empty;
 
         string ToServerVersionString(PackageInfoDetails details)
             => details.IsLoaded
-                ? "v" + details.Remote.version
+                ? !details.Remote.version.StartsWith("v")
+                    ? "v" + details.Remote.version
+                    : details.Remote.version
                 : string.Empty;
 
         string ToFixedVersion(PackageInfoDetails details)
         {
             if (details.IsInstalled)
             {
-                return "v" + details.Local.version;
+                return !details.Local.version.StartsWith("v")
+                    ? "v" + details.Local.version
+                    : details.Local.version;
             }
-            return "v" + details.GetVersionParam();
+            var version = details.GetVersionParam();
+            return !version.StartsWith("v")
+                ? "v" + version
+                : version;
         }
     }
 }

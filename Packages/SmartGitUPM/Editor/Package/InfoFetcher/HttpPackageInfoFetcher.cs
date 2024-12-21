@@ -1,7 +1,6 @@
 
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,7 +12,6 @@ namespace SmartGitUPM.Editor
     public sealed class HttpPackageInfoFetcher : IPackageInfoFetcher
     {
         public const string PackageJsonFileName = "package.json";
-        public const string PackageCachePath = "Library/PackageCache";
         public const string SgUpmPackageCachePath = "Library/PackageCache-SmartGitUPM";
         public bool IsProcessing{ get; private set; }
         public string SupportProtocol { get; } = "https";
@@ -58,21 +56,13 @@ namespace SmartGitUPM.Editor
                 var fileNameFromUrl = GenerateFileNameFromUrl(packageInstallUrl);
                 if (!supperReload)
                 {
-                    if (local != default)
-                    {
-                        server = await GetPackageInfoFromCache(local.name, token);
-                    }
-                    else
-                    {
-                        server = await GetPackageInfoFromSgUpmCache(fileNameFromUrl, token);
-                    }
+                    server = await GetPackageInfoFromSgUpmCache(fileNameFromUrl, token);
                 }
                 
                 if(server == default)
                 {
                     server = await FetchPackageInfo(gitPackageJsonUrl);
-                    if (server != default
-                        && local == default)
+                    if (server != default)
                     {
                         await SavePackageInfoFromSgUpmCache(fileNameFromUrl, server, token);
                     }
@@ -153,26 +143,6 @@ namespace SmartGitUPM.Editor
                 branch = "HEAD";
             }
             return $"{resultUrl}/raw/{branch}/{path}";
-        }
-
-                public static async Task<PackageRemoteInfo> GetPackageInfoFromCache(string packageName, CancellationToken token = default)
-        {
-            var rootDir = Application.dataPath + "/../" + PackageCachePath;
-            if (!Directory.Exists(rootDir))
-            {
-                return default;
-            }
-            var allFiles = Directory.GetDirectories(rootDir, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (var file in allFiles)
-            {
-                if (file.Contains(packageName))
-                {
-                    var filePath = file + "/package.json";
-                    var jsonString = await File.ReadAllTextAsync(filePath, token);
-                    return JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
-                }
-            }
-            return default;
         }
         
         public static async Task<PackageRemoteInfo> GetPackageInfoFromSgUpmCache(string packageName, CancellationToken token = default)

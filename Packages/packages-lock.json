@@ -17,11 +17,11 @@
       "dependencies": {}
     },
     "com.ishix.smcpconfigurator": {
-      "version": "https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator#1.0.9",
+      "version": "https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "2a313cbff8e5c1a27e989a0b1f1c2594bbd353fe"
+      "hash": "6af16bc10dd2848925d772651900605e9487472c"
     },
     "com.ishix.test.unitydependencypackage": {
       "version": "https://github.com/IShix-g/TestPackage.git?path=Packages/UnityDependencyPackage",
