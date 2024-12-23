@@ -1,7 +1,7 @@
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class SGUPackageManagerFactory
+    internal sealed class SGUPackageManagerFactory
     {
         public SGUPackageManager Create()
         {

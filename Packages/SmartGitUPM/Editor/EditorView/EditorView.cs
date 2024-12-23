@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace SmartGitUPM.Editor
 {
-    public abstract class EditorView : IDisposable
+    internal abstract class EditorView : IDisposable
     {
         public event Action<EditorView> OnOpenView = delegate { };
         public event Action<EditorView> OnCloseView = delegate { };

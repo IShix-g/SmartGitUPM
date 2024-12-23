@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class EditorViewSwitcher : IDisposable
+    internal sealed class EditorViewSwitcher : IDisposable
     {
         public List<EditorView> Views { get; private set; } = new ();
         public string CurrentViewID { get; private set; }

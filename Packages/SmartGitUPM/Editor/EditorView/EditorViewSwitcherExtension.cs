@@ -3,7 +3,7 @@ using System;
 
 namespace SmartGitUPM.Editor
 {
-    public static class EditorViewSwitcherExtension
+    internal static class EditorViewSwitcherExtension
     {
         public static bool IsOpen(this EditorViewSwitcher @this, string viewID)
             => @this.IsOpen(@this.Get(viewID));

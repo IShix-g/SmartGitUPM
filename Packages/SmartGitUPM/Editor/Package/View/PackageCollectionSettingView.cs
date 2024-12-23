@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class PackageCollectionSettingView : EditorView
+    internal sealed class PackageCollectionSettingView : EditorView
     {
         Vector2 _scrollPos;
         SerializedObject _serializedObject;

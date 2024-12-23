@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class SGUPackageManager : IDisposable
+    internal sealed class SGUPackageManager : IDisposable
     {
         public PackageInstaller Installer { get; }
         public PackageCollection Collection { get; }

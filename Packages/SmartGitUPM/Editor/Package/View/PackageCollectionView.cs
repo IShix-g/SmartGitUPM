@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class PackageCollectionView : EditorView
+    internal sealed class PackageCollectionView : EditorView
     {
         public event Action OnInstall = delegate { };
         public event Action OnUnInstall = delegate { };
