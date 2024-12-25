@@ -55,7 +55,7 @@ namespace SmartGitUPM.Editor
             path = Path.HasExtension(path)
                 ? Path.GetDirectoryName(path)
                 : path;
-            path = path.Replace("\\", "/");
+            path = path?.Replace("\\", "/");
 
             if (string.IsNullOrEmpty(path)
                 || AssetDatabase.IsValidFolder(path))

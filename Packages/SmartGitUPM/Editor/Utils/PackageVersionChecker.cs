@@ -12,7 +12,6 @@ namespace SmartGitUPM.Editor
     internal sealed class PackageVersionChecker : IDisposable
     {
         public const string PackageJsonFileName = "package.json";
-        public const string GitHubRawUrl = "https://raw.githubusercontent.com";
         
         public readonly string GitInstallUrl;
         public readonly string BranchName;
