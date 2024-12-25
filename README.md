@@ -20,11 +20,11 @@ Unity Package Manager doesn’t provide update information for packages publishe
 
 ### Support for Private Repository Update Checks
 
-Supports packages in private repositories (SSL connection). You can check updates even in private repositories.
+Supports packages in private repositories (SSH connection). You can check updates even in private repositories.
 
 ![Update](Docs/private_repo.jpg)
 
-- Configure SSL and set the SSL URL, for example, `git@github.com:IShix-g/SmartGitUPM.git`
+- Configure SSH and set the SSH URL, for example, `git@github.com:IShix-g/SmartGitUPM.git`
 - Large private repositories take longer to display the first time.
 - The size of a public repository does not affect display speed.
 
@@ -64,12 +64,12 @@ Click on the gear button or the settings button, which is only shown when not co
 
 ### Configure Package
 
-| Field           | Description                                   | Example                                                                                                                                                                         |
-|-----------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Update Notify   | Receive update notifications when the Unity Editor starts? | [Checked] Receive updates                                                                                                                                                      |
-| Install Url     | URL for package installation (https or SSL)   | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
-| Branch (Optional) | Specify the branch name if needed                | Leave blank, or use `main` or `master`, etc.|
-| Help Page Url (Optional) | Specify the help page URL if needed          | Leave it blank or provide a help page URL, e.g., https://github.com/IShix-g/CMSuniVortex                                                                    |
+| Field           | Description                                                | Example                                                                                                                                                     |
+|-----------------|------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Update Notify   | Receive update notifications when the Unity Editor starts? | [Checked] Receive updates                                                                                                                                   |
+| Install Url     | URL for package installation (https or SSH)                | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSH] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
+| Branch (Optional) | Specify the branch name if needed                          | Leave blank, or use `main` or `master`, etc.                                                                                                                |
+| Help Page Url (Optional) | Specify the help page URL if needed                        | Leave it blank or provide a help page URL, e.g., https://github.com/IShix-g/CMSuniVortex                                                                    |
 
 <img alt="SGUPM" src="Docs/setting_package2.jpg" width="550"/>
 

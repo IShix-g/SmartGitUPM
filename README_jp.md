@@ -19,11 +19,11 @@ Unity Package Managerは、Gitで公開されているパッケージのアッ�
 
 ### プライベートリポジトリの更新確認に対応
 
-プライベートリポジトリ(SSL接続)のパッケージに対応。更新確認がプライベートリポジトリでも可能です。
+プライベートリポジトリ(SSH接続)のパッケージに対応。更新確認がプライベートリポジトリでも可能です。
 
 ![Update](Docs/private_repo.jpg)
 
-- SSLを設定し、SSL用のURLを指定。例) `git@github.com:IShix-g/SmartGitUPM.git`
+- SSHを設定し、SSH用のURLを指定。例) `git@github.com:IShix-g/SmartGitUPM.git`
 - 大きなプライベートリポジトリは、初回の表示に時間がかかります。
 - パブリックリポジトリに大小は関係なく、表示速度は変わりません。
 
@@ -67,7 +67,7 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 | フィールド                    | 説明                              | 例                                                                                                                                                           |
 |--------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Update Notify            | Unity Editor起動時にアップデートの通知を受けるか？ | [チェックした場合] アップデートを受け取る                                                                                                                                      |
-| Install Url              | パッケージのインストールURL (https or SSL)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSL] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
+| Install Url              | パッケージのインストールURL (https or SSH)  | [https] https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex<br/>[SSH] git@github.com:IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex |
 | Branch (Optional)        | 必要あればブランチ名を指定                   | 空欄 または `main` や `master` など                                                                                                                                 |
 | Help Page Url (Optional) | 必要あればヘルプページを指定                  | 空欄 または ヘルプページのURL https://github.com/IShix-g/CMSuniVortex など                                                                                                |
 
