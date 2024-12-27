@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SmartGitUPM.Editor
@@ -8,8 +9,17 @@ namespace SmartGitUPM.Editor
     public sealed class PackageCollectionSetting : ScriptableObject
     {
         [SerializeField] PackageMetaData[] _packages;
-        public PackageMetaData[] Packages => _packages;
+        
+        public int Length => _packages.Length;
+        internal PackageMetaData[] Packages => _packages;
 
+        public static PackageCollectionSetting LoadInstance()
+            => UniqScriptableObject.CreateOrLoadAsset<PackageCollectionSetting>();
+        
+        public IReadOnlyList<PackageMetaData> GetPackages() => _packages;
+        
+        public PackageMetaData GetPackageAt(int index) => _packages[index];
+        
         public PackageMetaData GetPackage(string installUrl)
         {
             foreach (var package in _packages)

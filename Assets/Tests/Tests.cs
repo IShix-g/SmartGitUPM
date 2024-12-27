@@ -1,18 +1,17 @@
 
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using SmartGitUPM.Editor;
 using UnityEngine;
 
-namespace Editor
+namespace Tests
 {
-    public class TestWindow
+    public class Tests
     {
         [MenuItem("Tests/Create Path")]
         public static void CreatePath()
         {
-            AssetDatabaseSupport.CreateDirectories("Assets/Test/Test2");
+            AssetDatabaseSupport.CreateDirectories("Assets/CreateTest/Test");
         }
         
         [MenuItem("Tests/Install Package")]
@@ -31,7 +30,6 @@ namespace Editor
                     {
                         throw task.Exception;
                     }
-
                     var details = task.Result;
                     Debug.Log(details.Select(x => x.name + " " + x.version).Aggregate((a, b) => a + "\n" + b));
                 });
@@ -52,7 +50,6 @@ namespace Editor
                     {
                         throw task.Exception;
                     }
-                    
                     var details = task.Result;
                     Debug.Log("Server: \n" + JsonUtility.ToJson(details.Remote, true) + "\nLocal: \n" + JsonUtility.ToJson(details.Local, true));
                 });

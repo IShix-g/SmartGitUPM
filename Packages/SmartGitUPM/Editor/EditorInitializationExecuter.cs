@@ -3,12 +3,14 @@ using UnityEditor;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class EditorStartupDetector
+    internal sealed class EditorInitializationExecuter
     {
+        const string _key = "SmartGitUPM_EditorInitializationExecuter_FirstInit";
+        
         public static bool IsFirstInit
         {
-            get => SessionState.GetBool("EditorStartupDetector_FirstInit", false);
-            set => SessionState.SetBool("EditorStartupDetector_FirstInit", value);
+            get => SessionState.GetBool(_key, false);
+            set => SessionState.SetBool(_key, value);
         }
         
         [InitializeOnLoadMethod]

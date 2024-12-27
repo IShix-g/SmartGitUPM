@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class PackageCollection : IDisposable
+    internal sealed class PackageCollection : IDisposable
     {
         public bool IsDisposed{ get; private set; }
         public bool HasMetas => Metas is {Count: > 0};

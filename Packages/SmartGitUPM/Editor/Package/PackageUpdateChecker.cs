@@ -7,7 +7,7 @@ using UnityEngine.Pool;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class PackageUpdateChecker : IDisposable
+    internal sealed class PackageUpdateChecker : IDisposable
     {
         bool _disposed;
         CancellationTokenSource _tokenSource;

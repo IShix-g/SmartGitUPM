@@ -7,7 +7,7 @@ namespace SmartGitUPM.Editor
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class UniqScriptableObjectPathAttribute : Attribute
+    internal class UniqScriptableObjectPathAttribute : Attribute
     {
         public string Path { get; }
 

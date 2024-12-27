@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    public static class TaskExtensions
+    internal static class TaskExtensions
     {
         public static void ContinueOnMainThread<T>(
             this Task<T> @this,

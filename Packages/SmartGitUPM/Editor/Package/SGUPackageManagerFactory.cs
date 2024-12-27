@@ -5,7 +5,7 @@ namespace SmartGitUPM.Editor
     {
         public SGUPackageManager Create()
         {
-            var setting = UniqScriptableObject.CreateOrLoadAsset<PackageCollectionSetting>();
+            var setting = PackageCollectionSetting.LoadInstance();
             var installer = new PackageInstaller();
             var infoFetchers = new IPackageInfoFetcher[]
             {

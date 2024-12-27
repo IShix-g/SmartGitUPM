@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class PackageCacheManager
+    internal sealed class PackageCacheManager
     {
         const string _editorPrefsKey = "PackageCacheInfoKey";
 

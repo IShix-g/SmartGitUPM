@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace SmartGitUPM.Editor
 {
-    public static class AssetDatabaseSupport
+    internal static class AssetDatabaseSupport
     {
         public static T CreateOrLoad<T>(string path) where T : ScriptableObject
         {
@@ -69,7 +69,6 @@ namespace SmartGitUPM.Editor
             for (var i = 1; i < folders.Length; i++)
             {
                 var newFolder = parentFolder + "/" + folders[i];
-                Debug.Log(newFolder + " : " + AssetDatabase.IsValidFolder(newFolder));
                 if (!AssetDatabase.IsValidFolder(newFolder))
                 {
                     AssetDatabase.CreateFolder(parentFolder, folders[i]);

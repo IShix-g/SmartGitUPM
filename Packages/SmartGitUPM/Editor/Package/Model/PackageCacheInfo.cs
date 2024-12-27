@@ -5,13 +5,13 @@ using System.Collections.Generic;
 namespace SmartGitUPM.Editor
 {
     [Serializable]
-    public sealed class PackageCacheInfos
+    internal sealed class PackageCacheInfos
     {
         public List<PackageCacheInfo> Packages = new ();
     }
 
     [Serializable]
-    public sealed class PackageCacheInfo
+    internal sealed class PackageCacheInfo
     {
         public string Name;
         public string DisplayName;

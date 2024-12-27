@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class EditorAsync : IDisposable
+    internal sealed class EditorAsync : IDisposable
     {
         public bool IsStarted => _completionSource != null;
 

@@ -12,7 +12,8 @@ namespace SmartGitUPM.Editor
         const string _gitBranchName = "main";
         const string _packageName = "com.ishix.smartgitupm";
         const string _packagePath = "Packages/" + _packageName + "/";
-
+        const string _firstOpenKey = "SmartGitUPM_PackageCollectionWindow_IsFirstOpen";
+        
         [MenuItem("Window/Smart Git UPM")]
         public static void Open() => Open(IsFirstOpen);
         
@@ -26,8 +27,8 @@ namespace SmartGitUPM.Editor
         
         public static bool IsFirstOpen
         {
-            get => SessionState.GetBool("SmartGitUPM_PackageCollectionWindow_IsFirstOpen", true);
-            set => SessionState.SetBool("SmartGitUPM_PackageCollectionWindow_IsFirstOpen", value);
+            get => SessionState.GetBool(_firstOpenKey, true);
+            set => SessionState.SetBool(_firstOpenKey, value);
         }
         
         readonly PackageVersionChecker _versionChecker = new (_gitInstallUrl, _gitBranchName, _packageName);
@@ -212,7 +213,7 @@ namespace SmartGitUPM.Editor
         
         void FetchPackages(bool superReload)
         {
-            var setting = UniqScriptableObject.CreateOrLoadAsset<PackageCollectionSetting>();
+            var setting = PackageCollectionSetting.LoadInstance();
             _manager.Collection.Set(setting.Packages);
             if (!_manager.Collection.HasMetas)
             {
