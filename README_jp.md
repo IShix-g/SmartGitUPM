@@ -83,6 +83,12 @@ URL: `https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM`
 
 <img alt="SGUPM" src="Docs/sgupm.jpg" width="500"/>
 
+### プラグインの言語
+
+設定から言語が選択できます。アラートや注意文などが指定した言語に翻訳されます。
+
+<img alt="localization" src="Docs/localization.jpg" width="500"/>
+
 ## 各ボタンの説明
 
 <img alt="Buttons" src="Docs/buttons.jpg" width="500"/>

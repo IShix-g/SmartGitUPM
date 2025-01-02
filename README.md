@@ -82,6 +82,12 @@ After configuration, click the reload button to complete the setup. Next time, t
 
 <img alt="SGUPM" src="Docs/sgupm.jpg" width="500"/>
 
+### Plugin Language
+
+You can select the language from the settings. Alerts, warnings, and other messages will be translated into the specified language.
+
+<img alt="localization" src="Docs/localization.jpg" width="500"/>
+
 ## Button Descriptions
 
 <img alt="Buttons" src="Docs/buttons.jpg" width="500"/>
