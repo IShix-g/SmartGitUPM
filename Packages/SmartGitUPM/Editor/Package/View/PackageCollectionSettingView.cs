@@ -1,5 +1,6 @@
 
 using System;
+using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,19 +9,33 @@ namespace SmartGitUPM.Editor
     internal sealed class PackageCollectionSettingView : EditorView
     {
         Vector2 _scrollPos;
-        SerializedObject _serializedObject;
-        PackageCollectionSetting _setting;
+        SerializedObject _packageSettingSerializedObject;
+        SerializedObject _localizationSettingSerializedObject;
+        PackageCollectionSetting _packageSetting;
+        LocalizationSetting _localizationSetting;
         readonly string _supportProtocols;
         
+        LocalizationEntry _updateEntry;
+        LocalizationEntry _installUrlEntry;
+        LocalizationEntry _branchEntry;
+        LocalizationEntry _languageEntry;
+        
         public PackageCollectionSettingView(
-                PackageCollectionSetting setting,
+                PackageCollectionSetting packageSetting,
+                LocalizationSetting localizationSetting,
+                LanguageManager languageManager,
                 string[] supportProtocols,
                 EditorWindow window
             )
             : base(window)
         {
-            _setting = setting;
-            _supportProtocols = String.Join(", ", supportProtocols);;
+            _packageSetting = packageSetting;
+            _localizationSetting = localizationSetting;
+            _supportProtocols = String.Join(", ", supportProtocols);
+            _updateEntry = languageManager.GetEntry("Setting/Update");
+            _installUrlEntry = languageManager.GetEntry("Setting/Install");
+            _branchEntry = languageManager.GetEntry("Setting/Branch");
+            _languageEntry = languageManager.GetEntry("Setting/Language");
         }
 
         public override string ViewID => "setting-view";
@@ -28,40 +43,76 @@ namespace SmartGitUPM.Editor
         public override string ViewDisplayName => "Setting";
 
         protected override void OnOpen()
-            => _serializedObject = new SerializedObject(_setting);
+        {
+            _packageSettingSerializedObject = new SerializedObject(_packageSetting);
+            _localizationSettingSerializedObject = new SerializedObject(_localizationSetting);
+        }
 
         protected override void OnClose()
-            => _serializedObject = default;
+        {
+            _packageSettingSerializedObject = default;
+            _localizationSettingSerializedObject = default;
+        }
         
         protected override void OnUpdate()
         {
-            _serializedObject.Update();
-            
             var position = Window.position;
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(position.width));
-            GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
-            EditorGUILayout.HelpBox("UpdateNotify:\nYou will receive update notifications when you open the Unity Editor.", MessageType.Info);
-            EditorGUILayout.HelpBox("InstallUrl:\nThe URL should only be from Git. Please specify the URL in the format required by \"Package Manager > Add package from git URL...\".", MessageType.Info);
-            EditorGUILayout.HelpBox("Branch:\nBranch name (Optional). Leave empty to use default.", MessageType.Info);
-            EditorGUILayout.HelpBox("Supported Protocols:\n" + _supportProtocols, MessageType.Info);
-            GUILayout.EndVertical();
             
-            EditorGUILayout.Space(10);
-            var property = _serializedObject.GetIterator();
-            property.NextVisible(true);
-            while (property.NextVisible(false))
             {
-                EditorGUILayout.PropertyField(property, true);
+                GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
+                EditorGUILayout.HelpBox("UpdateNotify: " + _updateEntry.CurrentValue, MessageType.Info);
+                EditorGUILayout.HelpBox("InstallUrl: " + _installUrlEntry.CurrentValue, MessageType.Info);
+                EditorGUILayout.HelpBox("Branch: " + _branchEntry.CurrentValue, MessageType.Info);
+                EditorGUILayout.HelpBox("Supported Protocols: " + _supportProtocols, MessageType.Info);
+                GUILayout.EndVertical();
+                
+                _packageSettingSerializedObject.Update();
+                var property = _packageSettingSerializedObject.GetIterator();
+                property.NextVisible(true);
+                while (property.NextVisible(false))
+                {
+                    EditorGUILayout.PropertyField(property, true);
+                }
+                _packageSettingSerializedObject.ApplyModifiedProperties();
+            }
+
+            {
+                var style = new GUIStyle(GUI.skin.label)
+                {
+                    padding = new RectOffset(5, 5, 10, 5),
+                    alignment = TextAnchor.MiddleCenter,
+                };
+                GUILayout.BeginHorizontal(style);
+                GUILayout.Label("Language Setting", style);
+                GUILayout.EndHorizontal();
+                EditorGUILayout.HelpBox(_languageEntry.CurrentValue, MessageType.Info);
+                GUILayout.Space(10);
+                
+                _localizationSettingSerializedObject.Update();
+                var property = _localizationSettingSerializedObject.GetIterator();
+                property.NextVisible(true);
+                while (property.NextVisible(false))
+                {
+                    EditorGUILayout.PropertyField(property, true);
+                }
+                _localizationSettingSerializedObject.ApplyModifiedProperties();
+                
+                GUILayout.Space(20);
             }
             GUILayout.EndScrollView();
-            
-            _serializedObject.ApplyModifiedProperties();
         }
         
         protected override void OnDestroy()
         {
-            _setting = default;
-            _serializedObject = default;
+            _packageSetting = default;
+            _localizationSetting = default;
+            _packageSettingSerializedObject = default;
+            _localizationSettingSerializedObject = default;
+            _updateEntry = default;
+            _installUrlEntry = default;
+            _branchEntry = default;
+            _languageEntry = default;
         }
     }
 }

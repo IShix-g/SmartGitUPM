@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d87f975618484b2086366b9fb7391f96, type: 3}
-  m_Name: SmartGitUPM_PackageCollectionSetting
+  m_Script: {fileID: 11500000, guid: c7d7004826104d73bec0cfbecb5bd7f1, type: 3}
+  m_Name: SmartGitUPM_LocalizationSetting
   m_EditorClassIdentifier: 
-  _packages: []
+  _language: 22

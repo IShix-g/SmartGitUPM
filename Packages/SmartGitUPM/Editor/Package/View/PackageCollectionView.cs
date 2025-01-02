@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,11 +24,16 @@ namespace SmartGitUPM.Editor
         CancellationTokenSource _tokenSource;
         bool _hasFixed;
         bool _hasUpdate;
+
+        LocalizationEntry _configureButtonEntry;
+        LocalizationEntry _fixedEntry;
+        LocalizationEntry _updateEntry;
         
         public PackageCollectionView(
             PackageInstaller installer,
             PackageCollectionSetting setting,
             PackageCollection collection,
+            LanguageManager languageManager,
             Action openSettingAction,
             EditorWindow window)
             : base(window)
@@ -39,6 +45,9 @@ namespace SmartGitUPM.Editor
             _installedIcon = EditorGUIUtility.IconContent("Progress");
             _updateIcon = EditorGUIUtility.IconContent("Update-Available");
             _linkIcon = EditorGUIUtility.IconContent("Linked");
+            _configureButtonEntry = languageManager.GetEntry("Collection/ConfigureButton");
+            _fixedEntry = languageManager.GetEntry("Collection/Fixed");
+            _updateEntry = languageManager.GetEntry("Collection/Update");
         }
         
         public override string ViewID => "collection-view";
@@ -55,11 +64,13 @@ namespace SmartGitUPM.Editor
             {
                 GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5), alignment = TextAnchor.MiddleCenter});
 
-                if (_installer.IsProcessing)
+                if (_installer.IsProcessing
+                    || (_setting.Length > 0
+                        && _collection.IsFetching))
                 {
                     GUILayout.Label("Now Loading...");
                 }
-                else if (GUILayout.Button("Configure the settings"))
+                else if (GUILayout.Button(_configureButtonEntry.CurrentValue))
                 {
                     _openSettingAction?.Invoke();
                 }
@@ -197,13 +208,13 @@ namespace SmartGitUPM.Editor
             if (_hasFixed)
             {
                 GUILayout.Space(10);
-                EditorGUILayout.HelpBox("(Fixed) : Version is locked. Remove version number after '#' in the URL if necessary.", MessageType.Info);
+                EditorGUILayout.HelpBox(_fixedEntry.CurrentValue, MessageType.Info);
             }
 
             if (_hasUpdate)
             {
                 GUILayout.Space(10);
-                EditorGUILayout.HelpBox("\"v Installed \u2192 v Latest\" : Update available. Please update if necessary.", MessageType.Info);
+                EditorGUILayout.HelpBox(_updateEntry.CurrentValue, MessageType.Info);
             }
             
             GUILayout.EndVertical();
@@ -221,6 +232,10 @@ namespace SmartGitUPM.Editor
             _installedIcon = default;
             _updateIcon = default;
             _linkIcon = default;
+            
+            _configureButtonEntry = default;
+            _fixedEntry = default;
+            _updateEntry = default;
         }
         
         string GetButtonText(PackageInfoDetails details)

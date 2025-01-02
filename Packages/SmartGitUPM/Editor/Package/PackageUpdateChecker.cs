@@ -11,11 +11,23 @@ namespace SmartGitUPM.Editor
     {
         bool _disposed;
         CancellationTokenSource _tokenSource;
+
+        public sealed class LocalizedStrings
+        {
+            public string Title;
+            public string Button;
+            public string Installed;
+            public string UpdateAvailable;
+        }
+
+        readonly LocalizedStrings _localizedStrings;
+        
+        public PackageUpdateChecker(LocalizedStrings localizedStrings)
+            => _localizedStrings = localizedStrings;
         
         public async Task CheckUpdate(bool promptForUpdate = true, CancellationToken token = default)
         {
-            var factory = new SGUPackageManagerFactory();
-            var manager = factory.Create();
+            using var manager = SGUPackageManagerFactory.Create();
             if (!manager.Collection.HasMetas)
             {
                 return;
@@ -65,10 +77,10 @@ namespace SmartGitUPM.Editor
                 if (promptForUpdate)
                 {
                     var contents = new CustomDialogContents(
-                        "An available update has been found.",
+                        _localizedStrings.Title,
                         ToPackageDetailString(details),
                         () => PackageCollectionWindow.Open(false),
-                        "Manage Packages",
+                        _localizedStrings.Button,
                         "Close"
                     );
                     var logo = PackageCollectionWindow.GetLogo();
@@ -90,11 +102,11 @@ namespace SmartGitUPM.Editor
                 msg += "- " + detail.Remote.displayName;
                 if (detail.Local == default)
                 {
-                    msg += " v" + detail.Remote.version + " is not installed.\n";
+                    msg += " v" + detail.Remote.version + _localizedStrings.Installed + "\n";
                 }
                 else if (detail.Remote.version != detail.Local.version)
                 {
-                    msg += " v" + detail.Local.version + " \u2192 v" + detail.Remote.version + " Update available.\n";
+                    msg += " v" + detail.Local.version + " \u2192 v" + detail.Remote.version + _localizedStrings.UpdateAvailable + "\n";
                 }
             }
             return msg;

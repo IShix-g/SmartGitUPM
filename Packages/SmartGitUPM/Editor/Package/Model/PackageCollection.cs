@@ -10,6 +10,7 @@ namespace SmartGitUPM.Editor
     internal sealed class PackageCollection : IDisposable
     {
         public bool IsDisposed{ get; private set; }
+        public bool IsFetching => _tokenSource != default;
         public bool HasMetas => Metas is {Count: > 0};
         public IReadOnlyList<PackageMetaData> Metas { get; private set; }
         public List<PackageInfoDetails> Details { get; private set; } = new ();

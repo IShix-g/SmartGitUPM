@@ -1,11 +1,11 @@
 
 namespace SmartGitUPM.Editor
 {
-    internal sealed class SGUPackageManagerFactory
+    internal static class SGUPackageManagerFactory
     {
-        public SGUPackageManager Create()
+        public static SGUPackageManager Create()
         {
-            var setting = PackageCollectionSetting.LoadInstance();
+            var setting = UniquePackageCollectionSetting.GetOrCreate();
             var installer = new PackageInstaller();
             var infoFetchers = new IPackageInfoFetcher[]
             {

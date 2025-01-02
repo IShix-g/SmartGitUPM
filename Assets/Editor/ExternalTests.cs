@@ -10,7 +10,7 @@ namespace Editor
         [MenuItem("Tests/External/Load Settings")]
         public static void LoadSettingsTest()
         {
-            var setting = PackageCollectionSetting.LoadInstance();
+            var setting = UniquePackageCollectionSetting.GetOrCreate();
             Debug.Log(setting.Length);
         }
     }

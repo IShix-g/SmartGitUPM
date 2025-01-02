@@ -1,20 +1,19 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
-    [UniqScriptableObjectPath("Assets/Editor/SmartGitUPM_PackageCollectionSetting.asset")]
+    [UniqueScriptableObjectPath("Assets/Editor/SmartGitUPM_PackageCollectionSetting.asset")]
     public sealed class PackageCollectionSetting : ScriptableObject
     {
         [SerializeField] PackageMetaData[] _packages;
         
         public int Length => _packages.Length;
+        
         internal PackageMetaData[] Packages => _packages;
-
-        public static PackageCollectionSetting LoadInstance()
-            => UniqScriptableObject.CreateOrLoadAsset<PackageCollectionSetting>();
         
         public IReadOnlyList<PackageMetaData> GetPackages() => _packages;
         

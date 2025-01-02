@@ -2,18 +2,13 @@
 using System.Linq;
 using UnityEditor;
 using SmartGitUPM.Editor;
+using SmartGitUPM.Editor.Localization;
 using UnityEngine;
 
 namespace Tests
 {
     public class Tests
     {
-        [MenuItem("Tests/Create Path")]
-        public static void CreatePath()
-        {
-            AssetDatabaseSupport.CreateDirectories("Assets/CreateTest/Test");
-        }
-        
         [MenuItem("Tests/Install Package")]
         public static void InstallPackage()
         {
@@ -58,13 +53,14 @@ namespace Tests
         [MenuItem("Tests/Update Check")]
         static void UpdateCheck()
         {
-            var updater = new PackageUpdateChecker();
-            updater.CheckUpdate()
-                .Handled();
+            var manager = LanguageManagerFactory.GetOrCreate();
+            var strings = EditorInitializationExecuter.GetLocalizedStrings(manager);
+            var updater = new PackageUpdateChecker(strings);
+            updater.CheckUpdate().Handled();
         }
 
-        [MenuItem("Tests/Open Dialog")]
-        static void OpenDialog()
+        [MenuItem("Tests/Open Test Dialog")]
+        static void OpenTestDialog()
         {
             var contents = new CustomDialogContents(
                     "System Update Required",
@@ -85,6 +81,16 @@ namespace Tests
             {
                 Debug.Log(PackageCacheManager.Infos.Packages.Select(x => "- " + x.DisplayName + " (" + x.Name + ")").Aggregate((a,b) => a + "\n" + b));
             }
+        }
+
+        [MenuItem("Tests/Load Languages")]
+        static void LoadLanguages()
+        {
+            var path = "Assets/Tests/LocalizationData.asset";
+            var data = AssetDatabase.LoadAssetAtPath<LocalizationData>(path);
+            var manager = new LanguageManager(data, SystemLanguage.Afrikaans);
+            Debug.Log(manager.CurrentLanguage + " " + manager.GetEntry("test1").CurrentValue);
+            Debug.Log(manager.CurrentLanguage + " " + manager.GetEntry("test2").CurrentValue);
         }
     }
 }

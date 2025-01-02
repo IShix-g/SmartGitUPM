@@ -1,5 +1,6 @@
 
 using System.Threading;
+using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,11 +8,11 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class PackageCollectionWindow : EditorWindow
     {
+        public const string PackagePath = "Packages/" + _packageName + "/";
         const string _gitURL = "https://github.com/IShix-g/SmartGitUPM";
         const string _gitInstallUrl = _gitURL + ".git?path=Packages/SmartGitUPM";
         const string _gitBranchName = "main";
         const string _packageName = "com.ishix.smartgitupm";
-        const string _packagePath = "Packages/" + _packageName + "/";
         const string _firstOpenKey = "SmartGitUPM_PackageCollectionWindow_IsFirstOpen";
         
         [MenuItem("Window/Smart Git UPM")]
@@ -36,6 +37,7 @@ namespace SmartGitUPM.Editor
         SGUPackageManager _manager;
         EditorViewSwitcher _viewSwitcher;
         PackageCollectionSettingView _settingView;
+        LanguageManager _languageManager;
         PackageCollectionView _collectionView;
         CancellationTokenSource _tokenSource;
         Vector2 _scrollPos;
@@ -43,6 +45,7 @@ namespace SmartGitUPM.Editor
         GUIContent _refreshIcon;
         GUIContent _backIcon;
         Texture2D _logo;
+        LocalizationEntry _installAllEntry;
         
         void OnEnable()
         {
@@ -51,10 +54,14 @@ namespace SmartGitUPM.Editor
             _backIcon = EditorGUIUtility.IconContent("back");
             _logo = GetLogo();
             
-            var factory = new SGUPackageManagerFactory();
-            _manager = factory.Create();
+            _languageManager = LanguageManagerFactory.GetOrCreate();
+            _installAllEntry = _languageManager.GetEntry("InstallAll");
+            
+            _manager = SGUPackageManagerFactory.Create();
             _settingView ??= new PackageCollectionSettingView(
                     _manager.Setting,
+                    UniqueLocalizationSetting.GetOrCreate(),
+                    _languageManager,
                     _manager.Collection.GetSupportProtocols(),
                     this
                 );
@@ -62,6 +69,7 @@ namespace SmartGitUPM.Editor
                     _manager.Installer,
                     _manager.Setting,
                     _manager.Collection,
+                    _languageManager,
                     OpenSettingAction,
                     this
                 );
@@ -87,6 +95,7 @@ namespace SmartGitUPM.Editor
             _collectionView.OnUnInstall -= FetchPackagesNextFrame;
             EditorApplication.delayCall -= FetchPackagesNextFrame;
             
+            _languageManager?.Dispose();
             _manager?.Dispose();
             _versionChecker?.Dispose();
             _viewSwitcher?.Dispose();
@@ -176,7 +185,7 @@ namespace SmartGitUPM.Editor
                     {
                         var userAgreed = EditorUtility.DisplayDialog(
                             "Install All",
-                            "This will install all the SDKs and Mediations listed below. If there are updates available, they will be applied as well.",
+                            _installAllEntry.CurrentValue,
                             "Install All",
                             "Close"
                         );
@@ -213,7 +222,7 @@ namespace SmartGitUPM.Editor
         
         void FetchPackages(bool superReload)
         {
-            var setting = PackageCollectionSetting.LoadInstance();
+            var setting = UniquePackageCollectionSetting.GetOrCreate();
             _manager.Collection.Set(setting.Packages);
             if (!_manager.Collection.HasMetas)
             {
@@ -252,7 +261,7 @@ namespace SmartGitUPM.Editor
         
         static Texture2D GetTexture(string textureName)
         {
-            var guids = AssetDatabase.FindAssets("t:Texture2D " + textureName, new []{ _packagePath });
+            var guids = AssetDatabase.FindAssets("t:Texture2D " + textureName, new []{ PackagePath });
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);

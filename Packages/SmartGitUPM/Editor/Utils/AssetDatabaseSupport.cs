@@ -10,13 +10,15 @@ namespace SmartGitUPM.Editor
         public static T CreateOrLoad<T>(string path) where T : ScriptableObject
         {
             var asset = LoadAsset<T>(path);
-            if (asset != default)
-            {
-                return asset;
-            }
-            
+            return asset != default
+                ? asset
+                : CreateAsset<T>(path);
+        }
+        
+        public static T CreateAsset<T>(string path) where T : ScriptableObject
+        {
             CreateDirectories(path);
-            asset = ScriptableObject.CreateInstance<T>();
+            var asset = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             return asset;
@@ -31,6 +33,7 @@ namespace SmartGitUPM.Editor
             }
 
             var dir = Path.GetDirectoryName(path);
+            dir = dir?.Replace("\\", "/");
             if (!AssetDatabase.IsValidFolder(dir))
             {
                 return default;
