@@ -1,7 +1,6 @@
 
 using SmartGitUPM.Editor.Localization;
 using UnityEditor;
-using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
@@ -20,10 +19,9 @@ namespace SmartGitUPM.Editor
         {
             if (!IsFirstInit)
             {
-                FirstInit();
                 IsFirstInit = true;
+                EditorApplication.delayCall += FirstInit;
             }
-
             OnProjectLoadedInEditor();
         }
 

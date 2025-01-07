@@ -1,7 +1,6 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace SmartGitUPM.Editor
@@ -11,7 +10,7 @@ namespace SmartGitUPM.Editor
     {
         [SerializeField] PackageMetaData[] _packages;
         
-        public int Length => _packages.Length;
+        public int Length => _packages != default ? _packages.Length : 0;
         
         internal PackageMetaData[] Packages => _packages;
         
