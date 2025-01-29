@@ -24,7 +24,6 @@ namespace SmartGitUPM.Editor
         CancellationTokenSource _tokenSource;
         bool _hasFixed;
         bool _hasUpdate;
-
         LocalizationEntry _configureButtonEntry;
         LocalizationEntry _fixedEntry;
         LocalizationEntry _updateEntry;

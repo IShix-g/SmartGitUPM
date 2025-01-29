@@ -8,7 +8,7 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class EditorAsync : IDisposable
     {
-        public bool IsStarted => _completionSource != null;
+        public bool IsStarted => _completionSource != default;
 
         bool _isDisposed;
         Func<bool> _isOperationComplete;
