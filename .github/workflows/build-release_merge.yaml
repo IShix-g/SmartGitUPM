@@ -1,0 +1,103 @@
+name: Manual Release (Merge to Default)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag you want to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      clean-branch:
+        description: 'Delete the branch? All branches except the default branch will be deleted.'
+        default: false
+        type: boolean
+      fast-forward:
+        description: 'Allow fast-forward merge'
+        type: boolean
+        default: false
+      include-default-branch:
+        description: 'Include default branch in the action behavior. Set to true to include it.'
+        type: boolean
+        default: false
+      dry-run:
+        description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
+        type: boolean
+        default: false
+      draft-release:
+        description: 'true = Draft release; false = Non-draft release.'
+        type: boolean
+        default: false
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  validate-branch:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check if ref is default branch
+        if: ${{ !inputs.include-default-branch && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+        run: |
+          target_branch="${{ github.ref }}"
+          default_branch="${{ github.event.repository.default_branch }}"
+          echo "::error::Cannot proceed on default branch. ($default_branch)"
+          echo "::error::If you want to target the default branch ($default_branch), please turn on 'Include default branch'."
+          echo "Target branch: $target_branch"
+          echo "Default branch: $default_branch"
+          exit 1
+
+  update-packagejson:
+    needs: [validate-branch]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      ref: ${{ github.ref }}
+      file-path: ./Packages/SmartGitUPM/package.json
+      tag: ${{ inputs.tag }}
+      dry-run: ${{ inputs.dry-run }}
+
+  merge-and-push:
+    needs: [validate-branch, update-packagejson]
+    if: ${{ needs.update-packagejson.outputs.changed == '1' }}
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-merge-and-push.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      target-branch: ${{ github.ref }}
+      push-branch: ${{ github.event.repository.default_branch }}
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+      dry-run: ${{ inputs.dry-run }}
+      fast-forward: ${{ inputs.fast-forward }}
+
+  release-notes:
+    needs: [validate-branch, update-packagejson, merge-and-push]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@main
+    with:
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+
+  create-release:
+    needs: [validate-branch, update-packagejson, merge-and-push, release-notes]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      commit-id: ${{ needs.merge-and-push.outputs.sha }}
+      dry-run: ${{ inputs.dry-run }}
+      tag: ${{ inputs.tag }}
+      release-note: ${{ needs.release-notes.outputs.notes }}
+      draft-release: ${{ inputs.draft-release }}
+
+  clean-branch:
+    needs: [validate-branch, update-packagejson, merge-and-push, release-notes]
+    if: ${{ inputs.clean-branch && needs.update-packagejson.outputs.changed == '1' }}
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-clean-branch.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ github.ref }}

@@ -1,0 +1,68 @@
+name: Release via PR (Default Branch)
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  extract-tag:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == github.event.repository.default_branch }}
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.extract-tag.outputs.tag }}
+    steps:
+      - name: Extract tag from Pull Request title
+        id: extract-tag
+        run: |
+          pr_title="${{ github.event.pull_request.title }}"
+          echo "Pull Request title: $pr_title"
+          pr_title_lower=$(echo "$pr_title" | tr '[:upper:]' '[:lower:]')
+          echo "Pull Request title (lowercase): $pr_title_lower"
+          
+          tag_regex='(v|ver\.|version)?\s*([0-9]+\.[0-9]+\.[0-9]+)(\s|$)'
+          
+          if [[ $pr_title_lower =~ $tag_regex ]]; then
+            extracted_tag="${BASH_REMATCH[2]}"
+            echo "Extracted tag: $extracted_tag"
+            echo "tag=$extracted_tag" >> "$GITHUB_OUTPUT"
+            echo "::notice::Tag extracted from the Pull Request title: $extracted_tag"
+          else
+            echo "::error::No valid tag found in Pull Request title."
+          fi
+
+  update-packagejson:
+    needs: [extract-tag]
+    if: ${{ needs.extract-tag.outputs.tag }}
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      ref: ${{ github.event.pull_request.base.ref }}
+      file-path: ./Packages/SmartGitUPM/package.json
+      tag: ${{ needs.extract-tag.outputs.tag }}
+      dry-run: false
+
+  release-notes:
+    needs: [extract-tag, update-packagejson]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@main
+    with:
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+
+  create-release:
+    needs: [extract-tag, update-packagejson, release-notes]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+      dry-run: false
+      tag: ${{ needs.extract-tag.outputs.tag }}
+      release-note: ${{ needs.release-notes.outputs.notes }}
+      draft-release: false
