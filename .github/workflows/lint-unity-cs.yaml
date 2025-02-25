@@ -7,6 +7,9 @@ on:
     paths:
       - 'Packages/SmartGitUPM/**'
 
+permissions:
+  pull-requests: write
+
 jobs:
   release-notes:
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter.yaml@main
