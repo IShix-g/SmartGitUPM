@@ -383,3 +383,36 @@ dotnet_naming_style.camel_case_with_s.capitalization = camel_case
 dotnet_naming_style.interface_pascal_case.required_prefix = I
 dotnet_naming_style.interface_pascal_case.required_suffix =
 dotnet_naming_style.interface_pascal_case.capitalization = pascal_case
+
+
+# Specific Rule Exclusion Section =================
+
+[Packages/SmartGitUPM/Editor/Package/SGUP*.cs]
+
+dotnet_naming_rule.internal_classes.style = pascal_case
+dotnet_naming_rule.internal_classes.symbols = internal_classes
+dotnet_naming_rule.internal_classes.severity = none
+dotnet_naming_symbols.internal_classes.applicable_kinds = class
+dotnet_naming_symbols.internal_classes.applicable_accessibilities = internal
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+[Packages/SmartGitUPM/Editor/Package/Model/*Info.cs]
+
+dotnet_naming_rule.public_fields.style = camel_case
+dotnet_naming_rule.public_fields.symbols = public_fields
+dotnet_naming_symbols.public_fields.applicable_kinds = field
+dotnet_naming_symbols.public_fields.applicable_accessibilities = public
+dotnet_naming_symbols.public_fields.applicable_contained_types = PackageLocalInfo
+
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+[Packages/SmartGitUPM/Editor/Utils/PackageVersionChecker.cs]
+
+dotnet_naming_rule.public_fields.style = camel_case
+dotnet_naming_rule.public_fields.symbols = public_fields
+dotnet_naming_rule.public_fields.severity = none
+dotnet_naming_symbols.public_fields.applicable_kinds = field
+dotnet_naming_symbols.public_fields.applicable_accessibilities = public
+
+dotnet_naming_style.camel_case.capitalization = camel_case
