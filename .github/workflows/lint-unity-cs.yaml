@@ -1,0 +1,16 @@
+name: Lint Unity Csharp
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Packages/SmartGitUPM/**'
+
+jobs:
+  release-notes:
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter.yaml@main
+    with:
+      head-branch: ${{ github.event.pull_request.head.ref }}
+      base-branch: ${{ github.event.pull_request.base.ref }}
+      include-paths: 'Packages/SmartGitUPM/.*'
