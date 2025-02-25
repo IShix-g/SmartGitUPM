@@ -91,6 +91,8 @@ dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1503.severity = warning
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
+# Elements should be separated by blank line.
+dotnet_diagnostic.SA1507.severity = none
 # Ensures no blank lines appear before closing braces.
 dotnet_diagnostic.SA1508.severity = none
 # Single-line comment should be formatted correctly.

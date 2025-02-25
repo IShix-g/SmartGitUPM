@@ -10,8 +10,8 @@ namespace SmartGitUPM.Editor
         public PackageCollection Collection { get; }
         public PackageCollectionSetting Setting { get; }
 
-        bool _isDisposed;
         readonly IReadOnlyList<IPackageInfoFetcher> _infoFetchers;
+        bool _isDisposed;
 
         public SGUPackageManager(
             PackageInstaller installer,
