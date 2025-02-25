@@ -1,7 +1,6 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SmartGitUPM.Editor
 {
@@ -10,9 +9,9 @@ namespace SmartGitUPM.Editor
         public PackageInstaller Installer { get; }
         public PackageCollection Collection { get; }
         public PackageCollectionSetting Setting { get; }
-        
-        bool _isDisposed;
+
         readonly IReadOnlyList<IPackageInfoFetcher> _infoFetchers;
+        bool _isDisposed;
 
         public SGUPackageManager(
             PackageInstaller installer,
@@ -24,7 +23,7 @@ namespace SmartGitUPM.Editor
             Setting = setting;
             Collection = new PackageCollection(_infoFetchers, Setting.Packages);
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)
