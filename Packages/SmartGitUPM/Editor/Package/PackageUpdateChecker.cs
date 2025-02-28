@@ -17,9 +17,9 @@ namespace SmartGitUPM.Editor
             public string UpdateAvailable;
         }
 
+        readonly LocalizedStrings _localizedStrings;
         bool _disposed;
         CancellationTokenSource _tokenSource;
-        readonly LocalizedStrings _localizedStrings;
 
         public PackageUpdateChecker(LocalizedStrings localizedStrings)
             => _localizedStrings = localizedStrings;
