@@ -57,7 +57,7 @@ namespace SmartGitUPM.Editor
                        && details.Count > index)
                 {
                     var detail = details[index];
-                    if(detail.IsInstalled
+                    if (detail.IsInstalled
                        && (!detail.HasUpdate
                            || detail.IsFixedVersion))
                     {
