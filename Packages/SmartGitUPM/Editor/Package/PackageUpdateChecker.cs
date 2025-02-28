@@ -50,7 +50,7 @@ namespace SmartGitUPM.Editor
             var details = ListPool<PackageInfoDetails>.Get();
             try
             {
-                await  manager.Collection.FetchPackages(details, metas, true, token);
+                await manager.Collection.FetchPackages(details, metas, true, token);
 
                 var index = 0;
                 while (details.Count > 0
