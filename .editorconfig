@@ -37,12 +37,16 @@ dotnet_diagnostic.SA1004.severity = none
 dotnet_diagnostic.SA1005.severity = none
 # Preprocessor directives should not be preceded by space.
 dotnet_diagnostic.SA1006.severity = none
+# Closing parenthesis should not be preceded by a space.
+dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
 dotnet_diagnostic.SA1027.severity = warning
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
 dotnet_diagnostic.SA1101.severity = none
+# Closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
 # Use string.Empty for empty strings
 dotnet_diagnostic.SA1122.severity = warning
 # Using directives should be placed correctly (either top of file or inside namespace).
