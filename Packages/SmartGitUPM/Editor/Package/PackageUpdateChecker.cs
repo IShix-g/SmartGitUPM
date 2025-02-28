@@ -9,9 +9,6 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class PackageUpdateChecker : IDisposable
     {
-        bool _disposed;
-        CancellationTokenSource _tokenSource;
-
         public sealed class LocalizedStrings
         {
             public string Title;
@@ -21,10 +18,12 @@ namespace SmartGitUPM.Editor
         }
 
         readonly LocalizedStrings _localizedStrings;
-        
+        bool _disposed;
+        CancellationTokenSource _tokenSource;
+
         public PackageUpdateChecker(LocalizedStrings localizedStrings)
             => _localizedStrings = localizedStrings;
-        
+
         public async Task CheckUpdate(bool promptForUpdate = true, CancellationToken token = default)
         {
             using var manager = SGUPackageManagerFactory.Create();
@@ -32,7 +31,7 @@ namespace SmartGitUPM.Editor
             {
                 return;
             }
-            
+
             var metas = ListPool<PackageMetaData>.Get();
             foreach (var meta in manager.Collection.Metas)
             {
@@ -47,25 +46,25 @@ namespace SmartGitUPM.Editor
                 ListPool<PackageMetaData>.Release(metas);
                 return;
             }
-            
+
             var details = ListPool<PackageInfoDetails>.Get();
             try
             {
-                await  manager.Collection.FetchPackages(details, metas, true, token);
+                await manager.Collection.FetchPackages(details, metas, true, token);
 
                 var index = 0;
                 while (details.Count > 0
                        && details.Count > index)
                 {
                     var detail = details[index];
-                    if(detail.IsInstalled
-                       && (!detail.HasUpdate 
+                    if (detail.IsInstalled
+                       && (!detail.HasUpdate
                            || detail.IsFixedVersion))
                     {
                         details.RemoveAt(index);
                         continue;
                     }
-                    
+
                     index++;
                 }
 
@@ -73,7 +72,7 @@ namespace SmartGitUPM.Editor
                 {
                     return;
                 }
-                
+
                 if (promptForUpdate)
                 {
                     var contents = new CustomDialogContents(
@@ -111,7 +110,7 @@ namespace SmartGitUPM.Editor
             }
             return msg;
         }
-        
+
         public void Dispose()
         {
             if (_disposed)
