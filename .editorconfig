@@ -43,6 +43,8 @@ dotnet_diagnostic.SA1027.severity = warning
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
 dotnet_diagnostic.SA1101.severity = none
+# Use string.Empty for empty strings
+dotnet_diagnostic.SA1122.severity = warning
 # Using directives should be placed correctly (either top of file or inside namespace).
 dotnet_diagnostic.SA1200.severity = none
 # Static elements should appear before instance elements.
@@ -64,9 +66,9 @@ dotnet_diagnostic.SA1300.severity = none
 # Interface names must begin with an `I`
 dotnet_diagnostic.SA1302.severity = none
 # Fields should use camelCase naming style.
-dotnet_diagnostic.SA1306.severity = warning
+dotnet_diagnostic.SA1306.severity = none
 # Field names should not use the "m_" prefix.
-dotnet_diagnostic.SA1307.severity = warning
+dotnet_diagnostic.SA1307.severity = none
 # Local variables should not use underscores in their names.
 dotnet_diagnostic.SA1308.severity = none
 # Elements should be named in PascalCase, except for certain exceptional cases.
