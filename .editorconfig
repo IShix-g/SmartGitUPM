@@ -66,9 +66,9 @@ dotnet_diagnostic.SA1300.severity = none
 # Interface names must begin with an `I`
 dotnet_diagnostic.SA1302.severity = none
 # Fields should use camelCase naming style.
-dotnet_diagnostic.SA1306.severity = warning
+dotnet_diagnostic.SA1306.severity = none
 # Field names should not use the "m_" prefix.
-dotnet_diagnostic.SA1307.severity = warning
+dotnet_diagnostic.SA1307.severity = none
 # Local variables should not use underscores in their names.
 dotnet_diagnostic.SA1308.severity = none
 # Elements should be named in PascalCase, except for certain exceptional cases.
