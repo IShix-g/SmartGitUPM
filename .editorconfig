@@ -61,6 +61,8 @@ dotnet_diagnostic.SA1205.severity = none
 dotnet_diagnostic.SA1206.severity = none
 # The "this." prefix should be used consistently in the code base.
 dotnet_diagnostic.SA1208.severity = none
+# Readonly fields should appear before non-readonly fields
+dotnet_diagnostic.SA1214.severity = none
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = none
 # Interface names must begin with an `I`
@@ -101,6 +103,8 @@ dotnet_diagnostic.SA1508.severity = none
 dotnet_diagnostic.SA1511.severity = none
 # All files must end with a single newline.
 dotnet_diagnostic.SA1512.severity = none
+# Closing brace should be followed by blank line
+dotnet_diagnostic.SA1513.severity = none
 # Blank lines should be properly used within methods.
 dotnet_diagnostic.SA1515.severity = none
 # One or more adjacent elements must not be missing blank lines.
