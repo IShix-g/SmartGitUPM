@@ -13,7 +13,7 @@ namespace SmartGitUPM.Editor
             var source = new TaskCompletionSource<UnityWebRequest>();
             asyncOp.completed += operation =>
             {
-                var webRequest = ((UnityWebRequestAsyncOperation)operation).webRequest;
+                var webRequest = ((UnityWebRequestAsyncOperation) operation).webRequest;
                 if (webRequest.result
                     is UnityWebRequest.Result.ConnectionError
                     or UnityWebRequest.Result.ProtocolError)

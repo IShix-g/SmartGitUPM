@@ -39,12 +39,6 @@ csharp_indent_block_contents = true
 csharp_indent_braces = false
 # Indent the statement list and curly braces in the case of a switch statement.
 csharp_indent_case_contents_when_block = false
-# Insert spaces after cast operators
-csharp_space_after_cast = true
-# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
-csharp_space_after_keywords_in_control_flow_statements = true
-# Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = false
 # Insert a space before colons ':' in inheritance clauses
 csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
@@ -61,24 +55,16 @@ csharp_space_after_dot = false
 csharp_space_after_semicolon_in_for_statement = true
 # Insert spaces before and after binary operators
 csharp_space_around_binary_operators = before_and_after
-# Do not insert a space before open square brackets '['
-csharp_space_before_open_square_brackets = false
 # Do not insert a space before semicolons ';' in 'for' statements
 csharp_space_before_semicolon_in_for_statement = false
 # Do not insert spaces inside empty square brackets '[]'
 csharp_space_between_empty_square_brackets = false
 # Do not insert spaces within empty parameter lists in method calls
 csharp_space_between_method_call_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '('
-csharp_space_between_method_call_name_and_opening_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method calls
-csharp_space_between_method_call_parameter_list_parentheses = false
 # Do not insert spaces within empty parameter lists in method declarations
 csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
 # Do not insert a space between method names and opening parentheses '(' in declarations
 csharp_space_between_method_declaration_name_and_open_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method declarations
-csharp_space_between_method_declaration_parameter_list_parentheses = false
 # Do not insert spaces within square brackets '[]'
 csharp_space_between_square_brackets = false
 # Recommend using type inference ('var') for variable declarations
@@ -125,7 +111,7 @@ dotnet_diagnostic.SA1006.severity = none
 # Closing parenthesis should not be preceded by a space.
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
-dotnet_diagnostic.SA1027.severity = none
+dotnet_diagnostic.SA1027.severity = warning
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
