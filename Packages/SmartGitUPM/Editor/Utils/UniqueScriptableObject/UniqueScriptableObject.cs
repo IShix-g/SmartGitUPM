@@ -13,9 +13,9 @@ namespace SmartGitUPM.Editor
 
         protected virtual bool OnCreated(T setting) => false;
         protected virtual bool OnLoaded(T asset) => false;
-        
+
         public bool HasAsset() => File.Exists(ValidateAndGetPath());
-        
+
         public string GetAssetPath()
         {
             if (!string.IsNullOrEmpty(_cachedPath))
@@ -30,9 +30,9 @@ namespace SmartGitUPM.Editor
             _cachedPath = attr.Path;
             return _cachedPath;
         }
-        
+
         public T LoadAsset() => LoadAsset(ValidateAndGetPath());
-        
+
         public T LoadAsset(string path)
         {
             if (_cachedAsset != default)
@@ -48,7 +48,7 @@ namespace SmartGitUPM.Editor
             }
             return _cachedAsset;
         }
-        
+
         public T CreateOrLoadAsset()
         {
             var path = ValidateAndGetPath();
@@ -65,7 +65,7 @@ namespace SmartGitUPM.Editor
             }
             return LoadAsset(path);
         }
-        
+ 
         string ValidateAndGetPath()
         {
             var path = GetAssetPath();

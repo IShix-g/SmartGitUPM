@@ -104,7 +104,7 @@ namespace SmartGitUPM.Editor
                 TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Current);
         }
-        
+
         public static void ContinueOnMainThread(
             this Task @this,
             Action<Task> onSuccess,
@@ -133,7 +133,7 @@ namespace SmartGitUPM.Editor
                             }
                             return;
                         }
-                        
+
                         if (t.IsFaulted)
                         {
                             if (t.Exception != default && onError != default)
@@ -149,7 +149,7 @@ namespace SmartGitUPM.Editor
                             }
                             return;
                         }
-                        
+
                         if (t.IsCompleted)
                         {
                             if (SynchronizationContext.Current == context)
@@ -199,7 +199,7 @@ namespace SmartGitUPM.Editor
                 TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Current);
         }
-        
+
         public static void Handled(this Task task, Action<Task> onCompleted = default, Action<Exception> onError = default)
             => HandleTaskAsync(task, onCompleted, onError, SynchronizationContext.Current);
 
@@ -253,7 +253,7 @@ namespace SmartGitUPM.Editor
                 }
             }
         }
-        
+
         public static void Handled<T>(this Task<T> task, Action<Task<T>> onCompleted = default, Action<Exception> onError = default)
             => HandleTaskAsync<T>(task, onCompleted, onError, SynchronizationContext.Current);
 
@@ -307,14 +307,14 @@ namespace SmartGitUPM.Editor
                 }
             }
         }
-        
+
         public static void SafeCancelAndDispose(this CancellationTokenSource @this)
         {
             if (@this == default)
             {
                 return;
             }
-            
+
             try
             {
                 if (!@this.IsCancellationRequested)

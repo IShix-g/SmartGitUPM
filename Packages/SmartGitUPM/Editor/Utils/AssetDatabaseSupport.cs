@@ -14,7 +14,7 @@ namespace SmartGitUPM.Editor
                 ? asset
                 : CreateAsset<T>(path);
         }
-        
+
         public static T CreateAsset<T>(string path) where T : ScriptableObject
         {
             CreateDirectories(path);
@@ -23,7 +23,7 @@ namespace SmartGitUPM.Editor
             AssetDatabase.SaveAssets();
             return asset;
         }
-        
+
         public static T LoadAsset<T>(string path) where T : ScriptableObject
         {
             var asset = AssetDatabase.LoadAssetAtPath<T>(path);
@@ -65,10 +65,10 @@ namespace SmartGitUPM.Editor
             {
                 return;
             }
-    
+
             var folders = path.Split('/');
             var parentFolder = folders[0];
-    
+
             for (var i = 1; i < folders.Length; i++)
             {
                 var newFolder = parentFolder + "/" + folders[i];

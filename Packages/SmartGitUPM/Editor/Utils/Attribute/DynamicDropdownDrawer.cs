@@ -23,7 +23,7 @@ namespace SmartGitUPM.Editor
                Debug.LogError($"Method '{dropdownAttribute.MethodName}' not found.");
                 return;
             }
-            
+
             if (methodInfo.ReturnType != typeof(object[]))
             {
                 Debug.LogError($"Method '{dropdownAttribute.MethodName}' must return object[].");
@@ -37,7 +37,7 @@ namespace SmartGitUPM.Editor
                 EditorGUI.LabelField(position, label.text, "No options available.");
                 return;
             }
-            
+
             var selectedIndex = Array.IndexOf(options, GetValue(property));
             if (selectedIndex == -1)
             {
@@ -46,7 +46,7 @@ namespace SmartGitUPM.Editor
 
             var displayOptions = Array.ConvertAll(options, item => item.ToString());
             var newIndex = EditorGUI.Popup(position, label.text, selectedIndex, displayOptions);
-            
+
             if (newIndex != selectedIndex)
             {
                 SetValue(property, options[newIndex]);

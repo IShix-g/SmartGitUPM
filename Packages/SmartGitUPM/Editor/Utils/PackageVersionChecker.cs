@@ -12,11 +12,11 @@ namespace SmartGitUPM.Editor
     internal sealed class PackageVersionChecker : IDisposable
     {
         public const string PackageJsonFileName = "package.json";
-        
+
         public readonly string GitInstallUrl;
         public readonly string BranchName;
         public readonly string PackageName;
-        
+
         public bool IsProcessing => _isNowLoading || _packageInstaller.IsProcessing;
         public bool IsLoaded => ServerInfo != default && LocalInfo != default;
         public PackageJson ServerInfo { get; private set; }
@@ -26,14 +26,14 @@ namespace SmartGitUPM.Editor
         bool _isDisposed;
         CancellationTokenSource _tokenSource;
         bool _isNowLoading;
-        
+
         public sealed class PackageJson
         {
             public string name;
             public string version;
             public string VersionString => !string.IsNullOrEmpty(version) ? "v" + version : "v---";
         }
-        
+
         public PackageVersionChecker(string gitInstallUrl, string branchName, string packageName)
         {
             GitInstallUrl = gitInstallUrl;
@@ -52,13 +52,13 @@ namespace SmartGitUPM.Editor
             var server = new Version(LocalInfo.version);
             return current.CompareTo(server) > 0;
         }
-        
+
         public async Task Fetch()
         {
             _isNowLoading = true;
             var gitPackageJsonUrl = ToRawPackageJsonURL(GitInstallUrl, BranchName);
             var request = UnityWebRequest.Get(gitPackageJsonUrl);
-            
+
             try
             {
                 await request.SendWebRequest();
@@ -83,7 +83,7 @@ namespace SmartGitUPM.Editor
             var rootUrl = ToRawPackageRootURL(packageInstallUrl, branch);
             return rootUrl + "/" + PackageJsonFileName;
         }
-        
+
         public static string ToRawPackageRootURL(string packageInstallUrl, string branch)
         {
             if (!packageInstallUrl.StartsWith("https://github.com")
@@ -92,7 +92,7 @@ namespace SmartGitUPM.Editor
             {
                 throw new ArgumentException("Specify the URL of GitHub, Bitbucket, or GitLab. : " + packageInstallUrl, nameof(packageInstallUrl));
             }
-            
+
             var uri = new Uri(packageInstallUrl);
             var pathWithoutFileName = uri.AbsolutePath;
             if (pathWithoutFileName.EndsWith(".git"))
@@ -123,7 +123,7 @@ namespace SmartGitUPM.Editor
             }
             return string.Empty;
         }
-        
+
         public PackageJson GetLocalInfo(string packageName)
         {
             var path = "Packages/" + packageName + "/package.json";
@@ -143,7 +143,7 @@ namespace SmartGitUPM.Editor
                     localVersion + " -> " + serverVersion, "There is a newer version " + serverVersion + ".",
                     "Update",
                     "Close");
-                        
+
                 if (isOpen)
                 {
                     _packageInstaller.Install(new []{ GitInstallUrl }, _tokenSource.Token).Handled();
@@ -157,7 +157,7 @@ namespace SmartGitUPM.Editor
                     "Close");
             }
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)

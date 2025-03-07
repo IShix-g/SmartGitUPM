@@ -9,7 +9,7 @@ namespace SmartGitUPM.Editor
         CustomDialogContents _contents;
         Vector2 _scrollPos;
         Texture2D _logo;
-        
+
         public static void Open(CustomDialogContents contents, Texture2D logo, string dialogTitle = default)
         {
             var window = GetWindow<CustomDialog>(dialogTitle);
@@ -25,7 +25,7 @@ namespace SmartGitUPM.Editor
             _logo = default;
             _contents?.Dispose();
         }
-        
+
         void OnGUI()
         {
             if (_contents == default)
@@ -33,6 +33,7 @@ namespace SmartGitUPM.Editor
                 Close();
                 return;
             }
+
             if(_logo != default )
             {
                 var style = new GUIStyle(GUI.skin.label)
@@ -42,13 +43,13 @@ namespace SmartGitUPM.Editor
                 };
                 GUILayout.Label(_logo, style, GUILayout.MinWidth(430), GUILayout.Height(75));
             }
-            
+
             var wrapStyle = new GUIStyle
             {
                 padding = new RectOffset(20, 20, 20, 20)
             };
             GUILayout.BeginVertical(wrapStyle);
-            
+
             var titleStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 18,
@@ -56,15 +57,15 @@ namespace SmartGitUPM.Editor
                 alignment = TextAnchor.MiddleCenter
             };
             GUILayout.Label(_contents.Title, titleStyle, GUILayout.ExpandWidth(true));
-            
+
             EditorGUILayout.Space(10);
-            
+
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos, GUILayout.Width(400));
             GUILayout.Label(_contents.Message, EditorStyles.wordWrappedLabel);
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space(10);
-            
+
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             var width = GUILayout.Width(140);
@@ -82,7 +83,7 @@ namespace SmartGitUPM.Editor
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            
+
             GUILayout.EndVertical();
         }
     }

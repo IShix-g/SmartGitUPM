@@ -10,7 +10,7 @@ namespace SmartGitUPM.Editor
     internal class OnValueChangedDrawer : PropertyDrawer
     {
         readonly Dictionary<string, MethodInfo> _methodCache = new();
-        
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             var onValueChanged = (OnValueChangedAttribute) attribute;
@@ -20,9 +20,9 @@ namespace SmartGitUPM.Editor
             {
                 return;
             }
-            
+
             property.serializedObject.ApplyModifiedProperties();
-            
+
             foreach (var target in property.serializedObject.targetObjects)
             {
                 var method = GetCachedMethod(target, onValueChanged.MethodName);
@@ -35,7 +35,7 @@ namespace SmartGitUPM.Editor
                 method.Invoke(target, default);
             }
         }
-        
+
         MethodInfo GetCachedMethod(object targetObject, string methodName)
         {
             var key = $"{targetObject.GetType().FullName}.{methodName}";
