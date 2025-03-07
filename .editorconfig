@@ -106,6 +106,10 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
+# Whitespace errors (e.g. operators)
+dotnet_diagnostic.IDE0028.severity = none
+# Code formatting errors (general)
+dotnet_diagnostic.IDE0055.severity = none
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
