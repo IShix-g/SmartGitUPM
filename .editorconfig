@@ -17,7 +17,6 @@ indent_size = 4
 indent_style = space
 indent_size = 4
 tab_width = 4
-trim_trailing_whitespace = true
 
 # StyleCop Diagnostic Rules =================
 
@@ -44,7 +43,7 @@ csharp_space_after_cast = true
 # Insert a space after control flow keywords ('if', 'while', 'for', etc.)
 csharp_space_after_keywords_in_control_flow_statements = true
 # Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = false
+csharp_space_between_parentheses = control_flow_statements
 # Insert a space before colons ':' in inheritance clauses
 csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
@@ -104,13 +103,8 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # StyleCop Diagnostic Rules =================
 
-dotnet_diagnostic.WHITESPACE.severity = none
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
-# Whitespace errors (e.g. operators)
-dotnet_diagnostic.IDE0028.severity = none
-# Code formatting errors (general)
-dotnet_diagnostic.IDE0055.severity = none
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
@@ -130,7 +124,7 @@ dotnet_diagnostic.SA1006.severity = none
 # Closing parenthesis should not be preceded by a space.
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
-dotnet_diagnostic.SA1027.severity = error
+dotnet_diagnostic.SA1027.severity = warning
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
@@ -440,7 +434,7 @@ dotnet_naming_symbols.internal_classes.applicable_accessibilities = internal
 
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 
-[Packages/SmartGitUPM/Editor/Package/Model/*Info.cs]
+[Packages/SmartGitUPM/Editor/Package/Model/{PackageLocalInfo.cs,PackageRemoteInfo.cs}]
 
 dotnet_naming_rule.public_fields.style = camel_case
 dotnet_naming_rule.public_fields.symbols = public_fields
