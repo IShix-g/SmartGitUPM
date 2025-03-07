@@ -115,89 +115,89 @@ namespace SmartGitUPM.Editor
         {
             var context = SynchronizationContext.Current;
             @this.ContinueWith(t =>
+            {
+                try
                 {
-                    try
+                    if (cancellationToken.IsCancellationRequested || t.IsCanceled)
                     {
-                        if (cancellationToken.IsCancellationRequested || t.IsCanceled)
-                        {
-                            if (onCancel != default)
-                            {
-                                if (SynchronizationContext.Current == context)
-                                {
-                                    onCancel.Invoke();
-                                }
-                                else
-                                {
-                                    context.Post(_ => onCancel.Invoke(), default);
-                                }
-                            }
-                            return;
-                        }
-
-                        if (t.IsFaulted)
-                        {
-                            if (t.Exception != default && onError != default)
-                            {
-                                if (SynchronizationContext.Current == context)
-                                {
-                                    onError.Invoke(t.Exception);
-                                }
-                                else
-                                {
-                                    context.Post(_ => onError.Invoke(t.Exception), default);
-                                }
-                            }
-                            return;
-                        }
-
-                        if (t.IsCompleted)
+                        if (onCancel != default)
                         {
                             if (SynchronizationContext.Current == context)
                             {
-                                onSuccess(t);
+                                onCancel.Invoke();
                             }
                             else
                             {
-                                context.Post(_ => onSuccess(t), default);
+                                context.Post(_ => onCancel.Invoke(), default);
                             }
                         }
+                        return;
                     }
-                    catch (Exception ex)
+
+                    if (t.IsFaulted)
                     {
-                        if (onError != default)
+                        if (t.Exception != default && onError != default)
                         {
                             if (SynchronizationContext.Current == context)
                             {
-                                onError.Invoke(ex);
+                                onError.Invoke(t.Exception);
                             }
                             else
                             {
-                                context.Post(_ => onError.Invoke(ex), default);
+                                context.Post(_ => onError.Invoke(t.Exception), default);
                             }
+                        }
+                        return;
+                    }
+
+                    if (t.IsCompleted)
+                    {
+                        if (SynchronizationContext.Current == context)
+                        {
+                            onSuccess(t);
                         }
                         else
                         {
-                            Debug.LogError($"Unhandled exception in ContinueOnMainThread: {ex}");
+                            context.Post(_ => onSuccess(t), default);
                         }
                     }
-                    finally
+                }
+                catch (Exception ex)
+                {
+                    if (onError != default)
                     {
-                        if (onCompleted != default)
+                        if (SynchronizationContext.Current == context)
                         {
-                            if (SynchronizationContext.Current == context)
-                            {
-                                onCompleted.Invoke();
-                            }
-                            else
-                            {
-                                context.Post(_ => onCompleted.Invoke(), default);
-                            }
+                            onError.Invoke(ex);
+                        }
+                        else
+                        {
+                            context.Post(_ => onError.Invoke(ex), default);
                         }
                     }
-                },
-                cancellationToken,
-                TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Current);
+                    else
+                    {
+                        Debug.LogError($"Unhandled exception in ContinueOnMainThread: {ex}");
+                    }
+                }
+                finally
+                {
+                    if (onCompleted != default)
+                    {
+                        if (SynchronizationContext.Current == context)
+                        {
+                            onCompleted.Invoke();
+                        }
+                        else
+                        {
+                            context.Post(_ => onCompleted.Invoke(), default);
+                        }
+                    }
+                }
+            },
+            cancellationToken,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Current);
         }
 
         public static void Handled(this Task task, Action<Task> onCompleted = default, Action<Exception> onError = default)
