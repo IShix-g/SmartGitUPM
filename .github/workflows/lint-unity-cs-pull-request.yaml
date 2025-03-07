@@ -8,6 +8,7 @@ on:
       - 'Packages/SmartGitUPM/**'
 
 permissions:
+  contents: read
   pull-requests: write
 
 jobs:
