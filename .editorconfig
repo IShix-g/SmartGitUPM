@@ -104,8 +104,7 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # StyleCop Diagnostic Rules =================
 
-dotnet_analyzer_diagnostic.category-Style.severity = none
-
+dotnet_diagnostic.WHITESPACE.severity = none
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
 # Whitespace errors (e.g. operators)
@@ -131,7 +130,7 @@ dotnet_diagnostic.SA1006.severity = none
 # Closing parenthesis should not be preceded by a space.
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
-dotnet_diagnostic.SA1027.severity = warning
+dotnet_diagnostic.SA1027.severity = error
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
