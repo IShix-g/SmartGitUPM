@@ -104,6 +104,8 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # StyleCop Diagnostic Rules =================
 
+dotnet_analyzer_diagnostic.category-Spacing.severity = none
+
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
 # Whitespace errors (e.g. operators)
