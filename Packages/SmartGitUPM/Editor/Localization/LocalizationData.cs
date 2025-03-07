@@ -9,7 +9,7 @@ namespace SmartGitUPM.Editor.Localization
     internal sealed class LocalizationData : ScriptableObject
     {
         [SerializeField] List<LocalizationEntry> _localizedLanguages;
-        
+
         public bool IsEmpty => _localizedLanguages is null
                                || _localizedLanguages.Count == 0;
 
@@ -30,9 +30,9 @@ namespace SmartGitUPM.Editor.Localization
                 return _supportedLanguages;
             }
         }
-        
+
         SystemLanguage[] _supportedLanguages;
-        
+
         public void SetLanguage(SystemLanguage language)
         {
             language = ToSupportedLanguage(language);
@@ -56,7 +56,7 @@ namespace SmartGitUPM.Editor.Localization
             }
             return SupportedLanguages[0];
         }
-        
+
         public LocalizationEntry GetEntry(string key)
             => _localizedLanguages.Find(x => x.Key == key);
 
@@ -74,11 +74,11 @@ namespace SmartGitUPM.Editor.Localization
         public List<LocalizedText> Entries;
         public LocalizedText Text { get; private set; }
         public string CurrentValue => Text?.Value ?? string.Empty;
-        
+
         public bool CanSetLanguage(SystemLanguage language)
             => Text == default
                || Text.Language != language;
-        
+
         public void SetLanguage(SystemLanguage language)
         {
             Text = Entries?.Find(x => x.Language == language)
@@ -88,7 +88,7 @@ namespace SmartGitUPM.Editor.Localization
                 Debug.LogWarning($"Translation missing for key '{Key}' in language '{language}'");
             }
         }
-        
+
         public string GetTranslation() => CurrentValue;
 
         public bool TryGetTranslation(out string value)
@@ -96,7 +96,7 @@ namespace SmartGitUPM.Editor.Localization
             value = CurrentValue;
             return value != string.Empty;
         }
-        
+
         public string GetTranslation(SystemLanguage language)
         {
             var value = Entries.Find(x => x.Language == language)?.Value;
@@ -106,14 +106,14 @@ namespace SmartGitUPM.Editor.Localization
             }
             return value;
         }
-        
+
         public bool TryGetTranslation(SystemLanguage language, out string value)
         {
             value = GetTranslation(language);
             return !string.IsNullOrEmpty(value);
         }
     }
-    
+
     [Serializable]
     public class LocalizedText
     {

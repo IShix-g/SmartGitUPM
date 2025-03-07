@@ -10,30 +10,30 @@ namespace SmartGitUPM.Editor
         public string CurrentViewID { get; private set; }
         public string PrevViewID { get; private set; }
         public string CurrentViewDisplayName { get; private set; }
-        
+
         bool _isDisposed;
         string _defaultViewID;
 
         public EditorViewSwitcher(string defaultViewID = default)
             => _defaultViewID = defaultViewID;
-        
+
         public bool IsOpen() => !string.IsNullOrEmpty(CurrentViewID);
-        
+
         public bool IsOpen(EditorView view) => view.IsOpen && CurrentViewID == view.ViewID;
-        
+
         public bool Has(EditorView view) => Views.Contains(view);
-        
+
         public void SetDefaultView(string viewID) => _defaultViewID = viewID;
-        
+
         public EditorView Get(string viewID) => Views.Find(view => view.ViewID == viewID);
-        
+
         public void Show(EditorView view)
         {
             if (view.IsOpen)
             {
                 return;
             }
-            
+
             PrevViewID = CurrentViewID;
             if (!string.IsNullOrEmpty(CurrentViewID))
             {
@@ -54,7 +54,7 @@ namespace SmartGitUPM.Editor
                 }
             }
         }
-        
+
         bool Hide(string viewID)
         {
             var view = Get(viewID);
@@ -67,7 +67,7 @@ namespace SmartGitUPM.Editor
             CurrentViewDisplayName = string.Empty;
             return true;
         }
-        
+
         public void Add(params EditorView[] views)
         {
             foreach (var view in views)
@@ -78,7 +78,7 @@ namespace SmartGitUPM.Editor
                 }
             }
         }
-        
+
         public void Remove(params string[] viewIDs)
         {
             foreach (var viewID in viewIDs)
@@ -112,7 +112,7 @@ namespace SmartGitUPM.Editor
                 ShowDefaultView();
             }
         }
-        
+
         void ShowDefaultView()
         {
             var next = Get(_defaultViewID);
@@ -126,7 +126,7 @@ namespace SmartGitUPM.Editor
                 Show(next);
             }
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)

@@ -57,7 +57,7 @@ namespace SmartGitUPM.Editor
                 Cleanup();
             }
         }
-        
+
         public void Cancel(Exception exception = default)
         {
             if (!IsStarted)

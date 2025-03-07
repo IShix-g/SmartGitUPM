@@ -9,7 +9,7 @@ namespace SmartGitUPM.Editor
         public event Action<EditorView> OnOpenView = delegate { };
         public event Action<EditorView> OnCloseView = delegate { };
         public bool IsOpen { get; private set; }
-        
+
         bool _isDisposed;
         protected EditorWindow Window { get; private set; }
 
@@ -21,7 +21,7 @@ namespace SmartGitUPM.Editor
         protected abstract void OnClose();
         protected abstract void OnUpdate();
         protected abstract void OnDestroy();
-        
+
         public void Open()
         {
             if (IsOpen)
@@ -51,7 +51,7 @@ namespace SmartGitUPM.Editor
                 OnUpdate();
             }
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)

@@ -34,7 +34,7 @@ namespace SmartGitUPM.Editor
                 return;
             }
 
-            if(_logo != default )
+            if (_logo != default)
             {
                 var style = new GUIStyle(GUI.skin.label)
                 {

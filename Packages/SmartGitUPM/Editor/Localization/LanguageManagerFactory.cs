@@ -7,11 +7,11 @@ namespace SmartGitUPM.Editor.Localization
     internal static class LanguageManagerFactory
     {
         const string _dataPath = PackageCollectionWindow.PackagePath + "Editor/LocalizationData.asset";
-        
+
         static LanguageManager s_manager;
         static LocalizationSetting s_setting;
         static LocalizationData s_data;
-        
+
         public static LanguageManager GetOrCreate()
         {
             if (s_manager == default
@@ -27,7 +27,7 @@ namespace SmartGitUPM.Editor.Localization
             InitializeLocalization();
             return Create(s_data, s_setting);
         }
-        
+
         public static LanguageManager Create(LocalizationData data, LocalizationSetting setting)
         {
             var manager = new LanguageManager(data, setting.Language);
@@ -35,7 +35,7 @@ namespace SmartGitUPM.Editor.Localization
             setting.OnLanguageChanged += OnLanguageChanged;
             return manager;
         }
-        
+
         static void OnLanguageChanged(SystemLanguage language)
             => s_manager?.SetLanguage(language);
 

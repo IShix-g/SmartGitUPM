@@ -20,7 +20,7 @@ namespace SmartGitUPM.Editor
 
             if (methodInfo == default)
             {
-               Debug.LogError($"Method '{dropdownAttribute.MethodName}' not found.");
+                Debug.LogError($"Method '{dropdownAttribute.MethodName}' not found.");
                 return;
             }
 

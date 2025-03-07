@@ -10,21 +10,21 @@ namespace SmartGitUPM.Editor.Localization
     public sealed class LocalizationSetting : ScriptableObject
     {
         public event Action<SystemLanguage> OnLanguageChanged = delegate { };
-        
+
         [SerializeField,
          OnValueChanged("OnValueChanged"),
          DynamicDropdown("GetSupportedLanguages")]
         SystemLanguage _language = SystemLanguage.English;
-        
+
         #region Editor
         void OnValueChanged() => OnLanguageChanged(_language);
         object[] GetSupportedLanguages() => _supportedLanguages;
         #endregion
-        
+
         public SystemLanguage Language => _language;
-        
+
         object[] _supportedLanguages;
-        
+
         public void SetSupportedLanguage(IReadOnlyList<SystemLanguage> languages)
         {
             _supportedLanguages = new object[languages.Count];
