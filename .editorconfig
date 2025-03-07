@@ -44,7 +44,7 @@ csharp_space_after_cast = true
 # Insert a space after control flow keywords ('if', 'while', 'for', etc.)
 csharp_space_after_keywords_in_control_flow_statements = true
 # Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = control_flow_statements, type_casts
+csharp_space_between_parentheses = control_flow_statements
 # Insert a space before colons ':' in inheritance clauses
 csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
