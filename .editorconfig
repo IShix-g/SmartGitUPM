@@ -19,7 +19,7 @@ indent_size = 4
 tab_width = 4
 
 # Always insert a newline before opening braces '{'
-csharp_new_line_before_open_brace = methods, properties, control_blocks, types
+csharp_new_line_before_open_brace = all
 
 # switch case Indent the content.
 csharp_indent_case_contents = true
