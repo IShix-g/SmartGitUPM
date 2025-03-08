@@ -65,7 +65,7 @@ namespace SmartGitUPM.Editor
             }
             return LoadAsset(path);
         }
- 
+
         string ValidateAndGetPath()
         {
             var path = GetAssetPath();
