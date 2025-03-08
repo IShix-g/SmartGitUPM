@@ -1,5 +1,4 @@
 
-using System;
 using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
@@ -14,12 +13,12 @@ namespace SmartGitUPM.Editor
         PackageCollectionSetting _packageSetting;
         LocalizationSetting _localizationSetting;
         readonly string _supportProtocols;
-        
+
         LocalizationEntry _updateEntry;
         LocalizationEntry _installUrlEntry;
         LocalizationEntry _branchEntry;
         LocalizationEntry _languageEntry;
-        
+
         public PackageCollectionSettingView(
                 PackageCollectionSetting packageSetting,
                 LocalizationSetting localizationSetting,
@@ -31,7 +30,7 @@ namespace SmartGitUPM.Editor
         {
             _packageSetting = packageSetting;
             _localizationSetting = localizationSetting;
-            _supportProtocols = String.Join(", ", supportProtocols);
+            _supportProtocols = string.Join(", ", supportProtocols);
             _updateEntry = languageManager.GetEntry("Setting/Update");
             _installUrlEntry = languageManager.GetEntry("Setting/Install");
             _branchEntry = languageManager.GetEntry("Setting/Branch");
@@ -39,7 +38,7 @@ namespace SmartGitUPM.Editor
         }
 
         public override string ViewID => "setting-view";
-        
+
         public override string ViewDisplayName => "Setting";
 
         protected override void OnOpen()
@@ -53,12 +52,12 @@ namespace SmartGitUPM.Editor
             _packageSettingSerializedObject = default;
             _localizationSettingSerializedObject = default;
         }
-        
+
         protected override void OnUpdate()
         {
             var position = Window.position;
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(position.width));
-            
+
             {
                 GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
                 EditorGUILayout.HelpBox("UpdateNotify: " + _updateEntry.CurrentValue, MessageType.Info);
@@ -66,7 +65,7 @@ namespace SmartGitUPM.Editor
                 EditorGUILayout.HelpBox("Branch: " + _branchEntry.CurrentValue, MessageType.Info);
                 EditorGUILayout.HelpBox("Supported Protocols: " + _supportProtocols, MessageType.Info);
                 GUILayout.EndVertical();
-                
+
                 _packageSettingSerializedObject.Update();
                 var property = _packageSettingSerializedObject.GetIterator();
                 property.NextVisible(true);
@@ -88,7 +87,7 @@ namespace SmartGitUPM.Editor
                 GUILayout.EndHorizontal();
                 EditorGUILayout.HelpBox(_languageEntry.CurrentValue, MessageType.Info);
                 GUILayout.Space(10);
-                
+
                 _localizationSettingSerializedObject.Update();
                 var property = _localizationSettingSerializedObject.GetIterator();
                 property.NextVisible(true);
@@ -97,12 +96,12 @@ namespace SmartGitUPM.Editor
                     EditorGUILayout.PropertyField(property, true);
                 }
                 _localizationSettingSerializedObject.ApplyModifiedProperties();
-                
+
                 GUILayout.Space(20);
             }
             GUILayout.EndScrollView();
         }
-        
+
         protected override void OnDestroy()
         {
             _packageSetting = default;
