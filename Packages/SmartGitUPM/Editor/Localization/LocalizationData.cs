@@ -20,7 +20,7 @@ namespace SmartGitUPM.Editor.Localization
                 if (_supportedLanguages is null
                     || _supportedLanguages.Length == 0)
                 {
-                    _supportedLanguages = _localizedLanguages is {Count: > 0}
+                    _supportedLanguages = _localizedLanguages is { Count: > 0 }
                         ? _localizedLanguages[0].Entries
                             .Select(x => x.Language)
                             .Distinct()

@@ -39,7 +39,7 @@ namespace SmartGitUPM.Editor
                 return default;
             }
             var currentGuids = AssetDatabase.FindAssets("t:" + typeof(T), new[] { dir });
-            if (currentGuids is {Length: > 0})
+            if (currentGuids is { Length: > 0 })
             {
                 path = AssetDatabase.GUIDToAssetPath(currentGuids[0]);
                 asset = AssetDatabase.LoadAssetAtPath<T>(path);

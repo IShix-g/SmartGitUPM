@@ -8,11 +8,11 @@ namespace SmartGitUPM.Editor.Localization
     internal sealed class LanguageManager : IDisposable
     {
         public event Action<SystemLanguage> OnLanguageChanged = delegate {};
-        
+
         public bool IsDisposed { get; private set; }
         public IReadOnlyList<SystemLanguage> SupportedLanguages => _data.SupportedLanguages;
         public SystemLanguage CurrentLanguage { get; private set; }
-        
+
         LocalizationData _data;
 
         public LanguageManager(LocalizationData data, SystemLanguage language)
@@ -31,11 +31,11 @@ namespace SmartGitUPM.Editor.Localization
             CurrentLanguage = language;
             OnLanguageChanged(language);
         }
-        
+
         public void ResetData(LocalizationData data)
         {
             _data = data;
-            
+
             if (data.IsEmpty)
             {
                 Debug.LogWarning("data is empty.");

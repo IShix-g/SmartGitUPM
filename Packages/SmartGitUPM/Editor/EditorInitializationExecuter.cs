@@ -7,13 +7,13 @@ namespace SmartGitUPM.Editor
     internal sealed class EditorInitializationExecuter
     {
         const string _key = "SmartGitUPM_EditorInitializationExecuter_FirstInit";
-        
+
         public static bool IsFirstInit
         {
             get => SessionState.GetBool(_key, false);
             set => SessionState.SetBool(_key, value);
         }
-        
+
         [InitializeOnLoadMethod]
         static void DetectEditorStartup()
         {
@@ -43,7 +43,7 @@ namespace SmartGitUPM.Editor
                 UpdateAvailable = manager.GetEntry("UpdateChecker/UpdateAvailable").CurrentValue
             };
         }
-        
+
         static void OnProjectLoadedInEditor()
             => PackageCacheManager.Initialize();
     }

@@ -146,7 +146,7 @@ namespace SmartGitUPM.Editor
 
                 if (isOpen)
                 {
-                    _packageInstaller.Install(new []{ GitInstallUrl }, _tokenSource.Token).Handled();
+                    _packageInstaller.Install(new [] { GitInstallUrl }, _tokenSource.Token).Handled();
                 }
             }
             else

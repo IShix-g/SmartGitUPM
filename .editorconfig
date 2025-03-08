@@ -114,7 +114,7 @@ dotnet_diagnostic.IDE0028.severity = none
 # Simplify built-in type names.
 dotnet_diagnostic.IDE0049.severity = warning
 # Format code consistently.
-dotnet_diagnostic.IDE0055.severity = warning
+dotnet_diagnostic.IDE0055.severity = none
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.

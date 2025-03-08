@@ -7,7 +7,7 @@ namespace SmartGitUPM.Editor.Localization
     {
         static readonly Lazy<UniqueLocalizationSetting> s_instance
             = new (() => new UniqueLocalizationSetting());
-        
+
         UniqueLocalizationSetting()
         {
             if (s_instance.IsValueCreated)
@@ -18,7 +18,7 @@ namespace SmartGitUPM.Editor.Localization
 
         public static bool Has()
             => s_instance.Value.HasAsset();
-        
+
         public static LocalizationSetting GetOrCreate()
             => s_instance.Value.CreateOrLoadAsset();
     }
