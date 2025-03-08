@@ -1,31 +1,26 @@
+# EditorConfig is awesome: https://editorconfig.org
+
+# top-most EditorConfig file
 root = true
 
+# General
 [*]
 charset = utf-8
 end_of_line = lf
-trim_trailing_whitespace = false
-insert_final_newline = false
+insert_final_newline = true
 indent_style = space
 indent_size = 2
 
-[{appsettings.json,appsettings.*.json}]
-charset = utf-8-bom
-indent_style = space
-indent_size = 4
-
 [*.cs]
+trim_trailing_whitespace = true
+insert_final_newline = true
 indent_style = space
 indent_size = 4
 tab_width = 4
 
-# StyleCop Diagnostic Rules =================
-
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
-# Display multiple statements and member declarations on a single line
-csharp_preserve_single_line_statements = false
-# Allow code blocks to remain on a single line if they fit
-csharp_preserve_single_line_blocks = true
+
 # switch case Indent the content.
 csharp_indent_case_contents = true
 # Indent switch label
@@ -38,6 +33,7 @@ csharp_indent_block_contents = true
 csharp_indent_braces = false
 # Indent the statement list and curly braces in the case of a switch statement.
 csharp_indent_case_contents_when_block = false
+
 # Insert spaces after cast operators
 csharp_space_after_cast = true
 # Insert a space after control flow keywords ('if', 'while', 'for', etc.)
@@ -80,12 +76,19 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 # Do not insert spaces within square brackets '[]'
 csharp_space_between_square_brackets = false
+
+# Display multiple statements and member declarations on a single line
+csharp_preserve_single_line_statements = false
+# Allow code blocks to remain on a single line if they fit
+csharp_preserve_single_line_blocks = true
+
 # Recommend using type inference ('var') for variable declarations
 csharp_style_var_elsewhere = true:suggestion
 # Recommend using type inference ('var') for built-in types (e.g., 'int')
 csharp_style_var_for_built_in_types = true:suggestion
 # Recommend using type inference ('var') when the type is apparent
 csharp_style_var_when_type_is_apparent = true:suggestion
+
 # Always use braces for control structures
 csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:warning
@@ -101,10 +104,17 @@ dotnet_style_qualification_for_method = false:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
 dotnet_style_qualification_for_property = false:suggestion
 
-# StyleCop Diagnostic Rules =================
 
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
+# Object initializer can be simplified.
+dotnet_diagnostic.IDE0017.severity = none
+# Collection initialization can be simplified.
+dotnet_diagnostic.IDE0028.severity = none
+# Simplify built-in type names.
+dotnet_diagnostic.IDE0049.severity = warning
+# Format code consistently.
+dotnet_diagnostic.IDE0055.severity = none
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
@@ -133,6 +143,8 @@ dotnet_diagnostic.SA1101.severity = none
 dotnet_diagnostic.SA1111.severity = none
 # Use string.Empty for empty strings
 dotnet_diagnostic.SA1122.severity = warning
+# Elements should have the same indentation
+dotnet_diagnostic.SA1137.severity = warning
 # Using directives should be placed correctly (either top of file or inside namespace).
 dotnet_diagnostic.SA1200.severity = none
 # Static elements should appear before instance elements.
@@ -225,6 +237,7 @@ dotnet_diagnostic.SA3000.severity = none
 dotnet_diagnostic.SA9001.severity = none
 # Reserved for custom or experimental rules.
 dotnet_diagnostic.SA9002.severity = none
+
 
 # C# Naming Rules (Classes and Interfaces) =================
 
