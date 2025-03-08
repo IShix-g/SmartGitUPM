@@ -1,4 +1,5 @@
 # EditorConfig is awesome: https://editorconfig.org
+# IDE0055 reports many issues related to spaces and line breaks, so it is disabled.
 
 # top-most EditorConfig file
 root = true
