@@ -19,92 +19,155 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
-# Always insert a newline before opening braces '{'
+# Organize usings
+dotnet_separate_import_directive_groups = false
+dotnet_sort_system_directives_first = false
+file_header_template = unset
+
+# this. and Me. preferences
+dotnet_style_qualification_for_event = false
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_property = false
+
+# Language keywords vs BCL types preferences
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_predefined_type_for_member_access = true
+
+# Parentheses preferences
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers = never
+
+# Expression-level preferences
+dotnet_style_coalesce_expression = false
+dotnet_style_collection_initializer = false
+dotnet_style_explicit_tuple_names = true
+dotnet_style_namespace_match_folder = false
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_style_prefer_auto_properties = true
+dotnet_style_prefer_collection_expression = never
+dotnet_style_prefer_compound_assignment = true
+dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed
+dotnet_style_prefer_inferred_anonymous_type_member_names = true
+dotnet_style_prefer_inferred_tuple_names = true
+dotnet_style_prefer_simplified_boolean_expressions = true
+dotnet_style_prefer_simplified_interpolation = true
+
+# Field preferences
+dotnet_style_readonly_field = true
+
+# Suppression preferences
+dotnet_remove_unnecessary_suppression_exclusions = none
+
+# New line preferences
+dotnet_style_allow_multiple_blank_lines_experimental = true
+dotnet_style_allow_statement_immediately_after_block_experimental = true
+
+#### C# Coding Conventions ####
+
+# var preferences
+csharp_style_var_elsewhere = true
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+
+# Expression-bodied members
+csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_constructors = false
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_lambdas = true
+csharp_style_expression_bodied_local_functions = false
+csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_operators = false
+csharp_style_expression_bodied_properties = true
+
+# Modifier preferences
+csharp_prefer_static_local_function = true
+csharp_style_prefer_readonly_struct = true
+csharp_style_prefer_readonly_struct_member = false
+
+# Code-block preferences
+csharp_prefer_braces = true
+csharp_prefer_simple_using_statement = true
+csharp_style_namespace_declarations = block_scoped
+csharp_style_prefer_method_group_conversion = true
+csharp_style_prefer_primary_constructors = false
+csharp_style_prefer_top_level_statements = false
+
+# Expression-level preferences
+csharp_prefer_simple_default_expression = false
+csharp_style_deconstructed_variable_declaration = false
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+csharp_style_inlined_variable_declaration = true
+csharp_style_prefer_index_operator = true
+csharp_style_prefer_local_over_anonymous_function = true
+csharp_style_prefer_range_operator = true
+csharp_style_prefer_tuple_swap = false
+csharp_style_prefer_utf8_string_literals = false
+
+# 'using' directive preferences
+csharp_using_directive_placement = outside_namespace
+
+# New line preferences
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true
+csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true
+csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true
+csharp_style_allow_embedded_statements_on_same_line_experimental = false
+
+#### C# Formatting Rules ####
+
+# New line preferences
+csharp_new_line_before_catch = true
+csharp_new_line_before_else = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_open_brace = all
+csharp_new_line_between_query_expression_clauses = true
 
-# switch case Indent the content.
-csharp_indent_case_contents = true
-# Indent switch label
-csharp_indent_switch_labels = true
-# Indent label
-csharp_indent_labels = flush_left
-# Indent the contents of the block.
+# Indentation preferences
 csharp_indent_block_contents = true
-# Ensure opening and closing braces are indented correctly
 csharp_indent_braces = false
-# Indent the statement list and curly braces in the case of a switch statement.
-csharp_indent_case_contents_when_block = false
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_switch_labels = true
 
-# Insert spaces after cast operators
-csharp_space_after_cast = true
-# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
-csharp_space_after_keywords_in_control_flow_statements = true
-# Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = false
-# Insert a space before colons ':' in inheritance clauses
-csharp_space_before_colon_in_inheritance_clause = true
-# Insert spaces after colons ':' in inheritance clauses
+# Space preferences
+csharp_space_after_cast = false
 csharp_space_after_colon_in_inheritance_clause = true
-# Do not insert a space before commas ','
-csharp_space_before_comma = false
-# Insert a space after commas ','
 csharp_space_after_comma = true
-# Do not insert a space before dots '.'
-csharp_space_before_dot = false
-# Do not insert a space after dots '.'
 csharp_space_after_dot = false
-# Insert a space after semicolons ';' in 'for' statements
+csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_after_semicolon_in_for_statement = true
-# Insert spaces before and after binary operators
 csharp_space_around_binary_operators = before_and_after
-# Do not insert a space before open square brackets '['
+csharp_space_around_declaration_statements = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
 csharp_space_before_open_square_brackets = false
-# Do not insert a space before semicolons ';' in 'for' statements
 csharp_space_before_semicolon_in_for_statement = false
-# Do not insert spaces inside empty square brackets '[]'
 csharp_space_between_empty_square_brackets = false
-# Do not insert spaces within empty parameter lists in method calls
 csharp_space_between_method_call_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '('
 csharp_space_between_method_call_name_and_opening_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method calls
 csharp_space_between_method_call_parameter_list_parentheses = false
-# Do not insert spaces within empty parameter lists in method declarations
 csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '(' in declarations
 csharp_space_between_method_declaration_name_and_open_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method declarations
 csharp_space_between_method_declaration_parameter_list_parentheses = false
-# Do not insert spaces within square brackets '[]'
+csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
-# Display multiple statements and member declarations on a single line
-csharp_preserve_single_line_statements = false
-# Allow code blocks to remain on a single line if they fit
+# Wrapping preferences
 csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
 
-# Recommend using type inference ('var') for variable declarations
-csharp_style_var_elsewhere = true:suggestion
-# Recommend using type inference ('var') for built-in types (e.g., 'int')
-csharp_style_var_for_built_in_types = true:suggestion
-# Recommend using type inference ('var') when the type is apparent
-csharp_style_var_when_type_is_apparent = true:suggestion
-
-# Always use braces for control structures
-csharp_prefer_braces = true:warning
-csharp_prefer_simple_using_statement = true:warning
-
-# Prefer omitting 'private' access modifier for fields and methods
-dotnet_style_require_accessibility_modifiers = never:warning
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing events.
-dotnet_style_qualification_for_event = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing fields.
-dotnet_style_qualification_for_field = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing methods.
-dotnet_style_qualification_for_method = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
-dotnet_style_qualification_for_property = false:suggestion
-
+# Code Style Rules =================
+dotnet_analyzer_diagnostic.category-security.severity = error
 
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
