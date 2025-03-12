@@ -113,9 +113,9 @@ csharp_style_prefer_utf8_string_literals = false
 csharp_using_directive_placement = outside_namespace
 
 # New line preferences
-csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true
-csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true
-csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
+csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false
+csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true
 csharp_style_allow_embedded_statements_on_same_line_experimental = false
 
@@ -167,6 +167,7 @@ csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = false
 
 # Code Style Rules =================
+dotnet_analyzer_diagnostic.category-security.severity = error
 
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
