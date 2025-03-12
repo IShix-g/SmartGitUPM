@@ -169,6 +169,7 @@ csharp_preserve_single_line_statements = false
 # Code Style Rules =================
 dotnet_analyzer_diagnostic.category-security.severity = error
 
+dotnet_diagnostic.IDE0001.severity = none
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
 # Object initializer can be simplified.
