@@ -111,7 +111,7 @@ namespace SmartGitUPM.Editor
 
         void OnGUI()
         {
-            EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing);
+            EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing || _versionChecker.IsProcessing);
             GUILayout.BeginHorizontal(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
             var width = GUILayout.Width(33);
             var height = GUILayout.Height(EditorGUIUtility.singleLineHeight + 5);
@@ -123,7 +123,8 @@ namespace SmartGitUPM.Editor
             var clickedVersion = false;
             if (_versionChecker.IsLoaded)
             {
-                clickedVersion = GUILayout.Button(_versionChecker.LocalInfo.VersionString, height);
+                var version = _versionChecker.IsProcessing ? "Checking..." : _versionChecker.LocalInfo.VersionString;
+                clickedVersion = GUILayout.Button(version, height);
             }
             GUILayout.EndHorizontal();
             EditorGUI.EndDisabledGroup();
@@ -162,8 +163,13 @@ namespace SmartGitUPM.Editor
             }
             else if (clickedVersion)
             {
-                _tokenSource = new CancellationTokenSource();
-                _versionChecker.CheckVersion(_tokenSource.Token);
+                _versionChecker.Fetch()
+                    .ContinueOnMainThread(task =>
+                    {
+                        _tokenSource?.Dispose();
+                        _tokenSource = new CancellationTokenSource();
+                        _versionChecker.CheckVersion(_tokenSource.Token);
+                    });
             }
 
             {
@@ -185,7 +191,7 @@ namespace SmartGitUPM.Editor
                 if (_viewSwitcher.IsOpen(_collectionView)
                     && _manager.Collection.HasMetas)
                 {
-                    EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing);
+                    EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing || _versionChecker.IsProcessing);
                     if (GUILayout.Button("Install All", GUILayout.Width(70))
                         && _manager.Collection.HasMetas)
                     {
@@ -216,8 +222,10 @@ namespace SmartGitUPM.Editor
 
             if (_viewSwitcher.IsOpen())
             {
+                EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing || _versionChecker.IsProcessing);
                 var isUpdated = _viewSwitcher.Update();
                 _settingUpdated |= isUpdated && _viewSwitcher.IsOpen(_settingView);
+                EditorGUI.EndDisabledGroup();
             }
         }
 
