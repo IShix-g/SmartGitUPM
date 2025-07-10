@@ -18,7 +18,7 @@ MonoBehaviour:
     Branch: 
     HelpPageUrl: https://github.com/IShix-g/CMSuniVortex
   - UpdateNotify: 1
-    InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator
+    InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator#1.0.13
     Branch: 
     HelpPageUrl: 
   - UpdateNotify: 1
@@ -26,6 +26,6 @@ MonoBehaviour:
     Branch: 
     HelpPageUrl: 
   - UpdateNotify: 1
-    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
+    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/#0.5.11
     Branch: 
     HelpPageUrl: 

@@ -1,6 +1,4 @@
 
-using System.Text.RegularExpressions;
-
 namespace SmartGitUPM.Editor
 {
     public class PackageInfoDetails
