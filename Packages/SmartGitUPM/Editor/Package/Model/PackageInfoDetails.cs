@@ -14,9 +14,9 @@ namespace SmartGitUPM.Editor
         public bool IsInstalled => Local != default;
         public bool IsLoaded => Remote != default;
         public bool IsFixedVersion { get; private set; }
-        
+
         enum PreReleaseType { None, Beta, Alpha, Preview, Rc }
-        
+
         public PackageInfoDetails(PackageLocalInfo local, PackageRemoteInfo remote, string packageInstallUrl)
         {
             Remote = remote;
@@ -56,7 +56,7 @@ namespace SmartGitUPM.Editor
             {
                 return (PreReleaseType.None, 0, new Version(version));
             }
-            
+
             var mainVersionStr = match.Groups["mainVersion"].Value;
             var preReleaseTypeStr = match.Groups["preReleaseType"].Value.ToLower();
             var preReleaseNumberStr = match.Groups["preReleaseNumber"].Value;
@@ -83,7 +83,7 @@ namespace SmartGitUPM.Editor
             }
             return (preReleaseType, preReleaseNumber, mainVersion);
         }
-        
+
         static int CompareVersions(
             (PreReleaseType PreReleaseType, int PreReleaseNumber, Version MainVersion) local,
             (PreReleaseType PreReleaseType, int PreReleaseNumber, Version MainVersion) server
@@ -101,10 +101,10 @@ namespace SmartGitUPM.Editor
             }
             return local.PreReleaseNumber.CompareTo(server.PreReleaseNumber);
         }
-        
+
         public string GetVersionParam()
             => GetVersionParam(PackageInstallUrl);
-        
+
         public static string GetVersionParam(string packageInstallUrl)
         {
             var match = Regex.Match(packageInstallUrl, @"#v?([\d.]+)$");

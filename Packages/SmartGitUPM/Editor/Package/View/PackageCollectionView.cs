@@ -12,7 +12,7 @@ namespace SmartGitUPM.Editor
     {
         public event Action OnInstall = delegate { };
         public event Action OnUnInstall = delegate { };
-        
+
         PackageInstaller _installer;
         PackageCollection _collection;
         PackageCollectionSetting _setting;
@@ -20,14 +20,14 @@ namespace SmartGitUPM.Editor
         Vector2 _scrollPos;
         GUIContent _installedIcon;
         GUIContent _updateIcon;
-        GUIContent _linkIcon;
+        GUIContent _helpIcon;
         CancellationTokenSource _tokenSource;
         bool _hasFixed;
         bool _hasUpdate;
         LocalizationEntry _configureButtonEntry;
         LocalizationEntry _fixedEntry;
         LocalizationEntry _updateEntry;
-        
+
         public PackageCollectionView(
             PackageInstaller installer,
             PackageCollectionSetting setting,
@@ -43,12 +43,12 @@ namespace SmartGitUPM.Editor
             _openSettingAction = openSettingAction;
             _installedIcon = EditorGUIUtility.IconContent("Progress");
             _updateIcon = EditorGUIUtility.IconContent("Update-Available");
-            _linkIcon = EditorGUIUtility.IconContent("Linked");
+            _helpIcon = EditorGUIUtility.IconContent("_Help");
             _configureButtonEntry = languageManager.GetEntry("Collection/ConfigureButton");
             _fixedEntry = languageManager.GetEntry("Collection/Fixed");
             _updateEntry = languageManager.GetEntry("Collection/Update");
         }
-        
+
         public override string ViewID => "collection-view";
 
         public override string ViewDisplayName => "Collection";
@@ -77,14 +77,14 @@ namespace SmartGitUPM.Editor
                 GUILayout.EndVertical();
                 return;
             }
-            
+
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(Window.position.width));
             GUILayout.BeginVertical(new GUIStyle() { padding = new RectOffset(5, 5, 5, 5) });
-            
+
             foreach (var detail in _collection.Details)
             {
                 GUILayout.BeginHorizontal(GUI.skin.box);
-                
+
                 var setting = _setting.GetPackage(detail.PackageInstallUrl);
                 var versionText = ToLocalVersionString(detail);
                 if (detail.HasUpdate
@@ -96,20 +96,20 @@ namespace SmartGitUPM.Editor
                     }
                     versionText += ToServerVersionString(detail);
                 }
-                
+
                 if (string.IsNullOrEmpty(versionText))
                 {
                     versionText = detail.IsFixedVersion
                         ? ToFixedVersion(detail)
                         : " v---";
                 }
-                
+
                 if (detail.IsFixedVersion)
                 {
                     versionText += " (Fixed)";
                     _hasFixed = true;
                 }
-                
+
                 var displayName = detail.IsLoaded ? detail.Remote.displayName : "Unknown";
 
                 if (string.IsNullOrEmpty(setting.HelpPageUrl))
@@ -130,9 +130,9 @@ namespace SmartGitUPM.Editor
                         fixedWidth = 25,
                         fixedHeight = EditorGUIUtility.singleLineHeight,
                     };
-                    clickedHelp |= GUILayout.Button(_linkIcon, iconStyle);
+                    clickedHelp |= GUILayout.Button(_helpIcon, iconStyle);
                     GUILayout.EndHorizontal();
-                    
+
                     var lastRect = GUILayoutUtility.GetLastRect();
                     EditorGUIUtility.AddCursorRect(lastRect, MouseCursor.Link);
                     if (clickedHelp)
@@ -140,7 +140,7 @@ namespace SmartGitUPM.Editor
                         Application.OpenURL(setting.HelpPageUrl);
                     }
                 }
-                
+
                 var color = GUI.color;
                 if (detail.IsInstalled
                     && detail.HasUpdate
@@ -151,7 +151,7 @@ namespace SmartGitUPM.Editor
                 }
                 GUILayout.Label(versionText);
                 GUI.color = color;
-                
+
                 if (detail.IsInstalled)
                 {
                     var width = GUILayout.Width(22);
@@ -159,7 +159,7 @@ namespace SmartGitUPM.Editor
                     var icon = detail.HasUpdate && !detail.IsFixedVersion ? _updateIcon : _installedIcon;
                     GUILayout.Label(icon, width, height);
                 }
-                
+
                 var buttonText = GetButtonText(detail);
                 EditorGUI.BeginDisabledGroup(!detail.IsLoaded || _installer.IsProcessing);
                 if (GUILayout.Button(buttonText, GUILayout.Width(70)))
@@ -203,7 +203,7 @@ namespace SmartGitUPM.Editor
                 EditorGUI.EndDisabledGroup();
                 GUILayout.EndHorizontal();
             }
-            
+
             if (_hasFixed)
             {
                 GUILayout.Space(10);
@@ -215,7 +215,7 @@ namespace SmartGitUPM.Editor
                 GUILayout.Space(10);
                 EditorGUILayout.HelpBox(_updateEntry.CurrentValue, MessageType.Info);
             }
-            
+
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
         }
@@ -227,16 +227,16 @@ namespace SmartGitUPM.Editor
             _collection = default;
             _openSettingAction = default;
             _tokenSource?.SafeCancelAndDispose();
-            
+
             _installedIcon = default;
             _updateIcon = default;
-            _linkIcon = default;
-            
+            _helpIcon = default;
+
             _configureButtonEntry = default;
             _fixedEntry = default;
             _updateEntry = default;
         }
-        
+
         string GetButtonText(PackageInfoDetails details)
         {
             if (!details.IsInstalled)
@@ -252,7 +252,7 @@ namespace SmartGitUPM.Editor
         }
 
         string ToLocalVersionString(PackageInfoDetails details)
-            => details.IsInstalled 
+            => details.IsInstalled
                 ? !details.Local.version.StartsWith("v")
                     ? "v" + details.Local.version
                     : details.Local.version
