@@ -60,14 +60,6 @@ namespace SmartGitUPM.Editor
             }
         }
 
-        public string GetVersionParam() => GetVersionParam(PackageInstallUrl);
-
-        public static string GetVersionParam(string packageInstallUrl)
-        {
-            var match = Regex.Match(packageInstallUrl, @"[#@]v?([\d.]+)$");
-            return match.Success
-                ? match.Groups[1].Value
-                : string.Empty;
-        }
+        public string GetVersionParam() => PackageInstallUrl.ToVersion();
     }
 }

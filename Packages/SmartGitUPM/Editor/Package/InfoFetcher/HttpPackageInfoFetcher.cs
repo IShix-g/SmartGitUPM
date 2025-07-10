@@ -43,7 +43,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-                var installUrlWithoutVersion = WithoutVersion(packageInstallUrl);
+                var installUrlWithoutVersion = packageInstallUrl.WithoutVersion();
                 info = await _installer.GetInfoByPackageId(installUrlWithoutVersion, _tokenSource.Token);
 
                 var local = info != default
@@ -92,9 +92,6 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-
-        public static string WithoutVersion(string packageInstallUrl)
-            => Regex.Replace(packageInstallUrl, @"[#@]v?([\d.]+)$", string.Empty);
 
         public async Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl)
         {

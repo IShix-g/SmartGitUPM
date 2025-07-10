@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
@@ -32,7 +33,11 @@ namespace SmartGitUPM.Editor
 
             PackageCacheManager.Initialize();
 
-            var (absolutePath, query) = ParsePath(packageInstallUrl);
+            var currentVersion = packageInstallUrl.ToVersion();
+            var installUrlWithoutVersion = string.IsNullOrEmpty(currentVersion)
+                    ? packageInstallUrl
+                    : packageInstallUrl.WithoutVersion();
+            var (absolutePath, query) = ParsePath(installUrlWithoutVersion);
             var rootPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath;
             var tempPath = rootPath + "/.tmp_" + CreateUniqID();
             var command = "git";
@@ -51,16 +56,17 @@ namespace SmartGitUPM.Editor
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-                var info = await _installer.GetInfoByPackageId(packageInstallUrl, _tokenSource.Token);
+                var info = await _installer.GetInfoByPackageId(installUrlWithoutVersion, _tokenSource.Token);
                 localInfo = info != default
                     ? ToLocalInfo(info)
                     : default;
 
                 if (localInfo == default
-                    && PackageCacheManager.TryGetByInstallUrl(packageInstallUrl, out var cache))
+                    && PackageCacheManager.TryGetByInstallUrl(installUrlWithoutVersion, out var cache))
                 {
                     localInfo = ToLocalInfo(cache);
                     isCachePackage = true;
+                    Debug.Log("localInfo.version = " + localInfo.version);
                 }
             }
             finally
@@ -83,9 +89,10 @@ namespace SmartGitUPM.Editor
             {
                 var jsonString = await File.ReadAllTextAsync(absoluteLocalPackageJsonPath, token);
                 var serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
+
                 if (serverInfo != default)
                 {
-                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, installUrlWithoutVersion);
                 }
             }
 
@@ -181,7 +188,7 @@ namespace SmartGitUPM.Editor
                         Directory.Move(tempPath, localPackagePath);
 
                         var cache = new PackageCacheInfo(
-                            packageInstallUrl,
+                            installUrlWithoutVersion,
                             serverInfo.name,
                             serverInfo.displayName,
                             serverInfo.version);
@@ -189,7 +196,7 @@ namespace SmartGitUPM.Editor
                         PackageCacheManager.Save();
                     }
 
-                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, installUrlWithoutVersion);
                 }
                 else
                 {

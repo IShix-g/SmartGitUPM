@@ -272,6 +272,13 @@
       "dependencies": {},
       "hash": "af72a644a93488eee00713b1d518181f0f445bc7"
     },
+    "okinawa.ishix.unity.jenkins.builder": {
+      "version": "git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/#0.5.11",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "81425628a295a2fd91a9285153353afa373c2d9f"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
