@@ -19,7 +19,7 @@ namespace SmartGitUPM.Editor
         public abstract string ViewDisplayName { get; }
         protected abstract void OnOpen();
         protected abstract void OnClose();
-        protected abstract void OnUpdate();
+        protected abstract bool OnUpdate();
         protected abstract void OnDestroy();
 
         public void Open()
@@ -44,12 +44,13 @@ namespace SmartGitUPM.Editor
             OnCloseView(this);
         }
 
-        public void Update()
+        public bool Update()
         {
             if (IsOpen)
             {
-                OnUpdate();
+                return OnUpdate();
             }
+            return false;
         }
 
         public void Dispose()

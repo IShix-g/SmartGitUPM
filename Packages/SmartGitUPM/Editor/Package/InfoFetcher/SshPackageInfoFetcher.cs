@@ -14,24 +14,24 @@ namespace SmartGitUPM.Editor
     {
         public bool IsProcessing{ get; private set; }
         public string SupportProtocol { get; } = "SSH";
-        
+
         bool _isDisposed;
         CancellationTokenSource _tokenSource;
         readonly PackageInstaller _installer;
 
         public SshPackageInfoFetcher(PackageInstaller installer) => _installer = installer;
-        
+
         public bool IsSupported(string url) => url.StartsWith("git");
-        
+
         public async Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, CancellationToken token = default)
         {
             if (!IsSupported(packageInstallUrl))
             {
                 throw new ArgumentException("Specify the URL of " + SupportProtocol + ". packageInstallUrl: " + packageInstallUrl, nameof(packageInstallUrl));
             }
-            
+
             PackageCacheManager.Initialize();
-            
+
             var (absolutePath, query) = ParsePath(packageInstallUrl);
             var rootPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath;
             var tempPath = rootPath + "/.tmp_" + CreateUniqID();
@@ -45,14 +45,16 @@ namespace SmartGitUPM.Editor
             var isCachePackage = false;
             var localPackagePath = default(string);
             var absoluteLocalPackageJsonPath = default(string);
-            
+
             try
             {
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
                 var info = await _installer.GetInfoByPackageId(packageInstallUrl, _tokenSource.Token);
-                localInfo = info != default ? ToLocalInfo(info) : default;
+                localInfo = info != default
+                    ? ToLocalInfo(info)
+                    : default;
 
                 if (localInfo == default
                     && PackageCacheManager.TryGetByInstallUrl(packageInstallUrl, out var cache))
@@ -91,7 +93,7 @@ namespace SmartGitUPM.Editor
             {
                 branch = "-b " + branch;
             }
-            
+
             arguments = string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
                 ? $"clone --single-branch --no-tags {branch} {absolutePath} {tempPath}"
                 : $"pull origin {branch}";
@@ -113,7 +115,7 @@ namespace SmartGitUPM.Editor
                       && !string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
                         ? localPackagePath
                         : rootPath;
-            
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = command,
@@ -128,7 +130,7 @@ namespace SmartGitUPM.Editor
             try
             {
                 HttpPackageInfoFetcher.CreateDirectories(rootPath);
-                
+
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
@@ -149,7 +151,7 @@ namespace SmartGitUPM.Editor
                     {
                         var jsonString = await File.ReadAllTextAsync(absoluteLocalPackageJsonPath, token);
                         serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
-                        
+
                         if (serverInfo == default)
                         {
                             throw new InvalidOperationException("Failed to parse the package.json.");
@@ -162,22 +164,22 @@ namespace SmartGitUPM.Editor
                         {
                             throw new InvalidOperationException("Failed to find the package.json.");
                         }
-                        
+
                         var jsonString = await File.ReadAllTextAsync(absolutePackageJsonPath, token);
                         serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
-                        
+
                         if (serverInfo == default)
                         {
                             throw new InvalidOperationException("Failed to parse the package.json.");
                         }
-                        
+
                         localPackagePath = rootPath + "/" + serverInfo.name;
                         if (Directory.Exists(localPackagePath))
                         {
                             Directory.Delete(localPackagePath, true);
                         }
                         Directory.Move(tempPath, localPackagePath);
-                        
+
                         var cache = new PackageCacheInfo(
                             packageInstallUrl,
                             serverInfo.name,
@@ -186,7 +188,7 @@ namespace SmartGitUPM.Editor
                         PackageCacheManager.Add(cache);
                         PackageCacheManager.Save();
                     }
-                    
+
                     return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
                 else
@@ -200,14 +202,14 @@ namespace SmartGitUPM.Editor
                 {
                     Directory.Delete(tempPath, true);
                 }
-                
+
                 var message = ex.Message + "\n";
                 if (localInfo != default)
                 {
                     message += "Package: " + localInfo.displayName + " (" + localInfo.name + ") \n";
                 }
                 message += "Install url: " + packageInstallUrl;
-                
+
                 throw new Exception(message, ex);
             }
             finally
@@ -215,7 +217,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         static PackageLocalInfo ToLocalInfo(PackageInfo info)
             => new PackageLocalInfo
             {
@@ -223,7 +225,7 @@ namespace SmartGitUPM.Editor
                 version = info.version,
                 displayName = info.displayName
             };
-        
+
         static PackageLocalInfo ToLocalInfo(PackageCacheInfo info)
             => new PackageLocalInfo
             {
@@ -231,7 +233,7 @@ namespace SmartGitUPM.Editor
                 version = info.Version,
                 displayName = info.DisplayName
             };
-        
+
         static Task WaitForProcessExitAsync(Process process)
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -243,7 +245,7 @@ namespace SmartGitUPM.Editor
             };
             return tcs.Task;
         }
-        
+
         static string CreateUniqID()
         {
             var guid = Guid.NewGuid();
@@ -253,7 +255,7 @@ namespace SmartGitUPM.Editor
                 .Replace("+", "")
                 .Replace("/", "");
         }
-        
+
         static (string AbsolutePath, string Query) ParsePath(string path)
         {
             if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
@@ -261,19 +263,19 @@ namespace SmartGitUPM.Editor
                 var url = new Uri(path);
                 return (url.AbsolutePath, url.Query);
             }
-    
-            int index = path.IndexOf('?');
+
+            var index = path.IndexOf('?');
             if (index == -1)
             {
                 return (path, string.Empty);
             }
-    
-            string absolutePath = path.Substring(0, index);
-            string query = path.Substring(index);
+
+            var absolutePath = path.Substring(0, index);
+            var query = path.Substring(index);
 
             return (absolutePath, query);
         }
-        
+
         static string ExtractPathFromQuery(string query)
         {
             var parameters = query.TrimStart('?').Split('&');
@@ -288,7 +290,7 @@ namespace SmartGitUPM.Editor
             }
             return string.Empty;
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)
@@ -296,7 +298,7 @@ namespace SmartGitUPM.Editor
                 return;
             }
             _isDisposed = true;
-            
+
             if (_tokenSource != default)
             {
                 _tokenSource.Dispose();

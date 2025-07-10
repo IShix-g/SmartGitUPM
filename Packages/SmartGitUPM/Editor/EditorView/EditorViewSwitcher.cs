@@ -44,15 +44,16 @@ namespace SmartGitUPM.Editor
             CurrentViewDisplayName = view.ViewDisplayName;
         }
 
-        public void Update()
+        public bool Update()
         {
             foreach (var view in Views)
             {
                 if (view.IsOpen)
                 {
-                    view.Update();
+                    return view.Update();
                 }
             }
+            return false;
         }
 
         bool Hide(string viewID)

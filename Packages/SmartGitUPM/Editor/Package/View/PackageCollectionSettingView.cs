@@ -53,8 +53,9 @@ namespace SmartGitUPM.Editor
             _localizationSettingSerializedObject = default;
         }
 
-        protected override void OnUpdate()
+        protected override bool OnUpdate()
         {
+            var isUpdated = false;
             var position = Window.position;
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(position.width));
 
@@ -69,10 +70,15 @@ namespace SmartGitUPM.Editor
                 _packageSettingSerializedObject.Update();
                 var property = _packageSettingSerializedObject.GetIterator();
                 property.NextVisible(true);
+
+                EditorGUI.BeginChangeCheck();
+
                 while (property.NextVisible(false))
                 {
                     EditorGUILayout.PropertyField(property, true);
                 }
+                isUpdated |= EditorGUI.EndChangeCheck();
+
                 _packageSettingSerializedObject.ApplyModifiedProperties();
             }
 
@@ -100,6 +106,8 @@ namespace SmartGitUPM.Editor
                 GUILayout.Space(20);
             }
             GUILayout.EndScrollView();
+
+            return isUpdated;
         }
 
         protected override void OnDestroy()

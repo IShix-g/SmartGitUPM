@@ -1,6 +1,7 @@
 
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace SmartGitUPM.Editor
         bool _isDisposed;
         CancellationTokenSource _tokenSource;
         readonly PackageInstaller _installer;
-        
+
         public HttpPackageInfoFetcher(PackageInstaller installer) => _installer = installer;
 
         public bool IsSupported(string url) => url.StartsWith("http");
@@ -33,7 +34,7 @@ namespace SmartGitUPM.Editor
             var gitPackageJsonUrl = ToRawPackageJsonURL(packageInstallUrl, branch);
             return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, supperReload, token);
         }
-        
+
         public async Task<PackageInfoDetails> FetchPackageInfoByPackageJsonUrl(string packageInstallUrl, string gitPackageJsonUrl, bool supperReload, CancellationToken token = default)
         {
             var info = default(PackageInfo);
@@ -41,8 +42,10 @@ namespace SmartGitUPM.Editor
             {
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-                
-                info = await _installer.GetInfoByPackageId(packageInstallUrl, _tokenSource.Token);
+
+                var installUrlWithoutVersion = WithoutVersion(packageInstallUrl);
+                info = await _installer.GetInfoByPackageId(installUrlWithoutVersion, _tokenSource.Token);
+
                 var local = info != default
                     ? new PackageLocalInfo
                     {
@@ -51,14 +54,14 @@ namespace SmartGitUPM.Editor
                         displayName = info.displayName
                     }
                     : default;
-                
+
                 var server = default(PackageRemoteInfo);
                 var fileNameFromUrl = GenerateFileNameFromUrl(packageInstallUrl);
                 if (!supperReload)
                 {
                     server = await GetPackageInfoFromCache(fileNameFromUrl, token);
                 }
-                
+
                 if(server == default)
                 {
                     server = await FetchPackageInfo(gitPackageJsonUrl);
@@ -67,7 +70,7 @@ namespace SmartGitUPM.Editor
                         await SavePackageInfoToCache(fileNameFromUrl, server, token);
                     }
                 }
-                
+
                 return new PackageInfoDetails(local, server, packageInstallUrl);
             }
             catch (Exception ex)
@@ -89,7 +92,10 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
+        public static string WithoutVersion(string packageInstallUrl)
+            => Regex.Replace(packageInstallUrl, @"[#@]v?([\d.]+)$", string.Empty);
+
         public async Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl)
         {
             if (!packageJsonUrl.EndsWith(PackageJsonFileName))
@@ -113,13 +119,13 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public static string ToRawPackageJsonURL(string packageInstallUrl, string branch)
         {
             var rootUrl = ToRawPackageRootURL(packageInstallUrl, branch);
             return rootUrl + "/" + PackageJsonFileName;
         }
-        
+
         public static string ToRawPackageRootURL(string packageInstallUrl, string branch)
         {
             if (!packageInstallUrl.StartsWith("https://github.com")
@@ -128,7 +134,7 @@ namespace SmartGitUPM.Editor
             {
                 throw new ArgumentException("Specify the URL of GitHub, Bitbucket, or GitLab. : " + packageInstallUrl, nameof(packageInstallUrl));
             }
-            
+
             var uri = new Uri(packageInstallUrl);
             var pathWithoutFileName = uri.AbsolutePath;
             if (pathWithoutFileName.EndsWith(".git"))
@@ -144,7 +150,7 @@ namespace SmartGitUPM.Editor
             }
             return $"{resultUrl}/raw/{branch}/{path}";
         }
-        
+
         public static async Task<PackageRemoteInfo> GetPackageInfoFromCache(string packageName, CancellationToken token = default)
         {
             var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
@@ -155,7 +161,7 @@ namespace SmartGitUPM.Editor
             var jsonString = await File.ReadAllTextAsync(filePath, token);
             return JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
         }
-        
+
         public static async Task<bool> SavePackageInfoToCache(string packageName, PackageRemoteInfo info, CancellationToken token = default)
         {
             var filePath = Application.dataPath + "/../" + SgUpmPackageCachePath + "/" + packageName + ".json";
@@ -169,15 +175,17 @@ namespace SmartGitUPM.Editor
             }
             return false;
         }
-        
+
         public static string GenerateFileNameFromUrl(string packageInstallUrl)
         {
             try
             {
-                var uri = new Uri(packageInstallUrl);
+                var packageInstallUrlWithoutVersion = Regex.Replace(packageInstallUrl, @"[#@]v?([\d.]+)$", string.Empty);
+                var uri = new Uri(packageInstallUrlWithoutVersion);
                 var segments = uri.AbsolutePath.Split('/');
                 var userName = segments.Length > 1 ? segments[1] : string.Empty;
                 var repoName = segments.Length > 2 ? segments[^1] : string.Empty;
+
                 if (repoName.EndsWith(".git"))
                 {
                     repoName = repoName.Substring(0, repoName.Length - 4);
@@ -190,7 +198,7 @@ namespace SmartGitUPM.Editor
                 return string.Empty;
             }
         }
-        
+
         static string ExtractPathFromQuery(string query)
         {
             var parameters = query.TrimStart('?').Split('&');
@@ -205,20 +213,20 @@ namespace SmartGitUPM.Editor
             }
             return string.Empty;
         }
-        
+
         public static void CreateDirectories(string path)
         {
             path = Path.HasExtension(path)
                 ? Path.GetDirectoryName(path)
                 : path;
-            
+
             if (!string.IsNullOrEmpty(path)
                 && !Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)
@@ -226,7 +234,7 @@ namespace SmartGitUPM.Editor
                 return;
             }
             _isDisposed = true;
-            
+
             if (_tokenSource != default)
             {
                 _tokenSource.Dispose();

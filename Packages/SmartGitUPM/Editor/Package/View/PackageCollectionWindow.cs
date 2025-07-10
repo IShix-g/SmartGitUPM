@@ -1,5 +1,6 @@
 
 using System.Threading;
+using System.Threading.Tasks;
 using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
@@ -14,10 +15,10 @@ namespace SmartGitUPM.Editor
         const string _gitBranchName = "main";
         const string _packageName = "com.ishix.smartgitupm";
         const string _firstOpenKey = "SmartGitUPM_PackageCollectionWindow_IsFirstOpen";
-        
+
         [MenuItem("Window/Smart Git UPM")]
         public static void Open() => Open(IsFirstOpen);
-        
+
         public static void Open(bool superReload)
         {
             var window = GetWindow<PackageCollectionWindow>("Smart Git UPM");
@@ -25,13 +26,13 @@ namespace SmartGitUPM.Editor
             window._superReload = superReload;
             window.Show();
         }
-        
+
         public static bool IsFirstOpen
         {
             get => SessionState.GetBool(_firstOpenKey, true);
             set => SessionState.SetBool(_firstOpenKey, value);
         }
-        
+
         readonly PackageVersionChecker _versionChecker = new (_gitInstallUrl, _gitBranchName, _packageName);
         bool _superReload;
         SGUPackageManager _manager;
@@ -46,17 +47,18 @@ namespace SmartGitUPM.Editor
         GUIContent _backIcon;
         Texture2D _logo;
         LocalizationEntry _installAllEntry;
-        
+        bool _settingUpdated;
+
         void OnEnable()
         {
             _settingIcon = EditorGUIUtility.IconContent("Settings");
             _refreshIcon = EditorGUIUtility.IconContent("Refresh");
             _backIcon = EditorGUIUtility.IconContent("back");
             _logo = GetLogo();
-            
+
             _languageManager = LanguageManagerFactory.GetOrCreate();
             _installAllEntry = _languageManager.GetEntry("InstallAll");
-            
+
             _manager = SGUPackageManagerFactory.Create();
             _settingView ??= new PackageCollectionSettingView(
                     _manager.Setting,
@@ -76,7 +78,7 @@ namespace SmartGitUPM.Editor
 
             _collectionView.OnInstall += FetchPackagesNextFrame;
             _collectionView.OnUnInstall += FetchPackagesNextFrame;
-            
+
             if (_viewSwitcher == default)
             {
                 _viewSwitcher = new EditorViewSwitcher(_collectionView.ViewID);
@@ -85,7 +87,6 @@ namespace SmartGitUPM.Editor
             }
             _versionChecker.Fetch().Handled();
             FetchPackages(_superReload);
-            _superReload = false;
             IsFirstOpen = false;
         }
 
@@ -94,7 +95,7 @@ namespace SmartGitUPM.Editor
             _collectionView.OnInstall -= FetchPackagesNextFrame;
             _collectionView.OnUnInstall -= FetchPackagesNextFrame;
             EditorApplication.delayCall -= FetchPackagesNextFrame;
-            
+
             _languageManager?.Dispose();
             _manager?.Dispose();
             _versionChecker?.Dispose();
@@ -107,7 +108,7 @@ namespace SmartGitUPM.Editor
             _backIcon = default;
             _logo = default;
         }
-        
+
         void OnGUI()
         {
             EditorGUI.BeginDisabledGroup(_manager.Installer.IsProcessing);
@@ -139,6 +140,11 @@ namespace SmartGitUPM.Editor
                 }
                 else
                 {
+                    if (_settingUpdated)
+                    {
+                        FetchPackages(false);
+                    }
+                    _settingUpdated = false;
                     _viewSwitcher.Show(_collectionView);
                 }
             }
@@ -210,16 +216,17 @@ namespace SmartGitUPM.Editor
 
             if (_viewSwitcher.IsOpen())
             {
-                _viewSwitcher.Update();
+                var isUpdated = _viewSwitcher.Update();
+                _settingUpdated |= isUpdated && _viewSwitcher.IsOpen(_settingView);
             }
         }
-        
+
         void FetchPackagesNextFrame()
         {
             EditorApplication.delayCall -= FetchPackagesNextFrame;
             FetchPackages(false);
         }
-        
+
         void FetchPackages(bool superReload)
         {
             var setting = UniquePackageCollectionSetting.GetOrCreate();
@@ -230,8 +237,8 @@ namespace SmartGitUPM.Editor
             }
             _tokenSource?.SafeCancelAndDispose();
             _tokenSource = new CancellationTokenSource();
-            
-            _manager.Collection.FetchPackages(superReload)
+
+            _manager.Collection.FetchPackages(superReload, _tokenSource.Token)
                 .Handled(_ =>
                 {
                     Repaint();
@@ -239,14 +246,14 @@ namespace SmartGitUPM.Editor
                     _tokenSource = default;
                 });
         }
-        
+
         void OpenSettingAction()
         {
             if (_viewSwitcher.IsOpen(_settingView))
             {
                 return;
             }
-            
+
             _viewSwitcher.Show(_settingView);
             _settingView.OnCloseView += OnClosedSettingView;
         }
@@ -258,7 +265,7 @@ namespace SmartGitUPM.Editor
         }
 
         internal static Texture2D GetLogo() => GetTexture("SmartGitUPMLogo");
-        
+
         static Texture2D GetTexture(string textureName)
         {
             var guids = AssetDatabase.FindAssets("t:Texture2D " + textureName, new []{ PackagePath });

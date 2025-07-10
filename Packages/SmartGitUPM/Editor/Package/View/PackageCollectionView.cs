@@ -57,7 +57,7 @@ namespace SmartGitUPM.Editor
 
         protected override void OnClose() {}
 
-        protected override void OnUpdate()
+        protected override bool OnUpdate()
         {
             if (_collection.Details.Count == 0)
             {
@@ -75,7 +75,7 @@ namespace SmartGitUPM.Editor
                 }
 
                 GUILayout.EndVertical();
-                return;
+                return false;
             }
 
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(Window.position.width));
@@ -86,15 +86,18 @@ namespace SmartGitUPM.Editor
                 GUILayout.BeginHorizontal(GUI.skin.box);
 
                 var setting = _setting.GetPackage(detail.PackageInstallUrl);
+                detail.UpdatePackageUrl(setting.InstallUrl);
+
                 var versionText = ToLocalVersionString(detail);
-                if (detail.HasUpdate
-                    && !detail.IsFixedVersion)
+                if (detail.HasUpdate)
                 {
                     if (detail.IsInstalled)
                     {
                         versionText += " \u2192 ";
                     }
-                    versionText += ToServerVersionString(detail);
+                    versionText += detail.IsFixedVersion
+                        ? detail.FixedVersion
+                        : ToServerVersionString(detail);
                 }
 
                 if (string.IsNullOrEmpty(versionText))
@@ -143,8 +146,7 @@ namespace SmartGitUPM.Editor
 
                 var color = GUI.color;
                 if (detail.IsInstalled
-                    && detail.HasUpdate
-                    && !detail.IsFixedVersion)
+                    && detail.HasUpdate)
                 {
                     GUI.color = Color.yellow;
                     _hasUpdate = true;
@@ -156,7 +158,7 @@ namespace SmartGitUPM.Editor
                 {
                     var width = GUILayout.Width(22);
                     var height = GUILayout.Height(EditorGUIUtility.singleLineHeight);
-                    var icon = detail.HasUpdate && !detail.IsFixedVersion ? _updateIcon : _installedIcon;
+                    var icon = detail.HasUpdate ? _updateIcon : _installedIcon;
                     GUILayout.Label(icon, width, height);
                 }
 
@@ -165,26 +167,28 @@ namespace SmartGitUPM.Editor
                 if (GUILayout.Button(buttonText, GUILayout.Width(70)))
                 {
                     if (detail.HasUpdate
-                        && !detail.IsFixedVersion
                         || !detail.IsInstalled)
                     {
                         _tokenSource?.SafeCancelAndDispose();
                         _tokenSource = new CancellationTokenSource();
-                        var task = default(Task);
+                        var op = default(Task);
                         if (detail.HasUpdate
                             && detail.IsInstalled)
                         {
-                            task = _installer.Install(new []{ detail.PackageInstallUrl }, _tokenSource.Token);
+                            op = _installer.Install(new []{ detail.PackageInstallUrl }, _tokenSource.Token);
                         }
                         else
                         {
-                            task = _installer.Install(detail.PackageInstallUrl, _tokenSource.Token);
+                            op = _installer.Install(detail.PackageInstallUrl, _tokenSource.Token);
                         }
-                        task.Handled(_ =>
+                        op.Handled(task =>
                         {
                             _tokenSource?.Dispose();
                             _tokenSource = default;
-                            OnInstall();
+                            if (task.IsCompletedSuccessfully)
+                            {
+                                OnInstall();
+                            }
                         });
                     }
                     else if(detail.IsInstalled)
@@ -192,11 +196,14 @@ namespace SmartGitUPM.Editor
                         _tokenSource?.SafeCancelAndDispose();
                         _tokenSource = new CancellationTokenSource();
                         _installer.UnInstall(detail.Local.name, _tokenSource.Token)
-                            .Handled(_ =>
+                            .Handled(task =>
                             {
                                 _tokenSource?.Dispose();
                                 _tokenSource = default;
-                                OnUnInstall();
+                                if (task.IsCompletedSuccessfully)
+                                {
+                                    OnUnInstall();
+                                }
                             });
                     }
                 }
@@ -218,6 +225,7 @@ namespace SmartGitUPM.Editor
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
+            return false;
         }
 
         protected override void OnDestroy()
@@ -243,8 +251,7 @@ namespace SmartGitUPM.Editor
             {
                 return "Install";
             }
-            if (details.HasUpdate
-                && !details.IsFixedVersion)
+            if (details.HasUpdate)
             {
                 return "Update";
             }
