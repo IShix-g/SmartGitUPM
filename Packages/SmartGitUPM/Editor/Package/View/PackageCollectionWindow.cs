@@ -1,6 +1,5 @@
 
 using System.Threading;
-using System.Threading.Tasks;
 using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
@@ -17,13 +16,10 @@ namespace SmartGitUPM.Editor
         const string _firstOpenKey = "SmartGitUPM_PackageCollectionWindow_IsFirstOpen";
 
         [MenuItem("Window/Smart Git UPM")]
-        public static void Open() => Open(IsFirstOpen);
-
-        public static void Open(bool superReload)
+        public static void Open()
         {
             var window = GetWindow<PackageCollectionWindow>("Smart Git UPM");
             window.minSize = new Vector2(440, 450);
-            window._superReload = superReload;
             window.Show();
         }
 
@@ -34,7 +30,6 @@ namespace SmartGitUPM.Editor
         }
 
         readonly PackageVersionChecker _versionChecker = new (_gitInstallUrl, _gitBranchName, _packageName);
-        bool _superReload;
         SGUPackageManager _manager;
         EditorViewSwitcher _viewSwitcher;
         PackageCollectionSettingView _settingView;
@@ -86,7 +81,7 @@ namespace SmartGitUPM.Editor
                 _viewSwitcher.ShowDefaultViewIfNeeded();
             }
             _versionChecker.Fetch().Handled();
-            FetchPackages(_superReload);
+            FetchPackages(IsFirstOpen);
             IsFirstOpen = false;
         }
 
