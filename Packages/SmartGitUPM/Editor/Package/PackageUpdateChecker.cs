@@ -78,7 +78,7 @@ namespace SmartGitUPM.Editor
                     var contents = new CustomDialogContents(
                         _localizedStrings.Title,
                         ToPackageDetailString(details),
-                        () => PackageCollectionWindow.Open(false),
+                        PackageCollectionWindow.Open,
                         _localizedStrings.Button,
                         "Close"
                     );
