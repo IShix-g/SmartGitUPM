@@ -63,6 +63,11 @@ namespace SmartGitUPM.Editor
             {
                 await manager.Collection.FetchPackages(details, metas, true, token);
 
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 for (var index = 0; index < details.Count;)
                 {
                     var detail = details[index];
