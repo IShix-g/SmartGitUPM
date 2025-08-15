@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace SmartGitUPM.Editor
 {
@@ -14,7 +15,7 @@ namespace SmartGitUPM.Editor
         public bool HasMetas => Metas is {Count: > 0};
         public IReadOnlyList<PackageMetaData> Metas { get; private set; }
         public List<PackageInfoDetails> Details { get; private set; } = new ();
-        
+
         readonly IReadOnlyList<IPackageInfoFetcher> _infoFetchers;
         CancellationTokenSource _tokenSource;
 
@@ -25,7 +26,7 @@ namespace SmartGitUPM.Editor
             _infoFetchers = infoFetchers;
             Set(metas);
         }
-        
+
         public void Set(IReadOnlyList<PackageMetaData> metas) => Metas = metas;
 
         public Task FetchPackages(bool superReload, CancellationToken token = default)
@@ -36,41 +37,45 @@ namespace SmartGitUPM.Editor
             }
             return FetchPackages(Details, Metas, superReload, token);
         }
-        
+
         public async Task FetchPackages(List<PackageInfoDetails> details, IEnumerable<PackageMetaData> metas, bool superReload, CancellationToken token = default)
         {
             _tokenSource?.SafeCancelAndDispose();
             _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+
             details.Clear();
-            foreach (var meta in metas)
+
+            var taskList = ListPool<Task<PackageInfoDetails>>.Get();
+            try
             {
-                if (_tokenSource.IsCancellationRequested)
-                {
-                    break;
-                }
-                try
+                foreach (var meta in metas)
                 {
                     if (string.IsNullOrEmpty(meta.InstallUrl))
                     {
-                        throw new InvalidOperationException("Package install URL is not set.");
+                        Debug.LogError("Package install URL is not set.");
+                        continue;
                     }
                     var fetcher = GetInfoFetcher(meta.InstallUrl);
                     if (fetcher == default)
                     {
-                        throw new InvalidOperationException("Package info fetcher is not supported. Support Protocols: " + GetSupportProtocolsString());
+                        Debug.LogError("Package info fetcher is not supported. Support Protocols: " + GetSupportProtocolsString());
+                        continue;
                     }
                     var installUrl = meta.InstallUrl.Trim().TrimEnd('/');
                     var branch = meta.Branch.Trim();
-                    var detail = await fetcher.FetchPackageInfo(installUrl, branch, superReload, _tokenSource.Token);
-                    details.Add(detail);
+                    var task = fetcher.FetchPackageInfo(installUrl, branch, superReload, _tokenSource.Token);
+                    taskList.Add(task);
                 }
-                catch (Exception e)
-                {
-                    Debug.LogError(e);
-                }
+
+                var detailsArray = await Task.WhenAll(taskList);
+                details.AddRange(detailsArray);
             }
-            _tokenSource.Dispose();
-            _tokenSource = default;
+            finally
+            {
+                ListPool<Task<PackageInfoDetails>>.Release(taskList);
+                _tokenSource.Dispose();
+                _tokenSource = default;
+            }
         }
 
         public string[] GetSupportProtocols()
@@ -82,7 +87,7 @@ namespace SmartGitUPM.Editor
             }
             return protocols;
         }
-        
+
         public string GetSupportProtocolsString()
         {
             var protocols = string.Empty;
@@ -92,7 +97,7 @@ namespace SmartGitUPM.Editor
             }
             return protocols;
         }
-        
+
         IPackageInfoFetcher GetInfoFetcher(string packageInstallUrl)
         {
             foreach (var infoFetcher in _infoFetchers)
@@ -106,7 +111,7 @@ namespace SmartGitUPM.Editor
         }
 
         public string[] GetInstallPackageUrls() => GetInstallPackageUrls(Metas);
-        
+
         string[] GetInstallPackageUrls(IReadOnlyList<PackageMetaData> metas)
         {
             var result = new string[metas.Count];
@@ -116,7 +121,7 @@ namespace SmartGitUPM.Editor
             }
             return result;
         }
-        
+
         public void Dispose()
         {
             if (IsDisposed)
