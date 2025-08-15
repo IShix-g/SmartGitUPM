@@ -32,65 +32,83 @@ namespace SmartGitUPM.Editor
                 return;
             }
 
-            var metas = ListPool<PackageMetaData>.Get();
-            foreach (var meta in manager.Collection.Metas)
+            var metas = HashSetPool<PackageMetaData>.Get();
+            try
             {
-                if (meta.UpdateNotify)
+                foreach (var meta in manager.Collection.Metas)
                 {
-                    metas.Add(meta);
+                    if (meta.UpdateNotify)
+                    {
+                        metas.Add(meta);
+                    }
                 }
-            }
 
-            if (metas.Count == 0)
+                if (metas.Count == 0)
+                {
+                    return;
+                }
+
+                await FetchPackages(metas, manager, token, promptForUpdate);
+            }
+            finally
             {
-                ListPool<PackageMetaData>.Release(metas);
-                return;
+                HashSetPool<PackageMetaData>.Release(metas);
             }
+        }
 
+        async Task FetchPackages(HashSet<PackageMetaData> metas, SGUPackageManager manager, CancellationToken token, bool promptForUpdate)
+        {
             var details = ListPool<PackageInfoDetails>.Get();
             try
             {
                 await manager.Collection.FetchPackages(details, metas, true, token);
 
-                var index = 0;
-                while (details.Count > 0
-                       && details.Count > index)
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                for (var index = 0; index < details.Count;)
                 {
                     var detail = details[index];
                     if (detail.IsInstalled
-                       && (!detail.HasUpdate
-                           || detail.IsFixedVersion))
+                        && (!detail.HasUpdate
+                            || detail.IsFixedVersion))
                     {
                         details.RemoveAt(index);
-                        continue;
                     }
-
-                    index++;
+                    else
+                    {
+                        index++;
+                    }
                 }
 
                 if (details.Count == 0)
                 {
                     return;
                 }
-
                 if (promptForUpdate)
                 {
-                    var contents = new CustomDialogContents(
-                        _localizedStrings.Title,
-                        ToPackageDetailString(details),
-                        PackageCollectionWindow.Open,
-                        _localizedStrings.Button,
-                        "Close"
-                    );
-                    var logo = PackageCollectionWindow.GetLogo();
-                    CustomDialog.Open(contents, logo, "Package Update Alert");
+                    ShowUpdatePrompt(details);
                 }
             }
             finally
             {
-                ListPool<PackageMetaData>.Release(metas);
                 ListPool<PackageInfoDetails>.Release(details);
             }
+        }
+
+        void ShowUpdatePrompt(List<PackageInfoDetails> details)
+        {
+            var contents = new CustomDialogContents(
+                _localizedStrings.Title,
+                ToPackageDetailString(details),
+                PackageCollectionWindow.Open,
+                _localizedStrings.Button,
+                "Close"
+            );
+            var logo = PackageCollectionWindow.GetLogo();
+            CustomDialog.Open(contents, logo, "Package Update Alert");
         }
 
         string ToPackageDetailString(List<PackageInfoDetails> details)
