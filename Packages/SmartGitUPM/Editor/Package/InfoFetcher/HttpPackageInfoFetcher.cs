@@ -10,7 +10,7 @@ using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class HttpPackageInfoFetcher : IPackageInfoFetcher
+    internal sealed class HttpPackageInfoFetcher : IPackageInfoFetcher
     {
         public const string PackageJsonFileName = "package.json";
         public const string SgUpmPackageCachePath = "Library/PackageCache-SmartGitUPM";

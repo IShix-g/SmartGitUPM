@@ -11,7 +11,7 @@ using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
-    public sealed class SshPackageInfoFetcher : IPackageInfoFetcher
+    internal sealed class SshPackageInfoFetcher : IPackageInfoFetcher
     {
         public bool IsProcessing{ get; private set; }
         public string SupportProtocol { get; } = "SSH";
