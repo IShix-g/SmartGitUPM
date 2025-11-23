@@ -10,6 +10,13 @@
       },
       "hash": "ddedee246cdc93af13950e7ac74eec472c5c141e"
     },
+    "com.ishix.history.tracker": {
+      "version": "https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#1.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5900875ce461f9d6651cc63169c80c7682613641"
+    },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",
       "depth": 0,

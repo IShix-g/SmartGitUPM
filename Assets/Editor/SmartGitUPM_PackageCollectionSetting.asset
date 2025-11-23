@@ -33,3 +33,7 @@ MonoBehaviour:
     InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
     Branch: 
     HelpPageUrl: 
+  - UpdateNotify: 1
+    InstallUrl: https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#1.0
+    Branch: 
+    HelpPageUrl: 
