@@ -31,7 +31,9 @@ namespace SmartGitUPM.Editor
             {
                 throw new ArgumentException("Specify the URL of " + SupportProtocol + ". packageInstallUrl: " + packageInstallUrl, nameof(packageInstallUrl));
             }
-            var gitPackageJsonUrl = ToRawPackageJsonURL(packageInstallUrl, branch);
+            var versionOrBranch = ToVersionOrBranchFromPackageUrl(packageInstallUrl);
+            var branchName = string.IsNullOrEmpty(versionOrBranch) ? branch : versionOrBranch;
+            var gitPackageJsonUrl = ToRawPackageJsonURL(packageInstallUrl,  branchName);
             return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, supperReload, token);
         }
 
@@ -222,6 +224,16 @@ namespace SmartGitUPM.Editor
             {
                 Directory.CreateDirectory(path);
             }
+        }
+
+        static string ToVersionOrBranchFromPackageUrl(string packageUrl)
+        {
+            var index = packageUrl.IndexOf('#');
+            if (index != -1)
+            {
+                return packageUrl.Substring(index + 1);
+            }
+            return string.Empty;
         }
 
         public void Dispose()
