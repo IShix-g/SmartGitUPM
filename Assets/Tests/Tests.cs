@@ -1,4 +1,4 @@
-
+#if UNITY_EDITOR
 using System.Linq;
 using UnityEditor;
 using SmartGitUPM.Editor;
@@ -29,7 +29,7 @@ namespace Tests
                     Debug.Log(details.Select(x => x.name + " " + x.version).Aggregate((a, b) => a + "\n" + b));
                 });
         }
-        
+
         [MenuItem("Tests/Execute Git Clone")]
         public static void ExecuteGitClone()
         {
@@ -37,7 +37,7 @@ namespace Tests
             var fetcher = new SshPackageInfoFetcher(installer);
             var packageSsh = "git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins";
             var branch = "main";
-            
+
             fetcher.FetchPackageInfo(packageSsh, branch, true)
                 .Handled(task =>
                 {
@@ -94,3 +94,4 @@ namespace Tests
         }
     }
 }
+#endif

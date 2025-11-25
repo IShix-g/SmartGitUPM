@@ -15,7 +15,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "5900875ce461f9d6651cc63169c80c7682613641"
+      "hash": "6bff060f787a7ad2dd3e21514f9fc8927bb40fcd"
     },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",
@@ -29,6 +29,13 @@
       "source": "git",
       "dependencies": {},
       "hash": "2a313cbff8e5c1a27e989a0b1f1c2594bbd353fe"
+    },
+    "com.ishix.test.simplepackage": {
+      "version": "https://github.com/IShix-g/TestPackage.git?path=Packages/SimplePackage#1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f7d4ad93edb54d9277854584f590a5a47335f631"
     },
     "com.ishix.test.unitydependencypackage": {
       "version": "https://github.com/IShix-g/TestPackage.git?path=Packages/UnityDependencyPackage",
