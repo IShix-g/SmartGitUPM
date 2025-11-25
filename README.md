@@ -47,7 +47,7 @@ Internally, it uses Unity Package Manager (UPM) for package management, making i
 "Unity Editor : Window > Package Manager > Add package from git URL...".
 
 ```
-https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM
+https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM#v1
 ```
 
 ![Update](Docs/add_package.png)
