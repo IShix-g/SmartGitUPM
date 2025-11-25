@@ -10,6 +10,13 @@
       },
       "hash": "ddedee246cdc93af13950e7ac74eec472c5c141e"
     },
+    "com.ishix.history.tracker": {
+      "version": "https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#1.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6bff060f787a7ad2dd3e21514f9fc8927bb40fcd"
+    },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",
       "depth": 0,
@@ -23,6 +30,13 @@
       "dependencies": {},
       "hash": "2a313cbff8e5c1a27e989a0b1f1c2594bbd353fe"
     },
+    "com.ishix.test.simplepackage": {
+      "version": "https://github.com/IShix-g/TestPackage.git?path=Packages/SimplePackage#1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f7d4ad93edb54d9277854584f590a5a47335f631"
+    },
     "com.ishix.test.unitydependencypackage": {
       "version": "https://github.com/IShix-g/TestPackage.git?path=Packages/UnityDependencyPackage",
       "depth": 0,
@@ -33,19 +47,20 @@
       "hash": "a080eee4739ad47d607bdbf87f82aaf35ac33202"
     },
     "com.unity.2d.animation": {
-      "version": "7.1.1",
+      "version": "9.2.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.2d.common": "6.0.7",
+        "com.unity.2d.common": "8.1.0",
         "com.unity.2d.sprite": "1.0.0",
+        "com.unity.collections": "1.1.0",
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.uielements": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.2d.aseprite": {
-      "version": "1.1.6",
+      "version": "1.1.9",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -57,39 +72,35 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.2d.common": {
-      "version": "6.0.7",
+      "version": "8.1.0",
       "depth": 2,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.5.1",
+        "com.unity.burst": "1.7.3",
         "com.unity.2d.sprite": "1.0.0",
         "com.unity.mathematics": "1.1.0",
+        "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.uielements": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.2d.path": {
-      "version": "5.0.2",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
     "com.unity.2d.pixel-perfect": {
-      "version": "5.0.3",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.2d.psdimporter": {
-      "version": "6.0.9",
+      "version": "5.1.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.2d.common": "6.0.7",
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.2d.psdimporter": {
+      "version": "8.1.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.common": "8.1.0",
         "com.unity.2d.sprite": "1.0.0",
-        "com.unity.2d.animation": "7.1.0"
+        "com.unity.2d.animation": "9.2.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -100,12 +111,11 @@
       "dependencies": {}
     },
     "com.unity.2d.spriteshape": {
-      "version": "7.0.7",
+      "version": "9.1.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.2d.path": "5.0.2",
-        "com.unity.2d.common": "6.0.6",
+        "com.unity.2d.common": "8.1.0",
         "com.unity.mathematics": "1.1.0",
         "com.unity.modules.physics2d": "1.0.0"
       },
@@ -115,10 +125,13 @@
       "version": "1.0.0",
       "depth": 1,
       "source": "builtin",
-      "dependencies": {}
+      "dependencies": {
+        "com.unity.modules.tilemap": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0"
+      }
     },
     "com.unity.2d.tilemap.extras": {
-      "version": "2.2.7",
+      "version": "3.1.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -129,8 +142,17 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.ai.navigation": {
+      "version": "1.1.6",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.ai": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.burst": {
-      "version": "1.8.18",
+      "version": "1.8.21",
       "depth": 3,
       "source": "registry",
       "dependencies": {
@@ -140,10 +162,20 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
-      "version": "2.5.2",
+      "version": "2.7.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.collections": {
+      "version": "1.2.4",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.6.6",
+        "com.unity.test-framework": "1.1.31"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.editorcoroutines": {
@@ -165,18 +197,18 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.2d.animation": "7.1.1",
-        "com.unity.2d.pixel-perfect": "5.0.3",
-        "com.unity.2d.psdimporter": "6.0.9",
+        "com.unity.2d.animation": "9.2.0",
+        "com.unity.2d.pixel-perfect": "5.1.0",
+        "com.unity.2d.psdimporter": "8.1.0",
         "com.unity.2d.sprite": "1.0.0",
-        "com.unity.2d.spriteshape": "7.0.7",
+        "com.unity.2d.spriteshape": "9.1.0",
         "com.unity.2d.tilemap": "1.0.0",
-        "com.unity.2d.tilemap.extras": "2.2.7",
-        "com.unity.2d.aseprite": "1.1.6"
+        "com.unity.2d.tilemap.extras": "3.1.3",
+        "com.unity.2d.aseprite": "1.1.9"
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.34",
+      "version": "3.0.38",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -226,7 +258,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.6",
+      "version": "3.0.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -235,7 +267,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.6.5",
+      "version": "1.7.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -410,17 +442,6 @@
     "com.unity.modules.uielements": {
       "version": "1.0.0",
       "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.ui": "1.0.0",
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.uielementsnative": "1.0.0"
-      }
-    },
-    "com.unity.modules.uielementsnative": {
-      "version": "1.0.0",
-      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",

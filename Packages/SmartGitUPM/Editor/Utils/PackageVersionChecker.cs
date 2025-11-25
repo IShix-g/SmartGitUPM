@@ -1,9 +1,11 @@
 
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -56,7 +58,9 @@ namespace SmartGitUPM.Editor
         public async Task Fetch()
         {
             _isNowLoading = true;
-            var gitPackageJsonUrl = ToRawPackageJsonURL(GitInstallUrl, BranchName);
+            var version = await GetVersionOrBranchFromPackageID(PackageName);
+            var branchName = string.IsNullOrEmpty(version) ? BranchName : version;
+            var gitPackageJsonUrl = ToRawPackageJsonURL(GitInstallUrl, branchName);
             var request = UnityWebRequest.Get(gitPackageJsonUrl);
 
             try
@@ -157,6 +161,27 @@ namespace SmartGitUPM.Editor
                     "OK"
                 );
             }
+        }
+
+        static async Task<string> GetVersionOrBranchFromPackageID(string packageId)
+        {
+            var request = Client.List();
+            var op = new EditorAsync();
+            await op.StartAsync(() => request.IsCompleted);
+            foreach (var result in request.Result)
+            {
+                if (!result.packageId.Contains(packageId))
+                {
+                    continue;
+                }
+                var index = result.packageId.IndexOf('#');
+                if (index != -1)
+                {
+                    return result.packageId.Substring(index + 1);
+                }
+                break;
+            }
+            return string.Empty;
         }
 
         public void Dispose()

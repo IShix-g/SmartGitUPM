@@ -20,7 +20,7 @@ namespace SmartGitUPM.Editor
         bool _isDisposed;
         readonly ObjectPool<EditorAsync> _pool;
         CancellationTokenSource _tokenSource;
-        
+
         public PackageInstaller()
         {
             _pool = new ObjectPool<EditorAsync>(
@@ -56,7 +56,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public async Task<PackageInfo> GetInfoByPackageId(string packageIdOrPackageInstallUrl, CancellationToken token = default)
         {
             var infos = await GetInfos(token);
@@ -69,7 +69,7 @@ namespace SmartGitUPM.Editor
             }
             return default;
         }
-        
+
         public async Task Install(string packageId, CancellationToken token = default, bool showProgressBar = true)
         {
             var op = _pool.Get();
@@ -79,17 +79,17 @@ namespace SmartGitUPM.Editor
                 {
                     EditorUtility.DisplayProgressBar("Package operations", "Please wait...", 0.2f);
                 }
-                
+
                 var info = await GetInfoByPackageId(packageId, token);
                 var specifiedVersion = info != default
                         ? GetVersionFromPackageID(info.packageId)
                         : string.Empty;
-                
+
                 if (showProgressBar)
                 {
                     EditorUtility.DisplayProgressBar("Package operations", info != default ? "Update package..." : "Install Package...", 0.5f);
                 }
-                
+
                 IsProcessing = true;
                 var request = Client.Add(info != default ? info.name : packageId);
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -147,7 +147,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public async Task<UnityEditor.PackageManager.PackageCollection> Install(string[] packageIds, CancellationToken token = default, bool showProgressBar = true)
         {
             var op = _pool.Get();
@@ -159,7 +159,7 @@ namespace SmartGitUPM.Editor
                 {
                     EditorUtility.DisplayProgressBar("Package operations", "Please wait...", 0.2f);
                 }
-                
+
                 foreach (var packageId in packageIds)
                 {
                     var info = await GetInfoByPackageId(packageId, token);
@@ -169,12 +169,12 @@ namespace SmartGitUPM.Editor
                     infos.Add(info);
                     specifiedVersions.Add(specifiedVersion);
                 }
-                
+
                 if (showProgressBar)
                 {
                     EditorUtility.DisplayProgressBar("Package operations", "Resolving Dependence Packages.", 0.5f);
                 }
-                
+
                 IsProcessing = true;
                 var request = Client.AddAndRemove(packageIds);
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -185,20 +185,20 @@ namespace SmartGitUPM.Editor
                     case StatusCode.Success:
                         var sb = new StringBuilder();
                         sb.Append("Package operations success: \n");
-                        
+
                         for (var i = 0; i < packageIds.Length; i++)
                         {
                             var packageId = packageIds[i];
                             var info = infos[i];
                             var specifiedVersion = specifiedVersions[i];
-                            
+
                             foreach (var obj in request.Result)
                             {
                                 if (!obj.packageId.Contains(packageId, StringComparison.OrdinalIgnoreCase))
                                 {
                                     continue;
                                 }
-                                
+
                                 if (info != default)
                                 {
                                     if(obj.version != info.version)
@@ -252,7 +252,7 @@ namespace SmartGitUPM.Editor
                         }
 
                         sb.Append(".\nYou can check the details in the Package Manager.");
-                        
+
                         Debug.Log(sb.ToString());
                         return request.Result;
                     case StatusCode.Failure:
@@ -266,7 +266,7 @@ namespace SmartGitUPM.Editor
                 _pool.Release(op);
                 ListPool<PackageInfo>.Release(infos);
                 ListPool<string>.Release(specifiedVersions);
-                
+
                 if (_tokenSource != default)
                 {
                     _tokenSource.Dispose();
@@ -279,7 +279,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public async Task UnInstall(string packageId, CancellationToken token = default, bool showProgressBar = true)
         {
             var op = _pool.Get();
@@ -289,14 +289,14 @@ namespace SmartGitUPM.Editor
                 {
                     EditorUtility.DisplayProgressBar("Package operations", "Please wait...", 0.2f);
                 }
-                
+
                 var info = await GetInfoByPackageId(packageId, token);
                 if (info == default)
                 {
                     Debug.LogWarning("Did not exist. ID: " + packageId);
                     return;
                 }
-                
+
                 IsProcessing = true;
                 var request = Client.Remove(info.name);
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -327,7 +327,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public async Task UnInstall(string[] packageIds, CancellationToken token = default, bool showProgressBar = true)
         {
             var op = _pool.Get();
@@ -353,10 +353,10 @@ namespace SmartGitUPM.Editor
 
                 if (infos.Count == 0)
                 {
-                    
+
                     return;
                 }
-                
+
                 IsProcessing = true;
                 var ids = ToNames(infos);
                 var request = Client.AddAndRemove(default, ids);
@@ -399,7 +399,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
         }
-        
+
         public void Cancel()
         {
             if (!IsProcessing
@@ -407,7 +407,7 @@ namespace SmartGitUPM.Editor
             {
                 return;
             }
-            
+
             if (!_tokenSource.IsCancellationRequested)
             {
                 _tokenSource.Cancel();
@@ -415,7 +415,7 @@ namespace SmartGitUPM.Editor
             _tokenSource.Dispose();
             _tokenSource = default;
         }
-        
+
         string[] ToNames(in HashSet<PackageInfo> infos)
         {
             var names = new string[infos.Count];
@@ -427,7 +427,7 @@ namespace SmartGitUPM.Editor
             }
             return names;
         }
-        
+
         string GetVersionFromPackageID(string url)
         {
             var match = Regex.Match(url, @"#([\d.]+)$");
@@ -435,7 +435,7 @@ namespace SmartGitUPM.Editor
                 ? match.Groups[1].Value
                 : string.Empty;
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed)
@@ -448,7 +448,7 @@ namespace SmartGitUPM.Editor
             {
                 Cancel();
             }
-            
+
             if (_tokenSource != default)
             {
                 _tokenSource.Dispose();
@@ -456,7 +456,7 @@ namespace SmartGitUPM.Editor
             }
             _pool.Dispose();
         }
-        
+
         public static void OpenPackageManager()
             => EditorApplication.ExecuteMenuItem("Window/Package Manager");
     }

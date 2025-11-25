@@ -26,6 +26,14 @@ MonoBehaviour:
     Branch: 
     HelpPageUrl: 
   - UpdateNotify: 1
-    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/#0.5.11
+    InstallUrl: https://github.com/IShix-g/QuickAdMobIntegrator.git?path=Packages/QuickAdMobIntegrator
+    Branch: 
+    HelpPageUrl: 
+  - UpdateNotify: 1
+    InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
+    Branch: 
+    HelpPageUrl: 
+  - UpdateNotify: 1
+    InstallUrl: https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#1.0
     Branch: 
     HelpPageUrl: 

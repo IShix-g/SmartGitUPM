@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SmartGitUPM.Editor
 {
-    public interface IPackageInfoFetcher : IDisposable
+    internal interface IPackageInfoFetcher : IDisposable
     {
         public bool IsProcessing{ get; }
         public string SupportProtocol { get; }

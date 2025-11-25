@@ -1,4 +1,4 @@
-![Unity](https://img.shields.io/badge/Unity-2021.3%2B-black)
+![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black)
 
 > [!IMPORTANT]
 > 免責事項：SmartGitUPMはオープンソースのサービスであり、Unity Technologies Inc.が提供する公式のサービスではありません。
@@ -47,7 +47,7 @@ Unity Editorを開く度に、パッケージの更新があれば通知を受�
 "Unity Editor : Window > Package Manager > Add package from git URL...".
 
 ```
-https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM
+https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM#v1
 ```
 
 ![Update](Docs/add_package.png)
