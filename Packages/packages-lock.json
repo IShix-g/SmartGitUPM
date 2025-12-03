@@ -15,7 +15,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "d99f2cb45e01d5003feb02c8010f9352e1c612cd"
+      "hash": "77122942a78d186cb4e6f3627252280b5b5fd22d"
     },
     "com.ishix.smartgitupm": {
       "version": "file:SmartGitUPM",
