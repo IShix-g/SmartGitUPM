@@ -1,6 +1,6 @@
 {
   "name": "com.ishix.smartgitupm",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "displayName": "Smart Git UPM",
   "description": "Plugin for smart management of packages in a Git repository.",
   "unity": "2021.3",
