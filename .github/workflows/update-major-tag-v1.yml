@@ -1,0 +1,45 @@
+name: Update Major Tag (V1)
+
+on:
+  workflow_dispatch:
+
+env:
+  TAG: v1
+  TARGET_VERSION: 1
+
+permissions:
+  contents: write
+
+jobs:
+  set-target-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.set-target-tag.outputs.tag }}
+      target-tag: ${{ steps.set-target-tag.outputs.target-tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set Target Tag
+        id: set-target-tag
+        run: |
+          tag=$(git tag --merged HEAD --sort=-committerdate | grep -E '^${{ env.TARGET_VERSION }}\.[0-9]+\.[0-9]+$' | head -n 1)
+          
+          if [ -z "$tag" ]; then
+            echo "::error::No valid ${{ env.TARGET_VERSION }}.x.x tag found in history."
+            exit 1
+          fi
+          echo "tag=${{ env.TAG }}" >> "$GITHUB_OUTPUT"
+          echo "target-tag=$tag" >> "$GITHUB_OUTPUT"
+
+  update-major-tag:
+    needs: [set-target-tag]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-major-tag.yml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ github.ref }}
+      tag: ${{ needs.set-target-tag.outputs.tag }}
+      target-tag: ${{ needs.set-target-tag.outputs.target-tag }}
