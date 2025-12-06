@@ -38,7 +38,7 @@ jobs:
   update-packagejson:
     needs: [extract-tag]
     if: ${{ needs.extract-tag.outputs.tag }}
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
@@ -50,13 +50,13 @@ jobs:
 
   release-notes:
     needs: [extract-tag, update-packagejson]
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@v1
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   create-release:
     needs: [extract-tag, update-packagejson, release-notes]
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}

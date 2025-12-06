@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   unity-cs-linter:
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter-dispatch.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter-dispatch.yaml@v1
     with:
       base-branch: ${{ github.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
