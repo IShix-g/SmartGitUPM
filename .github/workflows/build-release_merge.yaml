@@ -49,7 +49,7 @@ jobs:
 
   update-packagejson:
     needs: [validate-branch]
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
@@ -62,7 +62,7 @@ jobs:
   merge-and-push:
     needs: [validate-branch, update-packagejson]
     if: ${{ needs.update-packagejson.outputs.changed == '1' }}
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-merge-and-push.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-merge-and-push.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
@@ -75,13 +75,13 @@ jobs:
 
   release-notes:
     needs: [validate-branch, update-packagejson, merge-and-push]
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@v1
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   create-release:
     needs: [validate-branch, update-packagejson, merge-and-push, release-notes]
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
@@ -95,7 +95,7 @@ jobs:
   clean-branch:
     needs: [validate-branch, update-packagejson, merge-and-push, release-notes]
     if: ${{ inputs.clean-branch && needs.update-packagejson.outputs.changed == '1' }}
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-clean-branch.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-clean-branch.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   release-notes:
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter-pull-request.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-unity-cs-linter-pull-request.yaml@v1
     with:
       head-branch: ${{ github.event.pull_request.head.ref }}
       base-branch: ${{ github.event.pull_request.base.ref }}
