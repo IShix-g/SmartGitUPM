@@ -1,0 +1,34 @@
+name: Major Tag Automation (V1)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "00 17 * * *"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  check-statuses:
+    name: Check Status (${{ matrix.workflow_id }})
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-check-last-run-status-age.yaml@v1
+    with:
+      workflow-id: ${{ matrix.workflow_id }}
+      min-day: 1
+      max-day: 2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        workflow_id:
+          - 'build-release_merge.yaml'
+          - 'build-release_pull-request.yaml'
+
+  update-major-tag:
+    needs: check-statuses
+    if: success() && contains(needs.check-statuses.outputs.*, '1')
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@v1
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}

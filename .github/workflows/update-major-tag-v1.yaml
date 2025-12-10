@@ -2,6 +2,12 @@ name: Update Major Tag (V1)
 
 on:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
 
 env:
   TAG: v1
