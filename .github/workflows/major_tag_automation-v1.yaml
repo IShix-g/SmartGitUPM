@@ -1,7 +1,6 @@
 name: Major Tag Automation (V1)
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "00 17 * * *"
 
@@ -28,7 +27,7 @@ jobs:
   update-major-tag:
     needs: check-statuses
     if: success() && contains(needs.check-statuses.outputs.*, '1')
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@v1
+    uses: ./.github/workflows/update-major-tag-v1.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
