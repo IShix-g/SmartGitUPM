@@ -25,6 +25,39 @@ namespace SmartGitUPM.Editor
 
         public bool IsSupported(string url) => url.StartsWith("git");
 
+        public async Task<PackageInfoDetails> GetCachedPackageInfo(string packageInstallUrl, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
+        {
+            PackageCacheManager.Initialize();
+            var installUrlWithoutVersion = packageInstallUrl.WithoutVersion();
+            if (!PackageCacheManager.TryGetByInstallUrl(installUrlWithoutVersion, out var cache))
+            {
+                return default;
+            }
+
+            var (_, query) = ParsePath(installUrlWithoutVersion);
+            var packagePath = ExtractPathFromQuery(query);
+            var jsonPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath + "/" + cache.Name + "/"
+                           + (!string.IsNullOrEmpty(packagePath) ? packagePath + "/" : string.Empty)
+                           + HttpPackageInfoFetcher.PackageJsonFileName;
+            if (!File.Exists(jsonPath))
+            {
+                return default;
+            }
+
+            var json = await File.ReadAllTextAsync(jsonPath, token);
+            var remote = JsonUtility.FromJson<PackageRemoteInfo>(json);
+            if (remote == default)
+            {
+                return default;
+            }
+
+            var installed = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
+            var local = installed != default
+                ? ToLocalInfo(installed)
+                : default;
+            return new PackageInfoDetails(local, remote, installUrlWithoutVersion);
+        }
+
         public async Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, CancellationToken token = default)
         {
             var installedPackages = await _installer.GetInfos(token);

@@ -26,6 +26,23 @@ namespace SmartGitUPM.Editor
 
         public bool IsSupported(string url) => url.StartsWith("http");
 
+        public async Task<PackageInfoDetails> GetCachedPackageInfo(string packageInstallUrl, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
+        {
+            var installUrlWithoutVersion = packageInstallUrl.WithoutVersion();
+            var fileNameFromUrl = GenerateFileNameFromUrl(packageInstallUrl);
+            var server = await GetPackageInfoFromCache(fileNameFromUrl, token);
+            if (server == default)
+            {
+                return default;
+            }
+
+            var info = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
+            var local = info != default
+                ? new PackageLocalInfo { name = info.name, version = info.version, displayName = info.displayName }
+                : default;
+            return new PackageInfoDetails(local, server, installUrlWithoutVersion);
+        }
+
         public Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
         {
             if (!IsSupported(packageInstallUrl))

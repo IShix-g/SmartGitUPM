@@ -1,16 +1,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Pool;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
     internal sealed class PackageCollection : IDisposable
     {
+        public event Action<PackageInfoDetails> OnDetailsUpdated = delegate { };
+        public event Action<PackageInfoDetails> OnLatestDetailsUpdated = delegate { };
         public bool IsDisposed{ get; private set; }
         public bool IsFetching => _tokenSource != default;
         public bool HasMetas => Metas is {Count: > 0};
@@ -45,41 +47,119 @@ namespace SmartGitUPM.Editor
         public async Task FetchPackages(List<PackageInfoDetails> details, IEnumerable<PackageMetaData> metas, bool superReload, CancellationToken token = default)
         {
             _tokenSource?.SafeCancelAndDispose();
-            _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-
-            details.Clear();
-
-            var taskList = ListPool<Task<PackageInfoDetails>>.Get();
+            var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+            _tokenSource = tokenSource;
+            var fetchToken = tokenSource.Token;
             try
             {
-                var installedPackages = await _installer.GetInfos(_tokenSource.Token);
-                foreach (var meta in metas)
-                {
-                    if (string.IsNullOrEmpty(meta.InstallUrl))
-                    {
-                        Debug.LogError("Package install URL is not set.");
-                        continue;
-                    }
-                    var fetcher = GetInfoFetcher(meta.InstallUrl);
-                    if (fetcher == default)
-                    {
-                        Debug.LogError("Package info fetcher is not supported. Support Protocols: " + GetSupportProtocolsString());
-                        continue;
-                    }
-                    var installUrl = meta.InstallUrl.Trim().TrimEnd('/');
-                    var branch = meta.Branch.Trim();
-                    var task = fetcher.FetchPackageInfo(installUrl, branch, superReload, installedPackages, _tokenSource.Token);
-                    taskList.Add(task);
-                }
+                var packageMetas = metas.ToArray();
+                var installUrls = new HashSet<string>(packageMetas
+                    .Where(meta => !string.IsNullOrEmpty(meta.InstallUrl))
+                    .Select(meta => meta.InstallUrl.WithoutVersion()));
+                details.RemoveAll(detail => !installUrls.Contains(detail.PackageInstallUrl.WithoutVersion()));
 
-                var detailsArray = await Task.WhenAll(taskList);
-                details.AddRange(detailsArray);
+                var installedPackages = await _installer.GetInfos(fetchToken);
+                var taskList = new List<Task>(packageMetas.Length);
+                foreach (var meta in packageMetas)
+                {
+                    taskList.Add(FetchPackage(meta, details, installedPackages, superReload, fetchToken));
+                }
+                await Task.WhenAll(taskList);
             }
             finally
             {
-                ListPool<Task<PackageInfoDetails>>.Release(taskList);
-                _tokenSource.Dispose();
-                _tokenSource = default;
+                tokenSource.Dispose();
+                if (ReferenceEquals(_tokenSource, tokenSource))
+                {
+                    _tokenSource = default;
+                }
+            }
+        }
+
+        async Task FetchPackage(PackageMetaData meta, List<PackageInfoDetails> details, IEnumerable<PackageInfo> installedPackages, bool superReload, CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(meta.InstallUrl))
+            {
+                Debug.LogError("Package install URL is not set.");
+                return;
+            }
+            var fetcher = GetInfoFetcher(meta.InstallUrl);
+            if (fetcher == default)
+            {
+                Debug.LogError("Package info fetcher is not supported. Support Protocols: " + GetSupportProtocolsString());
+                return;
+            }
+
+            var installUrl = meta.InstallUrl.Trim().TrimEnd('/');
+            var branch = meta.Branch?.Trim() ?? string.Empty;
+            try
+            {
+                var cached = await fetcher.GetCachedPackageInfo(installUrl, installedPackages, token);
+                if (cached != default)
+                {
+                    UpsertDetails(details, cached);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("Failed to read package cache. Install url: " + installUrl + "\n" + exception.Message);
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            try
+            {
+                var latest = await fetcher.FetchPackageInfo(installUrl, branch, superReload, installedPackages, token);
+                if (latest != default)
+                {
+                    UpsertDetails(details, latest, true);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // A newer refresh or window close superseded this request.
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("Failed to fetch package information. Install url: " + installUrl + "\n" + exception.Message);
+            }
+        }
+
+        void UpsertDetails(List<PackageInfoDetails> details, PackageInfoDetails detail, bool isLatest = false)
+        {
+            var index = details.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+            if (index >= 0)
+            {
+                if (!isLatest)
+                {
+                    return;
+                }
+                details[index] = detail;
+            }
+            else
+            {
+                details.Add(detail);
+            }
+            OnDetailsUpdated(detail);
+            if (isLatest)
+            {
+                OnLatestDetailsUpdated(detail);
+            }
+        }
+
+        public void ApplyFetchedDetail(PackageInfoDetails detail)
+        {
+            if (detail != default && Metas.Any(meta => !string.IsNullOrEmpty(meta.InstallUrl)
+                                                       && string.Equals(meta.InstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase)))
+            {
+                UpsertDetails(Details, detail, true);
             }
         }
 

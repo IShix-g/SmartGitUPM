@@ -12,6 +12,7 @@ namespace SmartGitUPM.Editor
         public bool IsProcessing{ get; }
         public string SupportProtocol { get; }
         public bool IsSupported(string protocol);
+        public Task<PackageInfoDetails> GetCachedPackageInfo(string packageInstallUrl, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default);
         public Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default);
     }
 }

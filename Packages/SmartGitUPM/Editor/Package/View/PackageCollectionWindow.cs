@@ -71,6 +71,13 @@ namespace SmartGitUPM.Editor
                     this
                 );
 
+            _manager.Collection.OnDetailsUpdated += OnPackageDetailsUpdated;
+            PackageUpdateChecker.OnPackageInfoFetched += OnStartupPackageInfoFetched;
+            foreach (var detail in PackageUpdateChecker.LatestFetchedDetails)
+            {
+                _manager.Collection.ApplyFetchedDetail(detail);
+            }
+
             _collectionView.OnInstall += FetchPackagesNextFrame;
             _collectionView.OnUnInstall += FetchPackagesNextFrame;
 
@@ -89,6 +96,11 @@ namespace SmartGitUPM.Editor
         {
             _collectionView.OnInstall -= FetchPackagesNextFrame;
             _collectionView.OnUnInstall -= FetchPackagesNextFrame;
+            if (_manager != default)
+            {
+                _manager.Collection.OnDetailsUpdated -= OnPackageDetailsUpdated;
+            }
+            PackageUpdateChecker.OnPackageInfoFetched -= OnStartupPackageInfoFetched;
             EditorApplication.delayCall -= FetchPackagesNextFrame;
 
             _languageManager?.Dispose();
@@ -228,6 +240,14 @@ namespace SmartGitUPM.Editor
         {
             EditorApplication.delayCall -= FetchPackagesNextFrame;
             FetchPackages(false);
+        }
+
+        void OnPackageDetailsUpdated(PackageInfoDetails detail) => Repaint();
+
+        void OnStartupPackageInfoFetched(PackageInfoDetails detail)
+        {
+            _manager?.Collection.ApplyFetchedDetail(detail);
+            Repaint();
         }
 
         void FetchPackages(bool superReload)

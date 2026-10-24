@@ -9,6 +9,10 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class PackageUpdateChecker : IDisposable
     {
+        static readonly List<PackageInfoDetails> _latestFetchedDetails = new();
+        public static event Action<PackageInfoDetails> OnPackageInfoFetched = delegate { };
+        public static IReadOnlyList<PackageInfoDetails> LatestFetchedDetails => _latestFetchedDetails;
+
         public sealed class LocalizedStrings
         {
             public string Title;
@@ -59,9 +63,28 @@ namespace SmartGitUPM.Editor
         async Task FetchPackages(HashSet<PackageMetaData> metas, SGUPackageManager manager, CancellationToken token, bool promptForUpdate)
         {
             var details = ListPool<PackageInfoDetails>.Get();
+            var latestDetails = new List<PackageInfoDetails>();
+            void OnLatestDetailsUpdated(PackageInfoDetails detail)
+            {
+                var index = latestDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+                if (index >= 0)
+                {
+                    latestDetails[index] = detail;
+                }
+                else
+                {
+                    latestDetails.Add(detail);
+                }
+                PublishFetchedDetail(detail);
+            }
+
             try
             {
+                details.Clear();
+                manager.Collection.OnLatestDetailsUpdated += OnLatestDetailsUpdated;
                 await manager.Collection.FetchPackages(details, metas, true, token);
+                details.Clear();
+                details.AddRange(latestDetails);
 
                 if (token.IsCancellationRequested)
                 {
@@ -94,8 +117,23 @@ namespace SmartGitUPM.Editor
             }
             finally
             {
+                manager.Collection.OnLatestDetailsUpdated -= OnLatestDetailsUpdated;
                 ListPool<PackageInfoDetails>.Release(details);
             }
+        }
+
+        static void PublishFetchedDetail(PackageInfoDetails detail)
+        {
+            var index = _latestFetchedDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+            if (index >= 0)
+            {
+                _latestFetchedDetails[index] = detail;
+            }
+            else
+            {
+                _latestFetchedDetails.Add(detail);
+            }
+            OnPackageInfoFetched(detail);
         }
 
         void ShowUpdatePrompt(List<PackageInfoDetails> details)
