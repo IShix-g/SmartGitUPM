@@ -148,11 +148,14 @@ namespace SmartGitUPM.Editor
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
+                    var standardOutputTask = process.StandardOutput.ReadToEndAsync();
+                    var standardErrorTask = process.StandardError.ReadToEndAsync();
+                    var processExitTask = WaitForProcessExitAsync(process);
 #if DEBUG_PROSESS
-                    var error = await process.StandardError.ReadToEndAsync();
+                    var error = await standardErrorTask;
 #endif
-                    process.WaitForExit();
-                    await WaitForProcessExitAsync(process);
+                    await processExitTask;
+                    await Task.WhenAll(standardOutputTask, standardErrorTask);
 #if DEBUG_PROSESS
                     if (!string.IsNullOrEmpty(error))
                     {
@@ -250,13 +253,13 @@ namespace SmartGitUPM.Editor
 
         static Task WaitForProcessExitAsync(Process process)
         {
-            var tcs = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            process.Exited += (sender, args) => tcs.TrySetResult(true);
             process.EnableRaisingEvents = true;
-            process.Exited += (sender, args) =>
+            if (process.HasExited)
             {
                 tcs.TrySetResult(true);
-                process.Dispose();
-            };
+            }
             return tcs.Task;
         }
 
