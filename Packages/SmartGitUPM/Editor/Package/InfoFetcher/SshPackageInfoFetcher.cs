@@ -189,6 +189,7 @@ namespace SmartGitUPM.Editor
 #endif
                     await processExitTask;
                     await Task.WhenAll(standardOutputTask, standardErrorTask);
+                    token.ThrowIfCancellationRequested();
 #if DEBUG_PROSESS
                     if (!string.IsNullOrEmpty(error))
                     {
@@ -251,6 +252,11 @@ namespace SmartGitUPM.Editor
                 if (Directory.Exists(tempPath))
                 {
                     Directory.Delete(tempPath, true);
+                }
+
+                if (ex is OperationCanceledException)
+                {
+                    throw;
                 }
 
                 var message = ex.Message + "\n";

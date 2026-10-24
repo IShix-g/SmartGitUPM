@@ -93,6 +93,10 @@ namespace SmartGitUPM.Editor
 
                 return new PackageInfoDetails(local, server, packageInstallUrl);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 var message = ex.Message + "\n";

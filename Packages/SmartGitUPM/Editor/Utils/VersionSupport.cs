@@ -8,6 +8,9 @@ namespace SmartGitUPM.Editor
         public static string WithoutVersion(this string url)
             => Regex.Replace(url, @"[#@][^\s?#]*(\d+\.\d+\.\d+)", string.Empty);
 
+        internal static string ToPackageKey(this string url)
+            => url.Trim().TrimEnd('/').WithoutVersion();
+
         public static string ToVersion(this string url)
         {
             var match = Regex.Match(url, @"[#@][^\s?#]*(\d+\.\d+\.\d+)");

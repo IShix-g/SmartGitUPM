@@ -259,14 +259,18 @@ namespace SmartGitUPM.Editor
                 return;
             }
             _tokenSource?.SafeCancelAndDispose();
-            _tokenSource = new CancellationTokenSource();
+            var tokenSource = new CancellationTokenSource();
+            _tokenSource = tokenSource;
 
-            _manager.Collection.FetchPackages(superReload, _tokenSource.Token)
+            _manager.Collection.FetchPackages(superReload, tokenSource.Token)
                 .Handled(_ =>
                 {
                     Repaint();
-                    _tokenSource?.Dispose();
-                    _tokenSource = default;
+                    tokenSource.Dispose();
+                    if (ReferenceEquals(_tokenSource, tokenSource))
+                    {
+                        _tokenSource = default;
+                    }
                 });
         }
 

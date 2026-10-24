@@ -55,8 +55,13 @@ namespace SmartGitUPM.Editor
                 var packageMetas = metas.ToArray();
                 var installUrls = new HashSet<string>(packageMetas
                     .Where(meta => !string.IsNullOrEmpty(meta.InstallUrl))
-                    .Select(meta => meta.InstallUrl.WithoutVersion()));
-                details.RemoveAll(detail => !installUrls.Contains(detail.PackageInstallUrl.WithoutVersion()));
+                    .Select(meta => meta.InstallUrl.ToPackageKey()), StringComparer.OrdinalIgnoreCase);
+                var existingUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                details.RemoveAll(detail =>
+                {
+                    var key = detail.PackageInstallUrl.ToPackageKey();
+                    return !installUrls.Contains(key) || !existingUrls.Add(key);
+                });
 
                 var installedPackages = await _installer.GetInfos(fetchToken);
                 var taskList = new List<Task>(packageMetas.Length);
@@ -95,6 +100,7 @@ namespace SmartGitUPM.Editor
             try
             {
                 var cached = await fetcher.GetCachedPackageInfo(installUrl, installedPackages, token);
+                token.ThrowIfCancellationRequested();
                 if (cached != default)
                 {
                     UpsertDetails(details, cached);
@@ -117,6 +123,7 @@ namespace SmartGitUPM.Editor
             try
             {
                 var latest = await fetcher.FetchPackageInfo(installUrl, branch, superReload, installedPackages, token);
+                token.ThrowIfCancellationRequested();
                 if (latest != default)
                 {
                     UpsertDetails(details, latest, true);
@@ -134,7 +141,7 @@ namespace SmartGitUPM.Editor
 
         void UpsertDetails(List<PackageInfoDetails> details, PackageInfoDetails detail, bool isLatest = false)
         {
-            var index = details.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+            var index = details.FindIndex(item => string.Equals(item.PackageInstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 if (!isLatest)
@@ -157,7 +164,7 @@ namespace SmartGitUPM.Editor
         public void ApplyFetchedDetail(PackageInfoDetails detail)
         {
             if (detail != default && Metas.Any(meta => !string.IsNullOrEmpty(meta.InstallUrl)
-                                                       && string.Equals(meta.InstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase)))
+                                                       && string.Equals(meta.InstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase)))
             {
                 UpsertDetails(Details, detail, true);
             }

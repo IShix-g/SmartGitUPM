@@ -66,7 +66,7 @@ namespace SmartGitUPM.Editor
             var latestDetails = new List<PackageInfoDetails>();
             void OnLatestDetailsUpdated(PackageInfoDetails detail)
             {
-                var index = latestDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+                var index = latestDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase));
                 if (index >= 0)
                 {
                     latestDetails[index] = detail;
@@ -124,7 +124,7 @@ namespace SmartGitUPM.Editor
 
         static void PublishFetchedDetail(PackageInfoDetails detail)
         {
-            var index = _latestFetchedDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.WithoutVersion(), detail.PackageInstallUrl.WithoutVersion(), StringComparison.OrdinalIgnoreCase));
+            var index = _latestFetchedDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 _latestFetchedDetails[index] = detail;
