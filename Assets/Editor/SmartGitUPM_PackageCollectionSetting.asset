@@ -20,20 +20,20 @@ MonoBehaviour:
   - UpdateNotify: 1
     InstallUrl: https://github.com/IShix-g/SMCP-Configurator.git?path=Packages/SMCPConfigurator#1.0.13
     Branch: 
-    HelpPageUrl: 
+    HelpPageUrl: https://github.com/IShix-g/SMCP-Configurator
   - UpdateNotify: 1
     InstallUrl: https://github.com/IShix-g/IDReference.git?path=Assets/Plugins/IDReference#v1.1.4
     Branch: 
-    HelpPageUrl: 
+    HelpPageUrl: https://github.com/IShix-g/IDReference
   - UpdateNotify: 1
     InstallUrl: https://github.com/IShix-g/QuickAdMobIntegrator.git?path=Packages/QuickAdMobIntegrator
     Branch: 
-    HelpPageUrl: 
+    HelpPageUrl: https://github.com/IShix-g/QuickAdMobIntegrator
   - UpdateNotify: 1
     InstallUrl: git@IShix-g-GitHub:IShix-g/UnityJenkinsBuilder.git?path=Assets/Plugins/Jenkins/
     Branch: 
-    HelpPageUrl: 
+    HelpPageUrl: https://github.com/IShix-g/UnityJenkinsBuilder
   - UpdateNotify: 1
     InstallUrl: https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#v1
     Branch: 
-    HelpPageUrl: 
+    HelpPageUrl: https://github.com/IShix-g/HistoryTracker
