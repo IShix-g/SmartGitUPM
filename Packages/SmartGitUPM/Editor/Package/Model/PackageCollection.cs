@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace SmartGitUPM.Editor
 {
@@ -17,12 +18,15 @@ namespace SmartGitUPM.Editor
         public List<PackageInfoDetails> Details { get; private set; } = new ();
 
         readonly IReadOnlyList<IPackageInfoFetcher> _infoFetchers;
+        readonly PackageInstaller _installer;
         CancellationTokenSource _tokenSource;
 
         public PackageCollection(
+            PackageInstaller installer,
             IReadOnlyList<IPackageInfoFetcher> infoFetchers,
             IReadOnlyList<PackageMetaData> metas)
         {
+            _installer = installer;
             _infoFetchers = infoFetchers;
             Set(metas);
         }
@@ -48,6 +52,7 @@ namespace SmartGitUPM.Editor
             var taskList = ListPool<Task<PackageInfoDetails>>.Get();
             try
             {
+                var installedPackages = await _installer.GetInfos(_tokenSource.Token);
                 foreach (var meta in metas)
                 {
                     if (string.IsNullOrEmpty(meta.InstallUrl))
@@ -63,7 +68,7 @@ namespace SmartGitUPM.Editor
                     }
                     var installUrl = meta.InstallUrl.Trim().TrimEnd('/');
                     var branch = meta.Branch.Trim();
-                    var task = fetcher.FetchPackageInfo(installUrl, branch, superReload, _tokenSource.Token);
+                    var task = fetcher.FetchPackageInfo(installUrl, branch, superReload, installedPackages, _tokenSource.Token);
                     taskList.Add(task);
                 }
 

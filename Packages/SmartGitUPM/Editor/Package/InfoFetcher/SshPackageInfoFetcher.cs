@@ -1,6 +1,7 @@
 // #define DEBUG_PROSESS
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
@@ -25,6 +26,12 @@ namespace SmartGitUPM.Editor
         public bool IsSupported(string url) => url.StartsWith("git");
 
         public async Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, CancellationToken token = default)
+        {
+            var installedPackages = await _installer.GetInfos(token);
+            return await FetchPackageInfo(packageInstallUrl, branch, supperReload, installedPackages, token);
+        }
+
+        public async Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
         {
             if (!IsSupported(packageInstallUrl))
             {
@@ -56,7 +63,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-                var info = await _installer.GetInfoByPackageId(installUrlWithoutVersion, _tokenSource.Token);
+                var info = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
                 localInfo = info != default
                     ? ToLocalInfo(info)
                     : default;

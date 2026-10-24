@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -25,7 +26,7 @@ namespace SmartGitUPM.Editor
 
         public bool IsSupported(string url) => url.StartsWith("http");
 
-        public Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, CancellationToken token = default)
+        public Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
         {
             if (!IsSupported(packageInstallUrl))
             {
@@ -34,10 +35,10 @@ namespace SmartGitUPM.Editor
             var versionOrBranch = ToVersionOrBranchFromPackageUrl(packageInstallUrl);
             var branchName = string.IsNullOrEmpty(versionOrBranch) ? branch : versionOrBranch;
             var gitPackageJsonUrl = ToRawPackageJsonURL(packageInstallUrl,  branchName);
-            return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, supperReload, token);
+            return FetchPackageInfoByPackageJsonUrl(packageInstallUrl, gitPackageJsonUrl, supperReload, installedPackages, token);
         }
 
-        public async Task<PackageInfoDetails> FetchPackageInfoByPackageJsonUrl(string packageInstallUrl, string gitPackageJsonUrl, bool supperReload, CancellationToken token = default)
+        public async Task<PackageInfoDetails> FetchPackageInfoByPackageJsonUrl(string packageInstallUrl, string gitPackageJsonUrl, bool supperReload, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
         {
             var info = default(PackageInfo);
             try
@@ -46,7 +47,7 @@ namespace SmartGitUPM.Editor
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
                 var installUrlWithoutVersion = packageInstallUrl.WithoutVersion();
-                info = await _installer.GetInfoByPackageId(installUrlWithoutVersion, _tokenSource.Token);
+                info = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
 
                 var local = info != default
                     ? new PackageLocalInfo

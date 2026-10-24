@@ -60,6 +60,11 @@ namespace SmartGitUPM.Editor
         public async Task<PackageInfo> GetInfoByPackageId(string packageIdOrPackageInstallUrl, CancellationToken token = default)
         {
             var infos = await GetInfos(token);
+            return GetInfoByPackageId(infos, packageIdOrPackageInstallUrl);
+        }
+
+        public PackageInfo GetInfoByPackageId(IEnumerable<PackageInfo> infos, string packageIdOrPackageInstallUrl)
+        {
             foreach (var info in infos)
             {
                 if (info.packageId.Contains(packageIdOrPackageInstallUrl, StringComparison.OrdinalIgnoreCase))
