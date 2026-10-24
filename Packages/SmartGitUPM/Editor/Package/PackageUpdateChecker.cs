@@ -9,9 +9,9 @@ namespace SmartGitUPM.Editor
 {
     internal sealed class PackageUpdateChecker : IDisposable
     {
-        static readonly List<PackageInfoDetails> _latestFetchedDetails = new();
+        static readonly List<PackageInfoDetails> s_latestFetchedDetails = new();
         public static event Action<PackageInfoDetails> OnPackageInfoFetched = delegate { };
-        public static IReadOnlyList<PackageInfoDetails> LatestFetchedDetails => _latestFetchedDetails;
+        public static IReadOnlyList<PackageInfoDetails> LatestFetchedDetails => s_latestFetchedDetails;
 
         public sealed class LocalizedStrings
         {
@@ -124,14 +124,14 @@ namespace SmartGitUPM.Editor
 
         static void PublishFetchedDetail(PackageInfoDetails detail)
         {
-            var index = _latestFetchedDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase));
+            var index = s_latestFetchedDetails.FindIndex(item => string.Equals(item.PackageInstallUrl.ToPackageKey(), detail.PackageInstallUrl.ToPackageKey(), StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
-                _latestFetchedDetails[index] = detail;
+                s_latestFetchedDetails[index] = detail;
             }
             else
             {
-                _latestFetchedDetails.Add(detail);
+                s_latestFetchedDetails.Add(detail);
             }
             OnPackageInfoFetched(detail);
         }

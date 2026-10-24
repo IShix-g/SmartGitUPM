@@ -19,20 +19,22 @@ jobs:
       - name: Extract tag from Pull Request title
         id: extract-tag
         run: |
-          pr_title="${{ github.event.pull_request.title }}"
-          echo "Pull Request title: $pr_title"
-          pr_title_lower=$(echo "$pr_title" | tr '[:upper:]' '[:lower:]')
+          pr_title='${{ toJSON(github.event.pull_request.title) }}'
+          pr_title_clean=$(echo "$pr_title" | tr -d '"')
+          echo "Pull Request title: $pr_title_clean"
+
+          pr_title_lower=$(echo "$pr_title_clean" | tr '[:upper:]' '[:lower:]')
           echo "Pull Request title (lowercase): $pr_title_lower"
           
           tag_regex='(v|ver\.|version)?\s*([0-9]+\.[0-9]+\.[0-9]+)(\s|$)'
           
-          if [[ $pr_title_lower =~ $tag_regex ]]; then
+          if [[ "$pr_title_lower" =~ $tag_regex ]]; then
             extracted_tag="${BASH_REMATCH[2]}"
             echo "Extracted tag: $extracted_tag"
             echo "tag=$extracted_tag" >> "$GITHUB_OUTPUT"
             echo "::notice::Tag extracted from the Pull Request title: $extracted_tag"
           else
-            echo "::error::No valid tag found in Pull Request title."
+            echo "::notice::No valid tag found in Pull Request title."
           fi
 
   update-packagejson:
