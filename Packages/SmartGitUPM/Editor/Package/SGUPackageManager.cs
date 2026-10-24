@@ -21,7 +21,7 @@ namespace SmartGitUPM.Editor
             Installer = installer;
             _infoFetchers = infoFetchers;
             Setting = setting;
-            Collection = new PackageCollection(_infoFetchers, Setting.Packages);
+            Collection = new PackageCollection(Installer, _infoFetchers, Setting.Packages);
         }
 
         public void Dispose()
