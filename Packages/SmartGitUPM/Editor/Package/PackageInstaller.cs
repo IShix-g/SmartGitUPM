@@ -463,6 +463,10 @@ namespace SmartGitUPM.Editor
         }
 
         public static void OpenPackageManager()
+#if UNITY_6000_1_OR_NEWER
+            => EditorApplication.ExecuteMenuItem("Window/Package Management/Package Manager");
+#else
             => EditorApplication.ExecuteMenuItem("Window/Package Manager");
+#endif
     }
 }
