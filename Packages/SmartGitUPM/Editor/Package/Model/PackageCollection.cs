@@ -33,7 +33,11 @@ namespace SmartGitUPM.Editor
             Set(metas);
         }
 
-        public void Set(IReadOnlyList<PackageMetaData> metas) => Metas = metas;
+        public void Set(IReadOnlyList<PackageMetaData> metas)
+        {
+            Metas = metas;
+            SortDetails(Details);
+        }
 
         public Task FetchPackages(bool superReload, CancellationToken token = default)
         {
@@ -154,11 +158,36 @@ namespace SmartGitUPM.Editor
             {
                 details.Add(detail);
             }
+            SortDetails(details);
             OnDetailsUpdated(detail);
             if (isLatest)
             {
                 OnLatestDetailsUpdated(detail);
             }
+        }
+
+        void SortDetails(List<PackageInfoDetails> details)
+        {
+            if (Metas == null || details.Count < 2)
+            {
+                return;
+            }
+
+            var order = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < Metas.Count; i++)
+            {
+                var url = Metas[i].InstallUrl;
+                if (!string.IsNullOrEmpty(url) && !order.ContainsKey(url.ToPackageKey()))
+                {
+                    order.Add(url.ToPackageKey(), i);
+                }
+            }
+            details.Sort((left, right) =>
+            {
+                var leftOrder = order.TryGetValue(left.PackageInstallUrl.ToPackageKey(), out var leftIndex) ? leftIndex : int.MaxValue;
+                var rightOrder = order.TryGetValue(right.PackageInstallUrl.ToPackageKey(), out var rightIndex) ? rightIndex : int.MaxValue;
+                return leftOrder.CompareTo(rightOrder);
+            });
         }
 
         public void ApplyFetchedDetail(PackageInfoDetails detail)

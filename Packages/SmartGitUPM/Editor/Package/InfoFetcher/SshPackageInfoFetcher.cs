@@ -106,7 +106,6 @@ namespace SmartGitUPM.Editor
                 {
                     localInfo = ToLocalInfo(cache);
                     isCachePackage = true;
-                    Debug.Log("localInfo.version = " + localInfo.version);
                 }
             }
             finally
