@@ -62,7 +62,7 @@ namespace SmartGitUPM.Editor
                     this
                 );
             _collectionView ??= new PackageCollectionView(
-                    _manager.Installer,
+                    _manager,
                     _manager.Setting,
                     _manager.Collection,
                     _languageManager,
@@ -207,9 +207,8 @@ namespace SmartGitUPM.Editor
 
                         if (userAgreed)
                         {
-                            var packageUrls = _manager.Collection.GetInstallPackageUrls();
                             _tokenSource = new CancellationTokenSource();
-                            _manager.Installer.Install(packageUrls, _tokenSource.Token)
+                            _manager.InstallAllAsync(_tokenSource.Token, true)
                                 .Handled(_ =>
                                 {
                                     _tokenSource.Dispose();
@@ -258,7 +257,7 @@ namespace SmartGitUPM.Editor
             var tokenSource = new CancellationTokenSource();
             _tokenSource = tokenSource;
 
-            _manager.Collection.FetchPackages(superReload, tokenSource.Token)
+            _manager.FetchPackagesAsync(superReload, tokenSource.Token)
                 .Handled(_ =>
                 {
                     Repaint();

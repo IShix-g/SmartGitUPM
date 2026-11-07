@@ -118,6 +118,49 @@ You can select the language from the settings. Alerts, warnings, and other messa
 3. Installed and version is fixed, can specify a version like `#1.1.4` at the end of the URL to fix
 4. Not installed
 
+## Editor API
+
+Use `SmartGitUPM.Editor.SmartGitUPMApi` from Editor code. An assembly definition must reference `SmartGitUPM.Editor` and target the Editor only. Call and await operations sequentially on the Editor main thread. The API opens no windows, dialogs, or progress bars.
+
+Following the existing settings-loading behavior, all API calls, including the two checks, create `Assets/Editor/SmartGitUPM_PackageCollectionSetting.asset` if it does not exist.
+
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using SmartGitUPM.Editor;
+
+public static class PackageAutomation
+{
+    public static async Task RunAsync(CancellationToken token = default)
+    {
+        bool hasMissing = await SmartGitUPMApi.HasUninstalledPackagesAsync(token);
+        bool hasUpdates = await SmartGitUPMApi.HasUpdatesAsync(token);
+
+        // Use the complete Install URL registered in Smart Git UPM, including #revision.
+        await SmartGitUPMApi.UpdatePackageAsync(
+            "https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex", token);
+        await SmartGitUPMApi.InstallAllAsync(token);
+    }
+}
+```
+
+The checks cover all registered packages, including those with update notifications disabled. The update check fetches current remote information and reports updates for installed packages; a fixed version is compared with that configured version. The missing-package check only needs the UPM installed-package list. With no registrations, both checks return `false` and Install All completes without a UPM request.
+
+`UpdatePackageAsync` uses the registered URL exactly, including its revision, and can also install that registration if it is missing. It checks the selected registration, so an unrelated incomplete registration does not block this operation. An empty or unregistered URL raises `ArgumentException`. Invalid registrations in whole-collection operations and fetch or UPM failures fault the task; cancellation raises `OperationCanceledException`. Cancelling an operation stops waiting, but an already submitted UPM operation may still complete. Await completion and inspect the resulting package state before starting another operation.
+
+### Calling from Unity Pipeline
+
+The API has no dependency on Unity Pipeline. The following connection and command-discovery examples have not been verified against a connected Editor. In a project that already has a compatible `com.unity.pipeline` version and a connected Editor, select that project explicitly and confirm the commands with that version's help and command list:
+
+```sh
+unity status --project-path /absolute/path/to/project --json
+unity command --project-path /absolute/path/to/project --query eval
+```
+
+Use the connected version's C# evaluation command to await the four calls above. Command names and async evaluation syntax vary by Pipeline version; check that version's command help before invoking it. Keep the Editor in the background, and do not open the Smart Git UPM window. Check returned values, task completion, errors, and the resulting UPM package state.
+
+The current [Pipeline requirements](https://docs.unity.com/en-us/unity-cli/unity-pipeline/unity-pipeline-package) specify Unity 6.0 or later. This repository's sample project uses Unity 2022.3. Pipeline verification therefore needs a compatible Unity 6 test project with this package and test registrations. The API does not require upgrading existing Smart Git UPM users or installing Pipeline. Pipeline execution has not been verified in this sample project.
+
 ## Role Sharing with UPM
 
 SmartGitUPM visualizes Git version information and notifies updates that Unity Package Manager(UPM) does not. Actual installation or uninstallation is delegated to Unity Package Manager.

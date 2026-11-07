@@ -13,7 +13,6 @@ namespace SmartGitUPM.Editor
         bool _isDisposed;
         Func<bool> _isOperationComplete;
         TaskCompletionSource<bool> _completionSource;
-        CancellationTokenSource _tokenSource;
 
         public async Task StartAsync(Func<bool> isOperationComplete, CancellationToken cancellationToken = default)
         {
@@ -22,27 +21,24 @@ namespace SmartGitUPM.Editor
                 throw new InvalidOperationException("Task is already started.");
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             if (isOperationComplete())
             {
                 return;
             }
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(cancellationToken);
-            }
-
             _isOperationComplete = isOperationComplete;
-            _completionSource = new TaskCompletionSource<bool>();
-            _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _tokenSource.Token.Register(() =>
-                Cancel(new OperationCanceledException("Operation was cancelled by token")));
+            var completionSource = new TaskCompletionSource<bool>();
+            _completionSource = completionSource;
+            // Cancellation can arrive on a worker thread. Only complete the Task there;
+            // detach from EditorApplication on the captured Editor context in finally.
+            using var registration = cancellationToken.Register(() => completionSource.TrySetCanceled());
 
             EditorApplication.update += OnUpdate;
 
             try
             {
-                await _completionSource.Task;
+                await completionSource.Task;
             }
             finally
             {
@@ -54,7 +50,7 @@ namespace SmartGitUPM.Editor
         {
             if (IsStarted)
             {
-                Cleanup();
+                Cancel();
             }
         }
 
@@ -65,27 +61,35 @@ namespace SmartGitUPM.Editor
                 return;
             }
 
-            _completionSource.TrySetException(
-                exception ?? new OperationCanceledException("Operation was cancelled"));
-            Cleanup();
+            if (exception == default)
+            {
+                _completionSource.TrySetCanceled();
+            }
+            else
+            {
+                _completionSource.TrySetException(exception);
+            }
         }
 
         void OnUpdate()
         {
-            if (_isOperationComplete())
+            try
             {
-                _completionSource.SetResult(true);
+                if (_isOperationComplete())
+                {
+                    _completionSource.TrySetResult(true);
+                }
+            }
+            catch (Exception exception)
+            {
+                _completionSource.TrySetException(exception);
             }
         }
 
         void Cleanup()
         {
             _completionSource = default;
-            if (_tokenSource != default)
-            {
-                _tokenSource?.Dispose();
-                _tokenSource = default;
-            }
+            _isOperationComplete = default;
             EditorApplication.update -= OnUpdate;
         }
 
@@ -99,12 +103,7 @@ namespace SmartGitUPM.Editor
 
             if (IsStarted)
             {
-                if (_tokenSource != default)
-                {
-                    _tokenSource?.Dispose();
-                    _tokenSource = default;
-                }
-                Cleanup();
+                Cancel();
             }
         }
     }

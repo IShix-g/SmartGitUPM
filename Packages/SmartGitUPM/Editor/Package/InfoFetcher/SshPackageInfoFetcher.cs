@@ -28,14 +28,13 @@ namespace SmartGitUPM.Editor
         public async Task<PackageInfoDetails> GetCachedPackageInfo(string packageInstallUrl, IEnumerable<PackageInfo> installedPackages, CancellationToken token = default)
         {
             PackageCacheManager.Initialize();
-            var installUrlWithoutVersion = packageInstallUrl.WithoutVersion();
-            if (!PackageCacheManager.TryGetByInstallUrl(installUrlWithoutVersion, out var cache))
+            var (installUrl, _, packagePath, revision) = ParseInstallUrl(packageInstallUrl);
+            if (!string.IsNullOrEmpty(revision)
+                || !PackageCacheManager.TryGetByInstallUrl(installUrl, out var cache))
             {
                 return default;
             }
 
-            var (_, query) = ParsePath(installUrlWithoutVersion);
-            var packagePath = ExtractPathFromQuery(query);
             var jsonPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath + "/" + cache.Name + "/"
                            + (!string.IsNullOrEmpty(packagePath) ? packagePath + "/" : string.Empty)
                            + HttpPackageInfoFetcher.PackageJsonFileName;
@@ -51,11 +50,11 @@ namespace SmartGitUPM.Editor
                 return default;
             }
 
-            var installed = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
+            var installed = _installer.GetInfoByPackageId(installedPackages, installUrl);
             var local = installed != default
                 ? ToLocalInfo(installed)
                 : default;
-            return new PackageInfoDetails(local, remote, installUrlWithoutVersion);
+            return new PackageInfoDetails(local, remote, packageInstallUrl);
         }
 
         public async Task<PackageInfoDetails> FetchPackageInfo(string packageInstallUrl, string branch, bool supperReload, CancellationToken token = default)
@@ -73,18 +72,12 @@ namespace SmartGitUPM.Editor
 
             PackageCacheManager.Initialize();
 
-            var currentVersion = packageInstallUrl.ToVersion();
-            var installUrlWithoutVersion = string.IsNullOrEmpty(currentVersion)
-                    ? packageInstallUrl
-                    : packageInstallUrl.WithoutVersion();
-            var (absolutePath, query) = ParsePath(installUrlWithoutVersion);
+            var (installUrl, remote, packagePath, revision) = ParseInstallUrl(packageInstallUrl);
+            var useCachedCheckout = string.IsNullOrEmpty(revision);
             var rootPath = Application.dataPath + "/../" + HttpPackageInfoFetcher.SgUpmPackageCachePath;
             var tempPath = rootPath + "/.tmp_" + CreateUniqID();
-            var command = "git";
-            var arguments = default(string);
-            var packagePath = ExtractPathFromQuery(query);
             var packageJsonPath = !string.IsNullOrEmpty(packagePath)
-                ? ExtractPathFromQuery(query) + "/" + HttpPackageInfoFetcher.PackageJsonFileName
+                ? packagePath + "/" + HttpPackageInfoFetcher.PackageJsonFileName
                 : HttpPackageInfoFetcher.PackageJsonFileName;
             var localInfo = default(PackageLocalInfo);
             var isCachePackage = false;
@@ -96,13 +89,14 @@ namespace SmartGitUPM.Editor
                 IsProcessing = true;
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-                var info = _installer.GetInfoByPackageId(installedPackages, installUrlWithoutVersion);
+                var info = _installer.GetInfoByPackageId(installedPackages, installUrl);
                 localInfo = info != default
                     ? ToLocalInfo(info)
                     : default;
 
                 if (localInfo == default
-                    && PackageCacheManager.TryGetByInstallUrl(installUrlWithoutVersion, out var cache))
+                    && useCachedCheckout
+                    && PackageCacheManager.TryGetByInstallUrl(installUrl, out var cache))
                 {
                     localInfo = ToLocalInfo(cache);
                     isCachePackage = true;
@@ -113,7 +107,7 @@ namespace SmartGitUPM.Editor
                 IsProcessing = false;
             }
 
-            if (localInfo != default)
+            if (useCachedCheckout && localInfo != default)
             {
                 localPackagePath = rootPath + "/" + localInfo.name;
                 absoluteLocalPackageJsonPath = localPackagePath + "/" + packageJsonPath;
@@ -131,120 +125,72 @@ namespace SmartGitUPM.Editor
 
                 if (serverInfo != default)
                 {
-                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, installUrlWithoutVersion);
+                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
                 }
             }
-
-            if (!string.IsNullOrEmpty(branch))
-            {
-                branch = "-b " + branch;
-            }
-
-            arguments = string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
-                ? $"clone --single-branch --no-tags {branch} {absolutePath} {tempPath}"
-                : $"pull origin {branch}";
-
-            switch (Application.platform)
-            {
-                case RuntimePlatform.WindowsEditor:
-                    arguments = $"/C {command} {arguments}";
-                    command = "cmd.exe";
-                    break;
-                default:
-                    arguments = $"-c \"{command} {arguments}\"";
-                    command = "/bin/bash";
-                    break;
-            }
-
-            var workingDirectory
-                    = localInfo != default
-                      && !string.IsNullOrEmpty(absoluteLocalPackageJsonPath)
-                        ? localPackagePath
-                        : rootPath;
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = command,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = workingDirectory
-            };
 
             try
             {
                 HttpPackageInfoFetcher.CreateDirectories(rootPath);
 
-                using var process = Process.Start(startInfo);
-                if (process != null)
+                if (!useCachedCheckout)
                 {
-                    var standardOutputTask = process.StandardOutput.ReadToEndAsync();
-                    var standardErrorTask = process.StandardError.ReadToEndAsync();
-                    var processExitTask = WaitForProcessExitAsync(process);
-#if DEBUG_PROSESS
-                    var error = await standardErrorTask;
-#endif
-                    await processExitTask;
-                    await Task.WhenAll(standardOutputTask, standardErrorTask);
-                    token.ThrowIfCancellationRequested();
-#if DEBUG_PROSESS
-                    if (!string.IsNullOrEmpty(error))
+                    // An explicit ref may be a tag or commit, so do not pull it into the shared branch cache.
+                    await RunGitAsync(rootPath, token, "init", tempPath);
+                    await RunGitAsync(tempPath, token, "fetch", "--depth", "1", "--no-tags", "--", remote, revision);
+                    await RunGitAsync(tempPath, token, "checkout", "--detach", "FETCH_HEAD");
+                }
+                else if (string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
+                {
+                    if (string.IsNullOrEmpty(branch))
                     {
-                        UnityEngine.Debug.LogWarning(error);
-                    }
-#endif
-
-                    var serverInfo = default(PackageRemoteInfo);
-                    if (!string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
-                    {
-                        var jsonString = await File.ReadAllTextAsync(absoluteLocalPackageJsonPath, token);
-                        serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
-
-                        if (serverInfo == default)
-                        {
-                            throw new InvalidOperationException("Failed to parse the package.json.");
-                        }
+                        await RunGitAsync(rootPath, token, "clone", "--single-branch", "--no-tags", remote, tempPath);
                     }
                     else
                     {
-                        var absolutePackageJsonPath = tempPath + "/" + packageJsonPath;
-                        if (!File.Exists(absolutePackageJsonPath))
-                        {
-                            throw new InvalidOperationException("Failed to find the package.json.");
-                        }
-
-                        var jsonString = await File.ReadAllTextAsync(absolutePackageJsonPath, token);
-                        serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
-
-                        if (serverInfo == default)
-                        {
-                            throw new InvalidOperationException("Failed to parse the package.json.");
-                        }
-
-                        localPackagePath = rootPath + "/" + serverInfo.name;
-                        if (Directory.Exists(localPackagePath))
-                        {
-                            Directory.Delete(localPackagePath, true);
-                        }
-                        Directory.Move(tempPath, localPackagePath);
-
-                        var cache = new PackageCacheInfo(
-                            installUrlWithoutVersion,
-                            serverInfo.name,
-                            serverInfo.displayName,
-                            serverInfo.version);
-                        PackageCacheManager.Add(cache);
-                        PackageCacheManager.Save();
+                        await RunGitAsync(rootPath, token, "clone", "--single-branch", "--no-tags", "-b", branch, remote, tempPath);
                     }
-
-                    return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, installUrlWithoutVersion);
+                }
+                else if (string.IsNullOrEmpty(branch))
+                {
+                    await RunGitAsync(localPackagePath, token, "pull", "origin");
                 }
                 else
                 {
-                    throw new InvalidOperationException("Failed to start the process.");
+                    await RunGitAsync(localPackagePath, token, "pull", "origin", branch);
                 }
+
+                var jsonPath = absoluteLocalPackageJsonPath ?? tempPath + "/" + packageJsonPath;
+                if (!File.Exists(jsonPath))
+                {
+                    throw new InvalidOperationException("Failed to find the package.json.");
+                }
+                var jsonString = await File.ReadAllTextAsync(jsonPath, token);
+                var serverInfo = JsonUtility.FromJson<PackageRemoteInfo>(jsonString);
+                if (serverInfo == default)
+                {
+                    throw new InvalidOperationException("Failed to parse the package.json.");
+                }
+
+                if (!useCachedCheckout)
+                {
+                    Directory.Delete(tempPath, true);
+                }
+                else if (string.IsNullOrEmpty(absoluteLocalPackageJsonPath))
+                {
+                    localPackagePath = rootPath + "/" + serverInfo.name;
+                    if (Directory.Exists(localPackagePath))
+                    {
+                        Directory.Delete(localPackagePath, true);
+                    }
+                    Directory.Move(tempPath, localPackagePath);
+
+                    var cache = new PackageCacheInfo(installUrl, serverInfo.name, serverInfo.displayName, serverInfo.version);
+                    PackageCacheManager.Add(cache);
+                    PackageCacheManager.Save();
+                }
+
+                return new PackageInfoDetails(!isCachePackage ? localInfo : default, serverInfo, packageInstallUrl);
             }
             catch (Exception ex)
             {
@@ -289,16 +235,82 @@ namespace SmartGitUPM.Editor
                 displayName = info.DisplayName
             };
 
-        static Task WaitForProcessExitAsync(Process process)
+        static async Task RunGitAsync(string workingDirectory, CancellationToken token, params string[] arguments)
+        {
+            token.ThrowIfCancellationRequested();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "git",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDirectory
+            };
+            foreach (var argument in arguments)
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                throw new InvalidOperationException("Failed to start the process.");
+            }
+            var standardOutput = process.StandardOutput.ReadToEndAsync();
+            var standardError = process.StandardError.ReadToEndAsync();
+            await WaitForProcessExitAsync(process, token);
+            await Task.WhenAll(standardOutput, standardError);
+            token.ThrowIfCancellationRequested();
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException("Git package information fetch failed with exit code " + process.ExitCode + ".");
+            }
+#if DEBUG_PROSESS
+            if (!string.IsNullOrEmpty(standardError.Result))
+            {
+                Debug.LogWarning(standardError.Result);
+            }
+#endif
+        }
+
+        static async Task WaitForProcessExitAsync(Process process, CancellationToken token)
         {
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            process.Exited += (sender, args) => tcs.TrySetResult(true);
-            process.EnableRaisingEvents = true;
-            if (process.HasExited)
+            void OnExited(object sender, EventArgs args) => tcs.TrySetResult(true);
+            process.Exited += OnExited;
+            using var registration = token.Register(() =>
             {
-                tcs.TrySetResult(true);
+                try
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    // The process may exit between the check and Kill.
+                }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // Cancellation still stops waiting if the OS cannot terminate the process.
+                }
+                tcs.TrySetCanceled();
+            });
+            try
+            {
+                process.EnableRaisingEvents = true;
+                if (process.HasExited)
+                {
+                    tcs.TrySetResult(true);
+                }
+                await tcs.Task;
             }
-            return tcs.Task;
+            finally
+            {
+                process.Exited -= OnExited;
+            }
         }
 
         static string CreateUniqID()
@@ -311,24 +323,15 @@ namespace SmartGitUPM.Editor
                 .Replace("/", "");
         }
 
-        static (string AbsolutePath, string Query) ParsePath(string path)
+        static (string InstallUrl, string Remote, string PackagePath, string Revision) ParseInstallUrl(string packageInstallUrl)
         {
-            if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
-            {
-                var url = new Uri(path);
-                return (url.AbsolutePath, url.Query);
-            }
-
-            var index = path.IndexOf('?');
-            if (index == -1)
-            {
-                return (path, string.Empty);
-            }
-
-            var absolutePath = path.Substring(0, index);
-            var query = path.Substring(index);
-
-            return (absolutePath, query);
+            var fragmentIndex = packageInstallUrl.IndexOf('#');
+            var installUrl = fragmentIndex >= 0 ? packageInstallUrl.Substring(0, fragmentIndex) : packageInstallUrl;
+            var revision = fragmentIndex >= 0 ? Uri.UnescapeDataString(packageInstallUrl.Substring(fragmentIndex + 1)) : string.Empty;
+            var queryIndex = installUrl.IndexOf('?');
+            return queryIndex >= 0
+                ? (installUrl, installUrl.Substring(0, queryIndex), ExtractPathFromQuery(installUrl.Substring(queryIndex + 1)), revision)
+                : (installUrl, installUrl, string.Empty, revision);
         }
 
         static string ExtractPathFromQuery(string query)

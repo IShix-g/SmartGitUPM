@@ -1,7 +1,6 @@
 
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using SmartGitUPM.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
@@ -14,6 +13,7 @@ namespace SmartGitUPM.Editor
         public event Action OnUnInstall = delegate { };
 
         PackageInstaller _installer;
+        SGUPackageManager _manager;
         PackageCollection _collection;
         PackageCollectionSetting _setting;
         Action _openSettingAction;
@@ -29,7 +29,7 @@ namespace SmartGitUPM.Editor
         LocalizationEntry _updateEntry;
 
         public PackageCollectionView(
-            PackageInstaller installer,
+            SGUPackageManager manager,
             PackageCollectionSetting setting,
             PackageCollection collection,
             LanguageManager languageManager,
@@ -37,7 +37,8 @@ namespace SmartGitUPM.Editor
             EditorWindow window)
             : base(window)
         {
-            _installer = installer;
+            _manager = manager;
+            _installer = manager.Installer;
             _setting = setting;
             _collection = collection;
             _openSettingAction = openSettingAction;
@@ -171,16 +172,7 @@ namespace SmartGitUPM.Editor
                     {
                         _tokenSource?.SafeCancelAndDispose();
                         _tokenSource = new CancellationTokenSource();
-                        var op = default(Task);
-                        if (detail.HasUpdate
-                            && detail.IsInstalled)
-                        {
-                            op = _installer.Install(new []{ detail.PackageInstallUrl }, _tokenSource.Token);
-                        }
-                        else
-                        {
-                            op = _installer.Install(detail.PackageInstallUrl, _tokenSource.Token);
-                        }
+                        var op = _manager.UpdatePackageAsync(detail.PackageInstallUrl, _tokenSource.Token, true);
                         op.Handled(task =>
                         {
                             _tokenSource?.Dispose();
@@ -232,6 +224,7 @@ namespace SmartGitUPM.Editor
         {
             _setting = default;
             _installer = default;
+            _manager = default;
             _collection = default;
             _openSettingAction = default;
             _tokenSource?.SafeCancelAndDispose();
