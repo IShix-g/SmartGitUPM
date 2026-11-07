@@ -84,7 +84,7 @@ namespace SmartGitUPM.Editor
 
                 if(server == default)
                 {
-                    server = await FetchPackageInfo(gitPackageJsonUrl);
+                    server = await FetchPackageInfo(gitPackageJsonUrl, token);
                     if (server != default)
                     {
                         await SavePackageInfoToCache(fileNameFromUrl, server, token);
@@ -117,8 +117,12 @@ namespace SmartGitUPM.Editor
             }
         }
 
-        public async Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl)
+        public Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl)
+            => FetchPackageInfo(packageJsonUrl, default);
+
+        async Task<PackageRemoteInfo> FetchPackageInfo(string packageJsonUrl, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (!packageJsonUrl.EndsWith(PackageJsonFileName))
             {
                 throw new ArgumentException("Please specify the URL of " + PackageJsonFileName + ". : " + packageJsonUrl, nameof(packageJsonUrl));
@@ -127,8 +131,11 @@ namespace SmartGitUPM.Editor
             try
             {
                 using var op = UnityWebRequest.Get(packageJsonUrl);
-                await op.SendWebRequest();
-                if (op.isDone)
+                using var wait = new EditorAsync();
+                var request = op.SendWebRequest();
+                await wait.StartAsync(() => request.isDone, token);
+                token.ThrowIfCancellationRequested();
+                if (op.result == UnityWebRequest.Result.Success)
                 {
                     return JsonUtility.FromJson<PackageRemoteInfo>(op.downloadHandler.text);
                 }
