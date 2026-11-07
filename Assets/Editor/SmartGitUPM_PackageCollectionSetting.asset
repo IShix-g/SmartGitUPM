@@ -37,3 +37,7 @@ MonoBehaviour:
     InstallUrl: https://github.com/IShix-g/HistoryTracker.git?path=Packages/HistoryTracker#v1
     Branch: 
     HelpPageUrl: https://github.com/IShix-g/HistoryTracker
+  - UpdateNotify: 1
+    InstallUrl: git@Harapp-GitHub:Harapp/mediation.git?path=Packages/com.harapeco.mediation
+    Branch: 
+    HelpPageUrl: https://github.com/Harapp/mediation
