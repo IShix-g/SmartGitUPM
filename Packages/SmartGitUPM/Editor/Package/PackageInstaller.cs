@@ -34,8 +34,15 @@ namespace SmartGitUPM.Editor
             );
         }
 
-        public async Task<IEnumerable<PackageInfo>> GetInfos(CancellationToken token = default)
+        public Task<IEnumerable<PackageInfo>> GetInfos(CancellationToken token = default)
+            => GetInfos(token, false);
+
+        internal Task<IEnumerable<PackageInfo>> GetInfosChecked(CancellationToken token = default)
+            => GetInfos(token, true);
+
+        async Task<IEnumerable<PackageInfo>> GetInfos(CancellationToken token, bool throwOnError)
         {
+            token.ThrowIfCancellationRequested();
             var op = _pool.Get();
             try
             {
@@ -43,6 +50,11 @@ namespace SmartGitUPM.Editor
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
                 var request = Client.List();
                 await op.StartAsync(() => request.IsCompleted, _tokenSource.Token);
+                token.ThrowIfCancellationRequested();
+                if (throwOnError && request.Status != StatusCode.Success)
+                {
+                    throw new InvalidOperationException("Failed to list installed packages: " + request.Error?.message);
+                }
                 return request.Result;
             }
             finally
@@ -73,6 +85,27 @@ namespace SmartGitUPM.Editor
                 }
             }
             return default;
+        }
+
+        internal static PackageInfo FindRegisteredPackage(IEnumerable<PackageInfo> infos, string installUrl)
+        {
+            var url = WithoutRevision(installUrl);
+            foreach (var info in infos)
+            {
+                var prefix = info.name + "@";
+                if (info.packageId.StartsWith(prefix, StringComparison.Ordinal)
+                    && string.Equals(WithoutRevision(info.packageId.Substring(prefix.Length)), url, StringComparison.OrdinalIgnoreCase))
+                {
+                    return info;
+                }
+            }
+            return default;
+        }
+
+        static string WithoutRevision(string url)
+        {
+            var index = url.IndexOf('#');
+            return (index >= 0 ? url.Substring(0, index) : url).Trim().TrimEnd('/');
         }
 
         public async Task Install(string packageId, CancellationToken token = default, bool showProgressBar = true)
@@ -153,8 +186,15 @@ namespace SmartGitUPM.Editor
             }
         }
 
-        public async Task<UnityEditor.PackageManager.PackageCollection> Install(string[] packageIds, CancellationToken token = default, bool showProgressBar = true)
+        public Task<UnityEditor.PackageManager.PackageCollection> Install(string[] packageIds, CancellationToken token = default, bool showProgressBar = true)
+            => Install(packageIds, token, showProgressBar, false);
+
+        internal Task<UnityEditor.PackageManager.PackageCollection> InstallChecked(string[] packageIds, CancellationToken token = default, bool showProgressBar = false)
+            => Install(packageIds, token, showProgressBar, true);
+
+        async Task<UnityEditor.PackageManager.PackageCollection> Install(string[] packageIds, CancellationToken token, bool showProgressBar, bool throwOnError)
         {
+            token.ThrowIfCancellationRequested();
             var op = _pool.Get();
             var infos = ListPool<PackageInfo>.Get();
             var specifiedVersions = ListPool<string>.Get();
@@ -165,9 +205,12 @@ namespace SmartGitUPM.Editor
                     EditorUtility.DisplayProgressBar("Package operations", "Please wait...", 0.2f);
                 }
 
+                var installed = throwOnError ? await GetInfosChecked(token) : default;
                 foreach (var packageId in packageIds)
                 {
-                    var info = await GetInfoByPackageId(packageId, token);
+                    var info = throwOnError
+                        ? FindRegisteredPackage(installed, packageId)
+                        : await GetInfoByPackageId(packageId, token);
                     var specifiedVersion = info != default
                         ? GetVersionFromPackageID(info.packageId)
                         : string.Empty;
@@ -180,10 +223,12 @@ namespace SmartGitUPM.Editor
                     EditorUtility.DisplayProgressBar("Package operations", "Resolving Dependence Packages.", 0.5f);
                 }
 
+                token.ThrowIfCancellationRequested();
                 IsProcessing = true;
                 var request = Client.AddAndRemove(packageIds);
                 _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
                 await op.StartAsync(() => request.IsCompleted, _tokenSource.Token);
+                token.ThrowIfCancellationRequested();
 
                 switch (request.Status)
                 {
@@ -261,8 +306,16 @@ namespace SmartGitUPM.Editor
                         Debug.Log(sb.ToString());
                         return request.Result;
                     case StatusCode.Failure:
+                        if (throwOnError)
+                        {
+                            throw new InvalidOperationException("Failed to install or update packages: " + request.Error?.message);
+                        }
                         Debug.LogError("ErrorCode: " + request.Error.errorCode + " " + request.Error.message);
                         break;
+                }
+                if (throwOnError)
+                {
+                    throw new InvalidOperationException("The package operation did not complete successfully.");
                 }
                 return default;
             }

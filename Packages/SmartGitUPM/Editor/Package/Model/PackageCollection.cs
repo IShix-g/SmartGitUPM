@@ -44,8 +44,9 @@ namespace SmartGitUPM.Editor
             return FetchPackages(Details, Metas, superReload, token);
         }
 
-        public async Task FetchPackages(List<PackageInfoDetails> details, IEnumerable<PackageMetaData> metas, bool superReload, CancellationToken token = default)
+        public async Task FetchPackages(List<PackageInfoDetails> details, IEnumerable<PackageMetaData> metas, bool superReload, CancellationToken token = default, bool throwOnError = false)
         {
+            token.ThrowIfCancellationRequested();
             _tokenSource?.SafeCancelAndDispose();
             var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             _tokenSource = tokenSource;
@@ -63,13 +64,19 @@ namespace SmartGitUPM.Editor
                     return !installUrls.Contains(key) || !existingUrls.Add(key);
                 });
 
-                var installedPackages = await _installer.GetInfos(fetchToken);
+                var installedPackages = throwOnError
+                    ? await _installer.GetInfosChecked(fetchToken)
+                    : await _installer.GetInfos(fetchToken);
                 var taskList = new List<Task>(packageMetas.Length);
                 foreach (var meta in packageMetas)
                 {
-                    taskList.Add(FetchPackage(meta, details, installedPackages, superReload, fetchToken));
+                    taskList.Add(FetchPackage(meta, details, installedPackages, superReload, fetchToken, throwOnError));
                 }
                 await Task.WhenAll(taskList);
+                if (throwOnError)
+                {
+                    fetchToken.ThrowIfCancellationRequested();
+                }
             }
             finally
             {
@@ -81,16 +88,24 @@ namespace SmartGitUPM.Editor
             }
         }
 
-        async Task FetchPackage(PackageMetaData meta, List<PackageInfoDetails> details, IEnumerable<PackageInfo> installedPackages, bool superReload, CancellationToken token)
+        async Task FetchPackage(PackageMetaData meta, List<PackageInfoDetails> details, IEnumerable<PackageInfo> installedPackages, bool superReload, CancellationToken token, bool throwOnError)
         {
             if (string.IsNullOrEmpty(meta.InstallUrl))
             {
+                if (throwOnError)
+                {
+                    throw new InvalidOperationException("A registered package has no install URL.");
+                }
                 Debug.LogError("Package install URL is not set.");
                 return;
             }
             var fetcher = GetInfoFetcher(meta.InstallUrl);
             if (fetcher == default)
             {
+                if (throwOnError)
+                {
+                    throw new InvalidOperationException("No package information fetcher supports a registered package.");
+                }
                 Debug.LogError("Package info fetcher is not supported. Support Protocols: " + GetSupportProtocolsString());
                 return;
             }
@@ -108,6 +123,10 @@ namespace SmartGitUPM.Editor
             }
             catch (OperationCanceledException)
             {
+                if (throwOnError)
+                {
+                    throw;
+                }
                 return;
             }
             catch (Exception exception)
@@ -117,6 +136,10 @@ namespace SmartGitUPM.Editor
 
             if (token.IsCancellationRequested)
             {
+                if (throwOnError)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
                 return;
             }
 
@@ -124,6 +147,18 @@ namespace SmartGitUPM.Editor
             {
                 var latest = await fetcher.FetchPackageInfo(installUrl, branch, superReload, installedPackages, token);
                 token.ThrowIfCancellationRequested();
+                if (throwOnError)
+                {
+                    if (latest == default || !latest.IsLoaded || string.IsNullOrEmpty(latest.Remote.version))
+                    {
+                        throw new InvalidOperationException("Failed to fetch current package information.");
+                    }
+                    var installed = PackageInstaller.FindRegisteredPackage(installedPackages, installUrl);
+                    latest.Installed(installed != default
+                        ? new PackageLocalInfo { name = installed.name, version = installed.version, displayName = installed.displayName }
+                        : default);
+                    latest.UpdatePackageUrl(meta.InstallUrl.Trim());
+                }
                 if (latest != default)
                 {
                     UpsertDetails(details, latest, true);
@@ -131,10 +166,18 @@ namespace SmartGitUPM.Editor
             }
             catch (OperationCanceledException)
             {
+                if (throwOnError)
+                {
+                    throw;
+                }
                 // A newer refresh or window close superseded this request.
             }
             catch (Exception exception)
             {
+                if (throwOnError)
+                {
+                    throw;
+                }
                 Debug.LogWarning("Failed to fetch package information. Install url: " + installUrl + "\n" + exception.Message);
             }
         }

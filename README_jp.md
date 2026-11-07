@@ -119,6 +119,49 @@ https://github.com/IShix-g/SmartGitUPM.git?path=Packages/SmartGitUPM#v1
 3. インストール済み、且つバージョンの固定、URLの最後に`#1.1.4`などのバージョンを指定する事で固定可
 4. 未インストール
 
+## Editor API
+
+Editorコードから `SmartGitUPM.Editor.SmartGitUPMApi` を利用できます。Assembly Definitionを使う場合は `SmartGitUPM.Editor` を参照し、対象PlatformをEditorのみにしてください。Editorのメインスレッドから、各操作を順番にawaitします。APIはWindow・Dialog・ProgressBarを表示しません。
+
+既存の設定読込処理に従い、確認用の2操作を含むすべてのAPIは、設定assetが無ければ `Assets/Editor/SmartGitUPM_PackageCollectionSetting.asset` を作成します。
+
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using SmartGitUPM.Editor;
+
+public static class PackageAutomation
+{
+    public static async Task RunAsync(CancellationToken token = default)
+    {
+        bool hasMissing = await SmartGitUPMApi.HasUninstalledPackagesAsync(token);
+        bool hasUpdates = await SmartGitUPMApi.HasUpdatesAsync(token);
+
+        // Smart Git UPMに登録した完全なInstall URLを、#revisionを含めて指定します。
+        await SmartGitUPMApi.UpdatePackageAsync(
+            "https://github.com/IShix-g/CMSuniVortex.git?path=Packages/CMSuniVortex", token);
+        await SmartGitUPMApi.InstallAllAsync(token);
+    }
+}
+```
+
+確認対象は、更新通知を無効にしたものも含む登録パッケージ全件です。更新確認は最新のリモート情報を取得し、インストール済みパッケージの更新有無を返します。バージョン固定時は設定された指定版との差を確認します。未インストール確認に必要なのはUPMの導入済み一覧だけです。登録が0件なら両確認は `false`、Install AllはUPMリクエストを行わず正常終了します。
+
+`UpdatePackageAsync` はrevisionを含む登録URLをそのまま使い、未インストールの登録も導入できます。選択した登録だけを確認するため、無関係な未入力の登録はこの操作を妨げません。空値・未登録URLは `ArgumentException`、全体操作での不正な登録や情報取得・UPMの失敗はTask失敗、キャンセルは `OperationCanceledException` になります。キャンセルで待機を停止しても、送信済みのUPM操作は完了する場合があります。操作の完了と実際のパッケージ状態を確認してから、次の操作を開始してください。
+
+### Unity Pipelineからの呼び出し
+
+API自体はUnity Pipelineに依存しません。次の接続・コマンド探索例は、接続済みEditorに対しては未検証です。互換性のある `com.unity.pipeline` と接続済みEditorが用意されたProjectで対象を明示し、その版のヘルプとコマンド一覧で実際の呼び出しを確定してください。
+
+```sh
+unity status --project-path /absolute/path/to/project --json
+unity command --project-path /absolute/path/to/project --query eval
+```
+
+接続先の版が提供するC#評価コマンドから、上記4操作をawaitします。コマンド名・非同期評価構文はPipelineの版によって異なるため、利用する版のコマンドヘルプで確認してください。EditorはBackgroundのままにし、Smart Git UPMのWindowは開きません。戻り値、Task完了、エラーと、操作後のUPMパッケージ状態を確認してください。
+
+現行の[Pipeline動作要件](https://docs.unity.com/en-us/unity-cli/unity-pipeline/unity-pipeline-package)はUnity 6.0以降です。このリポジトリのサンプルProjectはUnity 2022.3のため、Pipeline検証には本パッケージとテスト用登録を持つ互換性のあるUnity 6検証Projectが必要です。既存利用ProjectのUnity更新やPipeline導入はAPIの利用条件ではありません。このサンプルProjectではPipeline経由の実行は未確認です。
+
 ## UPMとの役割分担
 
 SmartGitUPMは、Unity Package Manager(UPM)が行わないGitのバージョン情報を視覚化したり、更新の通知をするプラグインです。
